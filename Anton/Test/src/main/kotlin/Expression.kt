@@ -32,7 +32,7 @@ abstract class SingleArgumentOperation() : Expression()
     abstract override fun getValue() : Double
 }
 
-class Increment(private val argument : Const) : SingleArgumentOperation()
+class Increment(private val argument : Expression) : SingleArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -40,7 +40,7 @@ class Increment(private val argument : Const) : SingleArgumentOperation()
     }
 }
 
-class Decrement(private val argument : Const) : SingleArgumentOperation()
+class Decrement(private val argument : Expression) : SingleArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -48,7 +48,7 @@ class Decrement(private val argument : Const) : SingleArgumentOperation()
     }
 }
 
-class Square(private val argument : Const) : SingleArgumentOperation()
+class Square(private val argument : Expression) : SingleArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -56,7 +56,7 @@ class Square(private val argument : Const) : SingleArgumentOperation()
     }
 }
 
-class SquareRoot(private val argument : Const) : SingleArgumentOperation()
+class SquareRoot(private val argument : Expression) : SingleArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -69,7 +69,7 @@ abstract class TwoArgumentOperation()
     abstract fun getValue() : Double
 }
 
-class Sum(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
+class Sum(private val argumentL : Expression, private val argumentR : Expression) : TwoArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -77,7 +77,7 @@ class Sum(private val argumentL : Const, private val argumentR : Const) : TwoArg
     }
 }
 
-class Sub(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
+class Sub(private val argumentL : Expression, private val argumentR : Expression) : TwoArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -85,7 +85,7 @@ class Sub(private val argumentL : Const, private val argumentR : Const) : TwoArg
     }
 }
 
-class Mul(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
+class Mul(private val argumentL : Expression, private val argumentR : Expression) : TwoArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -93,7 +93,7 @@ class Mul(private val argumentL : Const, private val argumentR : Const) : TwoArg
     }
 }
 
-class Div(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
+class Div(private val argumentL : Expression, private val argumentR : Expression) : TwoArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -101,7 +101,7 @@ class Div(private val argumentL : Const, private val argumentR : Const) : TwoArg
     }
 }
 
-class Pow(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
+class Pow(private val argumentL : Expression, private val argumentR : Expression) : TwoArgumentOperation()
 {
     override fun getValue() : Double
     {
@@ -114,7 +114,7 @@ abstract class ManyArgumentOperation()
     abstract fun getValue() : Double
 }
 
-class Max(vararg args : Const ) : ManyArgumentOperation()
+class Max(vararg args : Expression ) : ManyArgumentOperation()
 {
     private val arguments = args
 
@@ -128,7 +128,7 @@ class Max(vararg args : Const ) : ManyArgumentOperation()
     }
 }
 
-class Min(vararg args : Const ) : ManyArgumentOperation()
+class Min(vararg args : Expression ) : ManyArgumentOperation()
 {
     private val arguments = args
 
@@ -142,7 +142,7 @@ class Min(vararg args : Const ) : ManyArgumentOperation()
     }
 }
 
-class Avg(vararg args : Const ) : ManyArgumentOperation()
+class Avg(vararg args : Expression ) : ManyArgumentOperation()
 {
     private val arguments = args
 
