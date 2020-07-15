@@ -62,7 +62,7 @@ class TokenParser(var expr: String) {
             '+' -> {
                 if (counter < expr.length) {
                     if (expr[counter] == '+') {
-                        counter++`
+                        counter++
                         Token(TokenType.INC)
                     } else {
                         Token(TokenType.ADD)

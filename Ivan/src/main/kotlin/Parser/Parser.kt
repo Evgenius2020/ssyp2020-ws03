@@ -36,9 +36,12 @@ class Parser(var base: List<Token>, var container: VariableContainer? = null) {
 
         val lhs = parseTerm() ?: throw IllegalArgumentException("Non-parsable string")
 
-        if(counter >= base.size) return lhs
+        if(counter >= base.size){
+            return lhs
+        }
+
         if (base[counter].type == TokenType.ADD || base[counter].type == TokenType.SUB) {
-            var type_breakpoint = counter
+            val type_breakpoint = counter
             counter++
             val rhs = parseExpression() ?: throw IllegalArgumentException("Non-parsable string")
             if (base[type_breakpoint].type == TokenType.ADD) {
@@ -56,9 +59,10 @@ class Parser(var base: List<Token>, var container: VariableContainer? = null) {
         val lhs = parseFactor() ?: throw IllegalArgumentException("Non-parsable string")
         if(counter >= base.size) return lhs
         if (base[counter].type == TokenType.DIV || base[counter].type == TokenType.MUL) {
+            val type_breakpoint = counter
             counter++
             val rhs = parseTerm() ?: throw IllegalArgumentException("Non-parsable string")
-            if (base[counter].type == TokenType.MUL) {
+            if (base[type_breakpoint].type == TokenType.MUL) {
                 return Mul(lhs, rhs)
             } else {
                 return Div(lhs, rhs)
@@ -98,7 +102,10 @@ class Parser(var base: List<Token>, var container: VariableContainer? = null) {
         return when (base[counter-1].type) {
             TokenType.INC -> Inc(arg)
             TokenType.DEC -> Dec(arg)
-            else -> arg
+            else -> {
+                counter--
+                arg
+            }
         }
     }
 
@@ -142,6 +149,8 @@ class Parser(var base: List<Token>, var container: VariableContainer? = null) {
         if(base[counter].type != TokenType.R_PARENTHESIS) {
             throw IllegalArgumentException("There is no right parenthesis")
         }
+        counter++
+        if(counter > base.size) throw IllegalArgumentException("There are no container")
         return when(type){
             TokenType.MAX -> Max(args)
             TokenType.MIN -> Min(args)
@@ -172,8 +181,11 @@ class Parser(var base: List<Token>, var container: VariableContainer? = null) {
 }
 
 fun main() {
-    val tokens = TokenParser("1 + (2++)").parse()
-    val parse = Parser(tokens).parse()
+    var container = VariableContainer()
+    container.putVar("a", 1.0)
+    container.putVar("b", 2.0)
+    val tokens = TokenParser("a + b - 17").parse()
+    val parse = Parser(tokens, container).parse()
     if(parse == null){
         println(null)
     } else {

@@ -6,19 +6,14 @@ sealed class Expression{
     abstract fun getVal(): Double
 }
 
-class Const(): Expression() {
-    var container: VariableContainer? = null
-    private var value: Double = 0.0
-    private var key: String = ""
+class Const private constructor(val key: String = "",
+            val container: VariableContainer? = null,
+            val value: Double = 0.0
+    ): Expression() {
 
-    constructor(key: String, container: VariableContainer): this(){
-        this.container = container
-        this.key = key
-    }
+    constructor(key: String, container: VariableContainer): this(key = key, container = container, value = 0.0)
 
-    constructor(value: Double): this(){
-        this.value = value
-    }
+    constructor(value: Double): this(value = value, key = ""){}
 
     override fun getVal(): Double = container?.getVal(key) ?: value
 }
