@@ -1,8 +1,5 @@
 import java.lang.StrictMath.pow
 import kotlin.math.sqrt
-import Operators
-import Executor
-import Parameters
 
 abstract class Expression ()
 {
@@ -15,10 +12,10 @@ class Const (private val number : Any) : Expression()
     {
         when (number)
         {
-            is Double -> return (number as Double)
+            is Double -> return (number)
             is String ->
             {
-                if (Parameters.takeParameter(number as String) == null)
+                if (Parameters.takeParameter(number) == null)
                 {
                     throw IllegalArgumentException("Parameter is not defined")
                 }
@@ -30,104 +27,104 @@ class Const (private val number : Any) : Expression()
     }
 }
 
-abstract class SingleArgumentOperation()
+abstract class SingleArgumentOperation() : Expression()
 {
-    abstract fun doAction() : Const
+    abstract override fun getValue() : Double
 }
 
 class Increment(private val argument : Const) : SingleArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argument.getValue() + 1)
+        return argument.getValue() + 1
     }
 }
 
 class Decrement(private val argument : Const) : SingleArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argument.getValue() - 1)
+        return argument.getValue() - 1
     }
 }
 
 class Square(private val argument : Const) : SingleArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argument.getValue() * argument.getValue())
+        return argument.getValue() * argument.getValue()
     }
 }
 
 class SquareRoot(private val argument : Const) : SingleArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(sqrt(argument.getValue()))
+        return sqrt(argument.getValue())
     }
 }
 
 abstract class TwoArgumentOperation()
 {
-    abstract fun doAction() : Const
+    abstract fun getValue() : Double
 }
 
 class Sum(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argumentL.getValue() + argumentR.getValue())
+        return argumentL.getValue() + argumentR.getValue()
     }
 }
 
 class Sub(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argumentL.getValue() - argumentR.getValue())
+        return argumentL.getValue() - argumentR.getValue()
     }
 }
 
 class Mul(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argumentL.getValue() * argumentR.getValue())
+        return argumentL.getValue() * argumentR.getValue()
     }
 }
 
 class Div(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(argumentL.getValue() / argumentR.getValue())
+        return argumentL.getValue() / argumentR.getValue()
     }
 }
 
 class Pow(private val argumentL : Const, private val argumentR : Const) : TwoArgumentOperation()
 {
-    override fun doAction() : Const
+    override fun getValue() : Double
     {
-        return Const(pow(argumentL.getValue(), argumentR.getValue()))
+        return pow(argumentL.getValue(), argumentR.getValue())
     }
 }
 
 abstract class ManyArgumentOperation()
 {
-    abstract fun doAction() : Const
+    abstract fun getValue() : Double
 }
 
 class Max(vararg args : Const ) : ManyArgumentOperation()
 {
     private val arguments = args
 
-    override fun doAction(): Const
+    override fun getValue(): Double
     {
         var max : Double = arguments[0].getValue()
         for (i in arguments)
             if (i.getValue() > max)
                 max = i.getValue()
-        return Const(max)
+        return max
     }
 }
 
@@ -135,13 +132,13 @@ class Min(vararg args : Const ) : ManyArgumentOperation()
 {
     private val arguments = args
 
-    override fun doAction(): Const
+    override fun getValue(): Double
     {
         var min : Double = arguments[0].getValue()
         for (i in arguments)
             if (i.getValue() < min)
                 min = i.getValue()
-        return Const(min)
+        return min
     }
 }
 
@@ -149,22 +146,16 @@ class Avg(vararg args : Const ) : ManyArgumentOperation()
 {
     private val arguments = args
 
-    override fun doAction(): Const
+    override fun getValue(): Double
     {
         var avg : Double = 0.0
         for (i in arguments)
             avg += i.getValue()
-        return Const(avg / arguments.size)
+        return avg / arguments.size
     }
 }
 
 fun main()
 {
-    var variable = Const("a")
-    Parameters.addParameter("a", 5.0)
-
-    variable = Executor.execute(Operators.SUM, variable, Const(5.0))!!
-
-    print(variable.getValue())
 
 }

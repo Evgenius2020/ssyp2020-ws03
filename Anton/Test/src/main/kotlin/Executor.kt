@@ -1,26 +1,26 @@
 object Executor {
 
-        fun execute(operator : Operators, vararg const : Const) : Const?
+        fun execute(operator : Operators, vararg const : Const) : Double?
         {
             if (const.isEmpty())
                 return null
 
             when (operator)
             {
-                Operators.INC -> return Const(Increment(const[0]).doAction().getValue())
-                Operators.DEC -> return Const(Decrement(const[0]).doAction().getValue())
-                Operators.SQR -> return Const(Square(const[0]).doAction().getValue())
-                Operators.SQRT-> return Const(SquareRoot(const[0]).doAction().getValue())
+                Operators.INC -> return Increment(const[0]).getValue()
+                Operators.DEC -> return Decrement(const[0]).getValue()
+                Operators.SQR -> return Square(const[0]).getValue()
+                Operators.SQRT-> return SquareRoot(const[0]).getValue()
 
-                Operators.SUM -> return Const(Sum(const[0], const[1]).doAction().getValue())
-                Operators.SUB -> return Const(Sub(const[0], const[1]).doAction().getValue())
-                Operators.DIV -> return Const(Div(const[0], const[1]).doAction().getValue())
-                Operators.MUL -> return Const(Mul(const[0], const[1]).doAction().getValue())
-                Operators.POW -> return Const(Pow(const[0], const[1]).doAction().getValue())
+                Operators.SUM -> return Sum(const[0], const[1]).getValue()
+                Operators.SUB -> return Sub(const[0], const[1]).getValue()
+                Operators.DIV -> return Div(const[0], const[1]).getValue()
+                Operators.MUL -> return Mul(const[0], const[1]).getValue()
+                Operators.POW -> return Pow(const[0], const[1]).getValue()
 
-                Operators.MAX -> return Const(Max(*const).doAction().getValue())
-                Operators.MIN -> return Const(Min(*const).doAction().getValue())
-                Operators.AVG -> return Const(Avg(*const).doAction().getValue())
+                Operators.MAX -> return Max(*const).getValue()
+                Operators.MIN -> return Min(*const).getValue()
+                Operators.AVG -> return Avg(*const).getValue()
 
                 else -> return null
             }
