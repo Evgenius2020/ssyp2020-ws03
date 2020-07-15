@@ -15,12 +15,12 @@ interface ISingleArgumentAction {
 enum class SingleArgumentAction : ISingleArgumentAction {
     Inc {
         override fun apply(arg: Expression): Double {
-            return arg.getVal() + 1;
+            return arg.getVal() + 1
         }
     },
     Dec {
         override fun apply(arg: Expression): Double {
-            return arg.getVal() - 1;
+            return arg.getVal() - 1
         }
 
     }
@@ -37,10 +37,13 @@ class SingleArgumentExpression(
     companion object {
         fun inc(arg: Expression): SingleArgumentExpression =
             SingleArgumentExpression(SingleArgumentAction.Inc, arg)
+        fun dec(arg: Expression): SingleArgumentExpression =
+            SingleArgumentExpression(SingleArgumentAction.Dec, arg)
     }
 }
 
 fun main() {
     val expr = SingleArgumentExpression.inc(Const(4.0))
-    print(expr.getVal())
+    println(expr.getVal())
+    println(SingleArgumentExpression.dec(expr).getVal())
 }
