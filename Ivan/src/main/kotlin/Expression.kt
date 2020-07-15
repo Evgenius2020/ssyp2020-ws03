@@ -6,8 +6,21 @@ sealed class Expression{
     abstract fun getVal(): Double
 }
 
-class Const(private val value:Double): Expression() {
-    override fun getVal(): Double = value
+class Const(): Expression() {
+    var container: VariableContainer? = null
+    private var value: Double = 0.0
+    private var key: String = ""
+
+    constructor(key: String, container: VariableContainer): this(){
+        this.container = container
+        this.key = key
+    }
+
+    constructor(value: Double): this(){
+        this.value = value
+    }
+
+    override fun getVal(): Double = container?.getVal(key) ?: value
 }
 
 sealed class SingleArgumentOperation(protected val expr: Expression): Expression()
