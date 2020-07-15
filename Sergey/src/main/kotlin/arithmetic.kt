@@ -9,6 +9,10 @@ open class Const(private val num: Double): Expression {
     override fun getVal(): Double{
         return num
     }
+    var name: String? = null
+    /*if (name != null){
+        Parameter.addParameter(name, num)
+    }*/
 }
 
 interface IsSingleArgumentOperation{
@@ -155,4 +159,7 @@ class ManyArgumentExpression(
 }
 
 fun main(){
+    /*Parameter.addParameter("a", 6.0)
+    val r = Parameter.showParameter("a")!!
+    println(TwoArgumentExpression.pow(Const(2.0), Const(r)).getVal())*/
 }
