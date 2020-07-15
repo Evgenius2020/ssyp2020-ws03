@@ -1,5 +1,3 @@
-import java.lang.IllegalArgumentException
-
 class VariableContainer {
     val base: HashMap<String, Double> = HashMap()
 
