@@ -1,0 +1,1 @@
+enum class Operators { INC, DEC, SQR, SQRT, SUM, SUB, MUL, DIV, POW, MAX, MIN, AVG }
