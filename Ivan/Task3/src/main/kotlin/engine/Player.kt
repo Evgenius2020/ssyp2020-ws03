@@ -1,4 +1,4 @@
-package Engine
+package engine
 
 data class Player(
     var pos: Dot = Dot(0.0, 0.0),

@@ -1,6 +1,6 @@
-import Engine.Engine
-import Engine.Player
-import Engine.Vector
+import engine.Engine
+import engine.Player
+import engine.Vector
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
@@ -11,6 +11,8 @@ class ChangeDirection(val pId: Long, val dir: Vector) : ServerMsg()
 class GetPlayers(val response: CompletableDeferred<HashMap<Long, Player>>) : ServerMsg()
 object Update : ServerMsg()
 
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
 suspend fun startServer(context: CoroutineScope): SendChannel<ServerMsg> {
     val server = context.serverActor()
     context.launch {

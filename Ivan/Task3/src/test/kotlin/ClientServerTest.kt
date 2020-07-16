@@ -1,5 +1,5 @@
-import Engine.Player
-import Engine.Vector
+import engine.Player
+import engine.Vector
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 
@@ -40,6 +40,8 @@ class ClientServerTester {
         println("Done")
     }
 
+    @ObsoleteCoroutinesApi
+    @ExperimentalCoroutinesApi
     fun runConsoleAsClient() {
         runBlocking {
             val server = startServer(this)
@@ -66,6 +68,8 @@ class ClientServerTester {
     }
 }
 
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
 fun main() {
     ClientServerTester().runConsoleAsClient()
 }

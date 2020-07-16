@@ -1,17 +1,18 @@
-import Engine.Dot
-import Engine.Engine
-import Engine.Vector
+import engine.Dot
+import engine.Engine
+import engine.Player
+import engine.Vector
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.DisplayName
 import kotlin.math.sqrt
 
-class EngineTester{
+class EngineTester {
 
     @Test
     @DisplayName("CreateUserTest")
-    fun createUserTest(){
+    fun createUserTest() {
         val eng = Engine
 
         assertEquals(0, eng.getPlayers().size)
@@ -25,9 +26,12 @@ class EngineTester{
 
     @Test
     @DisplayName("MoveTest")
-    fun movePlayerTest(){
+    fun movePlayerTest() {
+        //SPEED = 50 AND DT = 1
         val eng = Engine
 
+        assertEquals(50.0, eng.speed)
+        assertEquals(1.0, eng.dt)
         assertEquals(0, eng.getPlayers().size)
 
         val p = eng.addPlayer()
@@ -43,9 +47,11 @@ class EngineTester{
 
         p.dir = Vector(1.0, 2.0)
         eng.nextState()
+
         assertEquals(50 / sqrt(5.0), p.pos.x, 1e-6)
         assertEquals(100 / sqrt(5.0), p.pos.y, 1e-6)
         assertEquals(50.0, Vector(p.pos).len, 1e-6)
+
         eng.nextState()
         eng.nextState()
         assertEquals(150.0, Vector(p.pos).len, 1e-6)
@@ -54,7 +60,7 @@ class EngineTester{
 
     @Test
     @DisplayName("ChangeDirectionTest")
-    fun changeDirectionTest(){
+    fun changeDirectionTest() {
         val eng = Engine
         assertEquals(0, eng.getPlayers().size)
 
@@ -72,7 +78,7 @@ class EngineTester{
 
     @Test
     @DisplayName("HitTest")
-    fun hitTest(){
+    fun hitTest() {
         val eng = Engine
         assertEquals(0, eng.getPlayers().size)
 
@@ -95,19 +101,52 @@ class EngineTester{
 
     @Test
     @DisplayName("WallTest")
-    fun wallTest(){
+    fun wallTest() {
         val eng = Engine
 
-        val p = eng.addPlayer()
+        val p: Player = eng.addPlayer()
+        val dR = eng.dt * eng.speed
 
-        p.pos = Dot(1000.0, 0.0)
+        // LEFT
+        p.pos = Dot(eng.minX, eng.maxY / 2)
+        p.dir = Vector(-1.0, 0.0)
+
+        eng.nextState()
+        assertEquals(Dot(eng.minX, eng.maxY / 2), p.pos)
+
+        eng.nextState()
+        assertEquals(Dot(eng.minX + dR, eng.maxY / 2), p.pos)
+
+        // RIGHT
+        p.pos = Dot(eng.maxX, eng.maxY / 2)
         p.dir = Vector(1.0, 0.0)
-        eng.nextState()
 
-        assertEquals(Dot(1000.0, 0.0), p.pos)
         eng.nextState()
-        assertNotEquals(Dot(1000.0, 0.0), p.pos)
-        assertEquals(50.0, Dot(1000.0, 0.0).distanceTo(p.pos), 1e-6)
+        assertEquals(Dot(eng.maxX, eng.maxY / 2), p.pos)
+
+        eng.nextState()
+        assertEquals(Dot(eng.maxX - dR, eng.maxY / 2), p.pos)
+
+        // DOWN
+        p.pos = Dot(eng.maxX / 2, eng.minY)
+        p.dir = Vector(0.0, -1.0)
+
+        eng.nextState()
+        assertEquals(Dot(eng.maxX / 2, eng.minY), p.pos)
+
+        eng.nextState()
+        assertEquals(Dot(eng.maxX / 2, eng.minY + dR), p.pos)
+
+        // UP
+        p.pos = Dot(eng.maxX / 2, eng.maxY)
+        p.dir = Vector(0.0, 1.0)
+
+        eng.nextState()
+        assertEquals(Dot(eng.maxX / 2, eng.maxY), p.pos)
+
+        eng.nextState()
+        assertEquals(Dot(eng.maxX / 2, eng.maxY - dR), p.pos)
+
         eng.clear()
     }
 }
