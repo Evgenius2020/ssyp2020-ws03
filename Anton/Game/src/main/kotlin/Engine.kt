@@ -22,7 +22,7 @@ class Engine
     var maxY = 640.0
     val radius = 5.0
 
-    private fun getNewTarget(playerId : Int) : Int?
+    fun getNewTarget(playerId : Int) : Int?
     {
         val chosenTargets = mutableListOf<Int>()
 

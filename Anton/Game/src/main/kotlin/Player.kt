@@ -27,7 +27,7 @@ class Player constructor(id : Int? = null, targetId : Int? = null, x : Double, y
         y = newY
     }
 
-    fun setTarget(newId : Int)
+    fun setTarget(newId : Int?)
     {
         targetId = newId
     }
