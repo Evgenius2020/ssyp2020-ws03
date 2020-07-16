@@ -14,6 +14,7 @@ class EngineTester {
     @DisplayName("CreateUserTest")
     fun createUserTest() {
         val eng = Engine
+        eng.clear()
 
         assertEquals(0, eng.getPlayers().size)
 
@@ -29,6 +30,7 @@ class EngineTester {
     fun movePlayerTest() {
         //SPEED = 50 AND DT = 1
         val eng = Engine
+        eng.clear()
 
         assertEquals(50.0, eng.speed)
         assertEquals(1.0, eng.dt)
@@ -62,6 +64,8 @@ class EngineTester {
     @DisplayName("ChangeDirectionTest")
     fun changeDirectionTest() {
         val eng = Engine
+        eng.clear()
+
         assertEquals(0, eng.getPlayers().size)
 
         val p = eng.addPlayer()
@@ -80,6 +84,8 @@ class EngineTester {
     @DisplayName("HitTest")
     fun hitTest() {
         val eng = Engine
+        eng.clear()
+
         assertEquals(0, eng.getPlayers().size)
 
         val dst = eng.addPlayer()
@@ -103,6 +109,7 @@ class EngineTester {
     @DisplayName("WallTest")
     fun wallTest() {
         val eng = Engine
+        eng.clear()
 
         val p: Player = eng.addPlayer()
         val dR = eng.dt * eng.speed

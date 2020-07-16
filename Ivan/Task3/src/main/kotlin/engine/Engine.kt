@@ -22,7 +22,7 @@ object Engine{
     private fun checkWalls(player: Player){
         if(player.pos.x < minX){
             player.pos.x = minX
-            player.dir.y *= -1
+            player.dir.x *= -1
         }
         if(player.pos.x > maxX){
             player.pos.x = maxX
@@ -63,7 +63,7 @@ object Engine{
     fun addPlayer(): Player {
         val res = Player()
         teleportRandom(res)
-        changeDirection(res.id, Vector(maxX * random(), maxY * random()).makeLenOne())
+        changeDirection(res.id, Vector(random(), random()).makeLenOne())
         players[res.id] = res
         return res
     }

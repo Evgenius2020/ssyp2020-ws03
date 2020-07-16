@@ -30,7 +30,7 @@ class Client(val server: SendChannel<ServerMsg>) {
     }
 
     private fun computeDir(target: Player?): Vector? {
-        if(target == null) return null
+        if (target == null) return null
         return me.pos.directionTo(target.pos)
     }
 }

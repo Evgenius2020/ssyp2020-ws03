@@ -33,8 +33,8 @@ suspend fun startServer(context: CoroutineScope): SendChannel<ServerMsg> {
 fun CoroutineScope.serverActor() = actor<ServerMsg> {
     val s = Server
 
-    for(msg in channel) {
-        when(msg){
+    for (msg in channel) {
+        when (msg) {
             is Register -> s.register(msg.response)
             is ChangeDirection -> s.changeDirection(msg.pId, msg.dir)
             is GetPlayers -> s.getPlayers(msg.response)
@@ -44,15 +44,15 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
 }
 
 object Server {
-    init{
+    init {
         Engine.clear()
     }
 
     val eng = Engine
 
-    private fun setTarget(player: Player){
-        for(p in Engine.getPlayers()){
-            if(!(player === p.component2()) && !p.component2().busy && !(Engine.getPlayers()[p.component2().targetId] === player)){
+    private fun setTarget(player: Player) {
+        for (p in Engine.getPlayers()) {
+            if (!(player === p.component2()) && !p.component2().busy && !(Engine.getPlayers()[p.component2().targetId] === player)) {
                 player.targetId = p.component1()
                 p.component2().busy = true
                 break
@@ -60,25 +60,25 @@ object Server {
         }
     }
 
-    fun register(response: CompletableDeferred<Player>){
+    fun register(response: CompletableDeferred<Player>) {
         val p = eng.addPlayer()
         setTarget(p)
         response.complete(p)
     }
 
-    suspend fun update(){
+    suspend fun update() {
         eng.nextState()
-        for(p in eng.getPlayers().filter { u -> (u.component2().targetId == 0L) }) {
+        for (p in eng.getPlayers().filter { u -> (u.component2().targetId == 0L) }) {
             setTarget(p.component2())
         }
         delay(100)
     }
 
-    fun changeDirection(pId: Long, dir: Vector){
+    fun changeDirection(pId: Long, dir: Vector) {
         eng.changeDirection(pId, dir)
     }
 
-    fun getPlayers(response: CompletableDeferred<HashMap<Long, Player>>){
+    fun getPlayers(response: CompletableDeferred<HashMap<Long, Player>>) {
         response.complete(eng.getPlayers())
     }
 }
