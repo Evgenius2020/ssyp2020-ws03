@@ -90,5 +90,24 @@ class EngineTester{
 
         assertEquals(Dot(0.0, 0.75), dst.pos)
         assertNotEquals(Dot(0.0, 0.5), src.pos)
+        eng.clear()
+    }
+
+    @Test
+    @DisplayName("WallTest")
+    fun wallTest(){
+        val eng = Engine
+
+        val p = eng.addPlayer()
+
+        p.pos = Dot(1000.0, 0.0)
+        p.dir = Vector(1.0, 0.0)
+        eng.nextState()
+
+        assertEquals(Dot(1000.0, 0.0), p.pos)
+        eng.nextState()
+        assertNotEquals(Dot(1000.0, 0.0), p.pos)
+        assertEquals(50.0, Dot(1000.0, 0.0).distanceTo(p.pos), 1e-6)
+        eng.clear()
     }
 }
