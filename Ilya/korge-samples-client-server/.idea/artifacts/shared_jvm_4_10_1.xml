@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="shared-jvm-4.10.1">
-    <output-path>C:\Users\Ilya\IdeaProjects\korge-samples-client-server\shared\build\libs</output-path>
+    <output-path>C:\Users\Ilya\IdeaProjects\ssyp2020-ws03\Ilya\korge-samples-client-server\shared\build\libs</output-path>
     <root id="archive" name="shared-jvm-4.10.1.jar">
       <element id="module-output" name="korge-samples-client-server.shared.jvmMain" />
     </root>

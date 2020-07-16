@@ -8,5 +8,6 @@ import kotlinx.coroutines.runBlocking
 @KtorExperimentalAPI
 fun main(args: Array<String>) {
     val srv = Server()
+    println("Starting server . . .")
     srv.run()
 }
