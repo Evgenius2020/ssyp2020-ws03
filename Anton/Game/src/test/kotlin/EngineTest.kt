@@ -1,8 +1,6 @@
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sqrt
+import kotlin.math.*
 
 class EngineTest
 {
@@ -125,5 +123,30 @@ class EngineTest
         engine.tick()
         assertEquals(border(y + sqrt(2.0)/2, 0.0, engine.maxY), engine.getPositions(0)!!.second, 1e-6)
         assertEquals(border(x + sqrt(2.0)/2, 0.0, engine.maxX), engine.getPositions(0)!!.first, 1e-6)
+    }
+
+    @Test
+    fun collideTest()
+    {
+        var engine = Engine()
+
+        engine.registerPlayer()
+        engine.registerPlayer()
+        engine.registerPlayer()
+        engine.registerPlayer()
+
+        engine.playerMap[0]!!.setPosition(0.0, 1.0)
+        engine.playerMap[1]!!.setPosition(11.0, 1.0)
+        engine.setAngle(1, PI)
+
+        engine.tick()
+
+        assertEquals(1.0, engine.playerMap[0]!!.getX(), 1e-6)
+        assertEquals(1.0, engine.playerMap[0]!!.getY(), 1e-6)
+
+        assert(abs(engine.playerMap[1]!!.getX() - 10.0) > 1e-6)
+        assert(abs(engine.playerMap[1]!!.getY() - 1.0) > 1e-6)
+
+        assertEquals(3, engine.playerMap[1]!!.getTargetId())
     }
 }

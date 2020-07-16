@@ -1,5 +1,4 @@
-import java.lang.Math.abs
-import java.lang.Math.pow
+import kotlin.math.abs
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.cos
 import kotlin.math.sin
@@ -97,14 +96,15 @@ class Engine
                 var tX = target.getX()
                 var tY = target.getY()
                 var pX = player.getX()
-                var pY = target.getY()
+                var pY = player.getY()
 
-                if (abs(sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) - 2 * radius) < 1e-6) {
+                if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius) {
                     var newTarget = getNewTarget(player.getId()!!)
                     if (newTarget != null)
                         if (newTarget == player.getTargetId())
                             newTarget = null
                     playerMap[i] = Player(
+
                         player.getId(),
                         newTarget,
                         ThreadLocalRandom.current().nextDouble(0.0, 640.0),
