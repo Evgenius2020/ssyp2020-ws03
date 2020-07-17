@@ -20,25 +20,22 @@ class Engine {
         val speed: Double = 20.0
         var direction: Double = 0.0
         var isTarget = 0
-        var haveTarget = -1
+        var haveTarget: Int? = null
         var points = 0.0
     }
-    fun addPlayer(x: Double, y: Double) {
+    fun addPlayer() {
         val player = Player(numOfIds++)
-        player.x = x
-        player.y = y
-
+        player.x = Random.nextDouble(radiusc, width-radiusc)
+        player.y = Random.nextDouble(radiusc, height-radiusc)
         players.add(player)
     }
     fun changeDir(id: Int, lr: Double){
-        val player = findPl(id)
-        if (player != null) {
-            player.direction = player.direction
-            if(players[id].direction > 2* PI) players[id].direction -= 2 * PI
-            if(players[id].direction < 2* PI) players[id].direction += 2 * PI
-            player.speedX = (player.speed - player.points*0.4) * kotlin.math.sin(player.direction)
-            player.speedY = -(player.speed - player.points*0.4) * kotlin.math.cos(player.direction)
-        }
+        val player = players[id]
+        player.direction = player.direction
+        if(players[id].direction > 2* PI) players[id].direction -= 2 * PI
+        if(players[id].direction < 2* PI) players[id].direction += 2 * PI
+        player.speedX = (player.speed - player.points*0.4) * kotlin.math.sin(player.direction)
+        player.speedY = -(player.speed - player.points*0.4) * kotlin.math.cos(player.direction)
     }
     fun movePlayers(){
         for (player in players){
@@ -63,7 +60,6 @@ class Engine {
         pl.x = Random.nextDouble(radiusc, width-radiusc)
         pl.y = Random.nextDouble(radiusc, height-radiusc)
         pl.points += 1.0*mul
-        if (mul < 0.0) pl.isTarget = 0
         changeDir(pl.id, Random.nextDouble(2*PI))
     }
 }

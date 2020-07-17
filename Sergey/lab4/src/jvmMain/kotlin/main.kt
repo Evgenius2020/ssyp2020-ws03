@@ -8,137 +8,164 @@ import com.soywiz.korio.file.std.*
 import com.soywiz.korma.geom.degrees
 import com.soywiz.korma.interpolation.Easing
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.awt.Color
-import kotlin.concurrent.thread
 import kotlin.math.*
 import kotlin.random.Random
 
 val mutex = Mutex()
 
-class Server {
+sealed class ActorMsg
+class AddPl(val response: CompletableDeferred<Engine.Player>) : ActorMsg()
+class GetTar(val playerId: Int, val response: CompletableDeferred<Int?>) : ActorMsg()
+class GetInfX(val response: CompletableDeferred<MutableList<Double>>) : ActorMsg()
+class GetInfY(val response: CompletableDeferred<MutableList<Double>>) : ActorMsg()
+class UpdPl(val playerId: Int, val mul: Double) : ActorMsg()
+class CD(val playerId: Int, val angleToTar: Double) : ActorMsg()
+
+fun CoroutineScope.Server() = actor<ActorMsg> {
     val eng = Engine()
-    fun addPl(x: Double, y: Double): Int{
-        eng.addPlayer(x, y)
-        return eng.numOfIds-1
-    }
-    fun getTarget(id: Int): Int{
-        var pl: Any
-        pl = if (id != 0){
-            eng.findPl(id-1)!!
-        } else{
-            eng.findPl(eng.numOfIds-1)!!
+    fun getTarget(id: Int): Int? {
+        val busyTargets: List<Int> = eng.players.filter { it.isTarget != 0 }.map { it.id }
+        var pl: Engine.Player? = null
+        var count = 0
+        var i = 0
+        while (((i in busyTargets) || (i == id)) && (pl == null)) {
+            if (eng.findPl(i) != null) {
+                count++
+            }
+            i++
+            if ((count <= eng.numOfIds) && (i != id)) {
+                if (eng.players[i].isTarget != 0) {
+                    pl = eng.findPl(i)
+                }
+            }
         }
-        if((pl.isTarget == 0) && (pl.id != id) && (pl.haveTarget != id)){
-            pl.isTarget = 1
-            val pla = eng.findPl(id)!!
-            pla.haveTarget = pl.id
-            return pl.id
+        return when {
+            pl != null -> {
+                eng.players[i].isTarget = 1
+                eng.players[id].isTarget = i
+                i
+            }
+            else -> null
         }
-        return -1
     }
-    fun run() {
-        GlobalScope.launch {
-            while(true){
-                delay(100)
-                eng.movePlayers()
+    for (msg in channel) {
+        when (msg) {
+            is AddPl -> {
+                eng.addPlayer()
+                eng.players[eng.numOfIds - 1].haveTarget = getTarget(eng.numOfIds - 1)
+                msg.response.complete(eng.players[eng.numOfIds - 1])
+            }
+            is GetTar -> msg.response.complete(getTarget(msg.playerId))
+            is GetInfX -> {
+                val a = mutableListOf<Double>()
+                for (pl in eng.players) {
+                    a.add(pl.x)
+                }
+                msg.response.complete(a)
+            }
+            is GetInfY -> {
+                val a = mutableListOf<Double>()
+                for (pl in eng.players) {
+                    a.add(pl.y)
+                }
+                msg.response.complete(a)
+            }
+            is UpdPl -> {
+                if (msg.mul < 0.0) eng.players[msg.playerId].isTarget = 0
+                else eng.players[msg.playerId].haveTarget = null
+                eng.updatePlayerState(msg.playerId, msg.mul)
+            }
+            is CD -> {
+                eng.changeDir(msg.playerId, msg.angleToTar)
             }
         }
     }
-    fun getInfX(): MutableList<Double>{
-        val a = mutableListOf<Double>()
-        for (pl in eng.players){
-            a.add(pl.x)
+    suspend fun run() {
+        while (true) {
+            delay(100)
+            eng.movePlayers()
         }
-        return a
-    }
-    fun getInfY(): MutableList<Double>{
-        val a = mutableListOf<Double>()
-        for (i in eng.players){
-            a.add(i.y)
-        }
-        return a
-    }
-
-    fun getInfX(id: Int): Double{
-        val a = eng.findPl(id)!!
-        return a.x
-    }
-    fun getInfY(id: Int): Double{
-        val a = eng.findPl(id)!!
-        return a.y
-    }
-
-    fun changeDir(id: Int, angleToTar: Double){
-        eng.changeDir(id, angleToTar)
-    }
-    fun updPl(id: Int, mul: Double){
-        eng.updatePlayerState(id, mul)
     }
 }
 
 class Client{
-    private var id = -1
-    private var target = -1
+    private var id: Int = -1
     private var listX = mutableListOf<Double>()
     private var listY = mutableListOf<Double>()
     private var angleToTarget = -1.0
-    suspend fun play(ser: Server, x: Double, y: Double) {
-        id = ser.addPl(x, y)
-        suspend fun gettar(){
-            while (target == -1) {
-                mutex.withLock {
-                    target = ser.getTarget(id)
-                }
-                delay(1000)
-            }
+    suspend fun play(ser: SendChannel<ActorMsg>) {
+        val response = CompletableDeferred<Engine.Player>()
+        ser.send(AddPl(response))
+        val player = response.await()
+        id = player.id
+        while (player.haveTarget == null) {
+            delay(1000)
+            val response = CompletableDeferred<Int?>()
+            ser.send(GetTar(player.id, response))
+            player.haveTarget = response.await()
         }
-        gettar()
         while (true) {
-            if (target != -1){
+            if (player.haveTarget != null){
                 mutex.withLock {
-                    listX = ser.getInfX()
-                    listY = ser.getInfY()
+                    val response = CompletableDeferred<MutableList<Double>>()
+                    ser.send(GetInfX(response))
+                    listX = response.await()
+                    //val response = CompletableDeferred<MutableList<Double>>()
+                    ser.send(GetInfY(response))
+                    listY = response.await()
                 }
-                if (sqrt(
-                        (listX[id] - listX[target]).pow(2.0) +
-                                (listY[id] - listY[target]).pow(2.0)
-                    ) < radiusc)
+                if (sqrt((listX[id] - listX[player.haveTarget!!]).pow(2.0) +
+                                (listY[id] - listY[player.haveTarget!!]).pow(2.0)) < radiusc)
                 {
                     mutex.withLock {
-                        ser.updPl(id, 1.0)
-                        ser.updPl(target, -1.0)
+                        ser.send(UpdPl(player.haveTarget!!, -1.0))
+                        ser.send(UpdPl(id, 1.0))
                     }
-                    target = -1
-                    gettar()
+                    player.haveTarget = null
+                    while (player.haveTarget == null) {
+                        delay(1000)
+                        val response = CompletableDeferred<Int?>()
+                        ser.send(GetTar(player.id, response))
+                        player.haveTarget = response.await()
+                    }
                 }
                 angleToTarget = atan(
-                    (listX[target] - listX[id]) /
-                            abs(listY[id] - listY[target])
+                        (listX[player.haveTarget!!] - listX[id]) /
+                                abs(listY[id] - listY[player.haveTarget!!])
                 )
-                if (listY[target] > listY[id]) angleToTarget += PI
+                if (listY[player.haveTarget!!] > listY[id]) angleToTarget += PI
                 mutex.withLock {
-                    ser.changeDir(id, angleToTarget)
+                    ser.send(CD(id, angleToTarget))
                 }
                 delay(1000)
             }
         }
     }
+
 }
 
 suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
         bgcolor = Colors["White"]) {
-    val ser = Server()
+    runBlocking {
+        val ser = counterActor()
+        withContext(Dispatchers.Default) {
+            coroutineScope {
+                repeat(4) {
+                    launch {
+                        Client().play(ser)
+                    }
+                }
+            }
+        }
+        ser.close()
+    }
     val listX = mutableListOf<Double>()
     val listY = mutableListOf<Double>()
     val circle = mutableListOf<Circle>()
-    ser.run()
-    for (i in 0..3) {
         listX.add(Random.nextDouble(radiusc, width-radiusc))
         listY.add(Random.nextDouble(radiusc, height-radiusc))
         circle.add(circle(radius = radiusc, color = Colors.GREEN).xy(listX[i], listY[i]))
@@ -146,22 +173,5 @@ suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
         circle[i].addUpdater(){
             listX[i] = ser.getInfX(i)
             listY[i] = ser.getInfY(i)
-        }
     }
 }
-/*
-suspend fun main() = Korge(width = 512, height = 512, bgcolor = Colors["#2b2b2b"]) {
-	val minDegrees = (-16).degrees
-	val maxDegrees = (+16).degrees
-	val image = image(resourcesVfs["korge.png"].readBitmap()) {
-		rotation = maxDegrees
-		anchor(.5, .5)
-		scale(.8)
-		position(256, 256)
-	}
-	while (true) {
-		image.tween(image::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-		image.tween(image::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-	}
-}
-*/
