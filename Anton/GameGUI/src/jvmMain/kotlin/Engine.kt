@@ -1,7 +1,4 @@
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 
 fun border (a : Double, small : Double, big : Double) : Double
@@ -20,7 +17,7 @@ class Engine
     var nextFreeId = 0
     val maxX = 640.0
     val maxY = 640.0
-    val radius = 5.0
+    val radius = 10.0
 
     fun getNewTarget(playerId : Int) : Int?
     {
@@ -83,6 +80,17 @@ class Engine
             playerY = border(playerY, 0.0, maxY)
 
             playerMap[i]!!.setPosition(playerX, playerY)
+
+            if (playerX == maxX || playerX == 0.0)
+            {
+                player.setMovement(PI - player.getAngle(), player.getSpeed())
+            }
+
+            if (playerY == maxX || playerY == 0.0)
+            {
+                player.setMovement(2*PI - player.getAngle(), player.getSpeed())
+            }
+
         }
 
         for (i in playerMap.keys)
@@ -103,12 +111,11 @@ class Engine
                     if (newTarget != null)
                         if (newTarget == player.getTargetId())
                             newTarget = null
-                    playerMap[i] = Player(
-                        player.getId(),
-                        newTarget,
-                        Random.nextDouble(maxX),
-                        Random.nextDouble(maxY)
-                    )
+                    playerMap[i]!!.setTarget(newTarget)
+                    playerMap[i]!!.setPosition(Random.nextDouble(maxX), Random.nextDouble(maxY))
+                    playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() - 0.2)
+                    target.setMovement(target.getAngle(), target.getSpeed() + 0.2)
+                    println("Player {$i} target is {$newTarget}")
                 }
             }
         }

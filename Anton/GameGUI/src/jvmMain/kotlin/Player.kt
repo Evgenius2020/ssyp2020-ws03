@@ -2,7 +2,7 @@ class Player constructor(private val id: Int? = null, private var targetId: Int?
 {
 
     private var angle : Double = 0.0
-    private var speed : Double = 1.0
+    private var speed : Double = 2.0
 
     fun getAngle() : Double = angle
     fun getSpeed() :  Double = speed
