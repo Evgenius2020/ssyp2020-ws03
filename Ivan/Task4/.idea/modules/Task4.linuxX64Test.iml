@@ -5,9 +5,9 @@
       <configuration version="3" platform="Native " allPlatforms="Native []" useProjectSettings="false" isTestModule="true" externalProjectId="Task4">
         <dependsOnModuleNames>Task4:commonTest</dependsOnModuleNames>
         <sourceSets>
+          <sourceSet>Task4.commonMain</sourceSet>
           <sourceSet>Task4.linuxX64Main</sourceSet>
           <sourceSet>Task4.commonTest</sourceSet>
-          <sourceSet>Task4.commonMain</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>linuxX64Test|Task4:linuxX64Test|linuxX64</externalSystemTestTasks>

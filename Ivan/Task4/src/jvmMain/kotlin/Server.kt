@@ -1,7 +1,6 @@
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.sync.withLock
 
 sealed class ServerMsg
 class Register(val response: CompletableDeferred<Player>) : ServerMsg()

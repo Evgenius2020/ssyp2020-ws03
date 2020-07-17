@@ -3,8 +3,6 @@ import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.sync.withLock
-import java.awt.Color
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -16,16 +14,16 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
     launch {
         serverManager.startServer(this)
         futureChannel.complete(serverManager.channel)
-        withContext(Dispatchers.Default) {
-            coroutineScope {
+//        withContext(Dispatchers.Default) {
+//            coroutineScope {
                 repeat(10) {
                     launch {
                         delay((1000 * Math.random()).toLong())
                         val c = BotClient(serverManager.channel)
                         c.start()
-                    }
+//                    }
                 }
-            }
+//            }
         }
     }
 
@@ -69,9 +67,11 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
         launch {
             val request = CompletableDeferred<HashMap<Long, Player>>()
             serverManager.channel.send(GetPlayers(request))
-            for (p in request.await()) {
+            val ps = request.await()
+            for (p in ps) {
                 drawPlayer(p.component2())
             }
+
         }
     }
 }

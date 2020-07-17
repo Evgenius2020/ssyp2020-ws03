@@ -6,8 +6,8 @@
         <dependsOnModuleNames>Task4:commonTest</dependsOnModuleNames>
         <sourceSets>
           <sourceSet>Task4.jsMain</sourceSet>
-          <sourceSet>Task4.commonTest</sourceSet>
           <sourceSet>Task4.commonMain</sourceSet>
+          <sourceSet>Task4.commonTest</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>jsBrowserTest|Task4:jsTest|js</externalSystemTestTasks>
