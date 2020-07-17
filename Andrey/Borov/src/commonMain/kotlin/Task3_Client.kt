@@ -4,11 +4,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class Client(val server: BorovServer) {
+class BorovClient(val server: BorovServer) {
     lateinit var clid: String
     lateinit var player: BorovPlayer
     init {
-        //
         GlobalScope.launch {
             val regcb = CompletableDeferred<String>()
             server.channel.send(BorovMessageRegister(regcb))

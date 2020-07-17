@@ -32,7 +32,7 @@ class BorovEngine(private val fieldw: Double, private val fieldh: Double) {
                 if(players.containsKey(targetid)) {
                     val target = players[targetid];
                     val dist = sqrt((target!!.x - player.x).pow(2.0) + (target.y - player.y).pow(2.0))
-                    if(dist - (player.hitbox + target.hitbox) < 1) {
+                    if(dist - (player.hitradius + target.hitradius) < 1) {
                         findTarget(player)
                     }
                 } else findTarget(player)
@@ -80,7 +80,7 @@ class BorovPlayer(val uuid: String) {
     var y = 0.0
     var dir = 0.0
     var vel = 1.0
-    val hitbox = 5.0
+    val hitradius = 5.0
 
     var target: String? = null
 
