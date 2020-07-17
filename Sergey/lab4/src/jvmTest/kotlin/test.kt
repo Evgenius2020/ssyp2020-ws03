@@ -16,7 +16,6 @@ class MyTest : ViewsForTesting() {
 		val ser = Server()
 		ser.run()
 		for (i in 0..3){
-			Client().play(ser)
 		}
 //		val log = arrayListOf<String>()
 //		val rect = solidRect(100, 100, Colors.RED)
