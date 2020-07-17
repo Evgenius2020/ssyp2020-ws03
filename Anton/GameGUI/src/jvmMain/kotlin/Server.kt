@@ -32,7 +32,6 @@ class Server
     suspend fun update()
     {
         engine.tick()
-        delay(16)
     }
 
     fun getMap(response: CompletableDeferred<MutableMap<Int, Player>>)
@@ -52,10 +51,12 @@ class Server
             val newTarget = engine.getNewTarget(playerId)
             engine.playerMap[playerId]!!.setTarget(newTarget)
             response.complete(newTarget)
+            println("Player {$playerId} target is {$newTarget}")
         }
         else
         {
             response.complete(null)
+            println("Player {$playerId} target is {null}")
         }
     }
 

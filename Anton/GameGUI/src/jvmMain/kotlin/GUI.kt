@@ -11,11 +11,12 @@ import kotlin.collections.set
 
 class GUI (private val serverActor : SendChannel<ServerMsg>)
 {
-    private val radius = 10.0
+    private val radius = Config.radius
     suspend fun start()
     {
-        Korge(width = 640, height = 640, bgcolor = Colors["#2b2b2b"])
+        Korge(width = Config.maxX, height = Config.maxY, bgcolor = Colors["#2b2b2b"])
         {
+
             val graphicsMap = mutableMapOf<Int, Pair<Circle, Text>>()
             val responseMap = CompletableDeferred<MutableMap<Int, Player>>()
             serverActor.send(GetMap(responseMap))
@@ -30,6 +31,7 @@ class GUI (private val serverActor : SendChannel<ServerMsg>)
 
             while (true)
             {
+                delay(Config.updateTime)
                 val responseMapUpdate = CompletableDeferred<MutableMap<Int, Player>>()
                 serverActor.send(GetMap(responseMapUpdate))
                 val mapUpdate = responseMap.await()

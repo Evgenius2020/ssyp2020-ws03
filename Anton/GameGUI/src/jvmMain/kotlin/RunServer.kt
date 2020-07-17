@@ -11,7 +11,6 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
 {
     val serverActor = scope.serverActor()
     scope.launch {
-
         InfLoop@ while (true)
         {
             when
@@ -19,6 +18,7 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
                 serverActor.isClosedForSend -> break@InfLoop
                 else -> serverActor.send(Update)
             }
+            delay(Config.updateTime)
         }
     }
     return serverActor
