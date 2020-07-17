@@ -15,8 +15,8 @@ class Engine
 {
     var playerMap = mutableMapOf<Int, Player>()
     var nextFreeId = 0
-    val maxX = Config.maxX
-    val maxY = Config.maxY
+    val maxX = Config.maxX.toDouble()
+    val maxY = Config.maxY.toDouble()
     val radius = Config.radius
 
     fun getNewTarget(playerId : Int) : Int?
@@ -32,7 +32,7 @@ class Engine
 
         var i = 0
 
-        while ((i < nextFreeId) && (i in chosenTargets || i == playerId || playerMap[i]!!.getTargetId() == playerId))
+        while ((i in playerMap.keys) && (i in chosenTargets || i == playerId || playerMap[i]!!.getTargetId() == playerId))
             i++
         if (i in playerMap.map {it.value.getId()})
             return i
@@ -41,8 +41,8 @@ class Engine
 
     fun registerPlayer() : Player
     {
-        val x = Random.nextDouble(maxX.toDouble())
-        val y = Random.nextDouble(maxY.toDouble())
+        val x = Random.nextDouble(maxX)
+        val y = Random.nextDouble(maxY)
 
         val newPlayer = Player(nextFreeId, getNewTarget(nextFreeId), x, y)
 
@@ -76,17 +76,17 @@ class Engine
             playerX += player.getSpeed() * cos(player.getAngle())
             playerY += player.getSpeed() * sin(player.getAngle())
 
-            playerX = border(playerX, 0.0, maxX.toDouble())
-            playerY = border(playerY, 0.0, maxY.toDouble())
+            playerX = border(playerX, 0.0, maxX)
+            playerY = border(playerY, 0.0, maxY)
 
             playerMap[i]!!.setPosition(playerX, playerY)
 
-            if (playerX == maxX.toDouble() || playerX == 0.0)
+            if (playerX == maxX || playerX == 0.0)
             {
                 player.setMovement(PI - player.getAngle(), player.getSpeed())
             }
 
-            if (playerY == maxX.toDouble() || playerY == 0.0)
+            if (playerY == maxX || playerY == 0.0)
             {
                 player.setMovement(2*PI - player.getAngle(), player.getSpeed())
             }
@@ -112,7 +112,7 @@ class Engine
                         if (newTarget == player.getTargetId())
                             newTarget = null
                     playerMap[i]!!.setTarget(newTarget)
-                    playerMap[i]!!.setPosition(Random.nextDouble(maxX.toDouble()), Random.nextDouble(maxY.toDouble()))
+                    playerMap[i]!!.setPosition(Random.nextDouble(maxX), Random.nextDouble(maxY))
                     playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() - 0.2)
                     target.setMovement(target.getAngle(), target.getSpeed() + 0.2)
                     println("Player {$i} target is {$newTarget}")
