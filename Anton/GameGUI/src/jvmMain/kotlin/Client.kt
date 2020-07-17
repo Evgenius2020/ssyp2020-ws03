@@ -16,28 +16,31 @@ class Client (private val serverActor : SendChannel<ServerMsg>)
         targetId = answer.getTargetId()
         if (playerId != -1) {
             while (true) {
-                if (targetId == null)
-                {
-                    val responseNewTarget = CompletableDeferred<Int?>()
-                    serverActor.send(GetNewTarget(playerId, responseNewTarget))
-                    targetId = responseNewTarget.await()
-                    delay(Config.ping)
-                }
-                else
-                {
-                    val responseMap = CompletableDeferred<MutableMap<Int, Player>>()
-                    serverActor.send(GetMap(responseMap))
-                    val map = responseMap.await()
+                val responseMap = CompletableDeferred<MutableMap<Int, Player>>()
+                serverActor.send(GetMap(responseMap))
+                val map = responseMap.await()
+                targetId = map[playerId]!!.getTargetId()
 
+                //println("$playerId target is $targetId")
+
+                if (targetId != null)
+                {
+                    delay(Config.ping)
                     val targetPos = Pair(map[targetId!!]!!.getX(), map[targetId!!]!!.getY())
                     val playerPos = Pair(map[playerId]!!.getX(), map[playerId]!!.getY())
 
                     val angle = atan2(targetPos.second - playerPos.second, targetPos.first - playerPos.first)
 
                     serverActor.send(SetAngle(playerId, angle))
-                    delay(Config.ping)
-                }
 
+                }
+                else
+                {
+                    val responseTarget = CompletableDeferred<Int?>()
+                    serverActor.send(GetNewTarget(playerId, responseTarget))
+                    targetId = responseTarget.await()
+                }
+                delay(Config.ping)
             }
         }
         else

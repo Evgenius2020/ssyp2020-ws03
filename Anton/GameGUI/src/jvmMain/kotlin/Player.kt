@@ -1,4 +1,4 @@
-class Player constructor(private val id: Int? = null, private var targetId: Int? = null, private var x: Double, private var y: Double)
+class Player constructor(private val id: Int, private var targetId: Int? = null, private var x: Double, private var y: Double)
 {
 
     private var angle : Double = 0.0
@@ -8,7 +8,7 @@ class Player constructor(private val id: Int? = null, private var targetId: Int?
     fun getSpeed() :  Double = speed
     fun getX() : Double = x
     fun getY() : Double = y
-    fun getId() : Int? = id
+    fun getId() : Int?= id
     fun getTargetId() : Int? = targetId
 
     fun setMovement(newAngle : Double, newSpeed : Double)

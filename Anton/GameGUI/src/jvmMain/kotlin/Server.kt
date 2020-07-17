@@ -51,12 +51,10 @@ class Server
             val newTarget = engine.getNewTarget(playerId)
             engine.playerMap[playerId]!!.setTarget(newTarget)
             response.complete(newTarget)
-            println("Player {$playerId} target is {$newTarget}")
         }
         else
         {
             response.complete(null)
-            println("Player {$playerId} target is {null}")
         }
     }
 

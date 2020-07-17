@@ -35,7 +35,7 @@ fun main()
                     val gui = GUI(serverActor)
                     gui.start()
                 }
-                repeat(3) {
+                repeat(2) {
                     launch {
                         delay((random() * 10000).toLong())
                         val client = Client(serverActor)

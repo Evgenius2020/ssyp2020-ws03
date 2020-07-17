@@ -95,7 +95,7 @@ class Engine
 
         for (i in playerMap.keys)
         {
-
+            //println("Checking collision for $i, target IS ${playerMap[i]!!.getTargetId()}")
             val player = playerMap[i]!!
             if (player.getTargetId() != null)
             {
@@ -106,17 +106,25 @@ class Engine
                 val pX = player.getX()
                 val pY = player.getY()
 
-                if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius) {
+                //println("${player.getId()}: {$pX; $pY} -> ${target.getId()}: {$tX; $tY")
+
+                if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius)
+                {
+                    //println("${player.getId()} COLLIDE WITH ${target.getId()}")
                     var newTarget = getNewTarget(player.getId()!!)
-                    if (newTarget != null)
-                        if (newTarget == player.getTargetId())
-                            newTarget = null
-                    playerMap[i]!!.setTarget(newTarget)
-                    playerMap[i]!!.setPosition(Random.nextDouble(maxX), Random.nextDouble(maxY))
-                    playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() - 0.2)
-                    target.setMovement(target.getAngle(), target.getSpeed() + 0.2)
-                    println("Player {$i} target is {$newTarget}")
+
+                    println("${player!!.getId()} is chasing $newTarget")
+
+                    var newX = Random.nextDouble(maxX)
+                    var newY = Random.nextDouble(maxY)
+                    playerMap[i] = Player(player.getId()!!, newTarget, newX, newY)
+                    playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() + 0.2)
+                    playerMap[target!!.getId()]!!.setMovement(playerMap[target!!.getId()]!!.getAngle(), playerMap[target!!.getId()]!!.getSpeed() - 0.2)
                 }
+            }
+            else
+            {
+                //println("${player.getId()} have no target!")
             }
         }
 
