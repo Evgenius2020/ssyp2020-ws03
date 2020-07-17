@@ -6,25 +6,26 @@ sealed class ServerMsg
 class Register(val response : CompletableDeferred<Player>) : ServerMsg()
 class GetNewTarget (val playerId : Int, val response: CompletableDeferred<Int?>) : ServerMsg()
 class SetAngle (val playerId : Int, val newAngle : Double) : ServerMsg()
-class GetPositionById (val playerId: Int, val response: CompletableDeferred<Pair<Double, Double>?>) : ServerMsg()
-class Update() : ServerMsg()
+class GetMap (val response: CompletableDeferred<MutableMap<Int, Player>>) : ServerMsg()
+object Update : ServerMsg()
 
 @ObsoleteCoroutinesApi
 fun CoroutineScope.serverActor() = actor<ServerMsg> {
+    val server = Server()
     for (msg in channel)
     {
         when (msg)
         {
-            is Register -> Server.registerPlayer(msg.response)
-            is GetNewTarget -> Server.getNewTarget(msg.playerId, msg.response)
-            is SetAngle -> Server.setAngle(msg.playerId, msg.newAngle)
-            is GetPositionById -> Server.getPositionById(msg.playerId, msg.response)
-            is Update -> Server.update()
+            is Register -> server.registerPlayer(msg.response)
+            is GetNewTarget -> server.getNewTarget(msg.playerId, msg.response)
+            is SetAngle -> server.setAngle(msg.playerId, msg.newAngle)
+            is GetMap -> server.getMap(msg.response)
+            is Update -> server.update()
         }
     }
 }
 
-object Server
+class Server
 {
     private val engine = Engine()
 
@@ -34,18 +35,9 @@ object Server
         delay(100)
     }
 
-    fun getPositionById(playerId: Int, response: CompletableDeferred<Pair<Double, Double>?>)
+    fun getMap(response: CompletableDeferred<MutableMap<Int, Player>>)
     {
-        if (playerId in engine.playerMap.keys)
-        {
-            val position = engine.getPositions(playerId)
-            //println("Player ($playerId) position is: {$position}")
-            response.complete(position)
-        }
-        else
-        {
-            response.complete(null)
-        }
+        response.complete(engine.playerMap)
     }
 
     fun setAngle(playerId : Int, angle : Double)

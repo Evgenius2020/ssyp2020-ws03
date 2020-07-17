@@ -17,7 +17,7 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
             when
             {
                 serverActor.isClosedForSend -> break@InfLoop
-                else -> serverActor.send(Update())
+                else -> serverActor.send(Update)
             }
             delay(100)
         }
@@ -25,15 +25,20 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
     return serverActor
 }
 
+@ExperimentalCoroutinesApi
 fun main()
 {
     runBlocking {
         val serverActor = serverStart(this)
         withContext(Dispatchers.Default) {
             coroutineScope {
+                launch {
+                    val gui = GUI(serverActor)
+                    gui.start()
+                }
                 repeat(3) {
                     launch {
-                        delay((random() * 1000).toLong())
+                        delay((random() * 10000).toLong())
                         val client = Client(serverActor)
                         client.start()
                     }
