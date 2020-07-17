@@ -16,9 +16,7 @@
             <array />
           </option>
           <option name="pluginClasspaths">
-            <array>
-              <option value="$KOTLIN_BUNDLED$/lib/kotlinx-serialization-compiler-plugin.jar" />
-            </array>
+            <array />
           </option>
           <option name="multiPlatform" value="true" />
           <option name="errors">

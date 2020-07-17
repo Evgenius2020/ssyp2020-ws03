@@ -9,7 +9,7 @@ class MenuScene() : Scene() {
         textButton{
             text = "Start"
             onClick {
-                sceneContainer.changeTo<GameScene>()
+                sceneContainer.changeTo<GameScene>("127.0.0.1", 1337)
             }
             centerOn(stage!!.root)
         }

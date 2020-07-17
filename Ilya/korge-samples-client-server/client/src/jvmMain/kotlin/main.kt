@@ -44,6 +44,6 @@ object module: Module(){
 
     override suspend fun AsyncInjector.configure(){
         mapPrototype { MenuScene() }
-        mapPrototype { GameScene() }
+        mapPrototype { GameScene(get(), get()) }
     }
 }
