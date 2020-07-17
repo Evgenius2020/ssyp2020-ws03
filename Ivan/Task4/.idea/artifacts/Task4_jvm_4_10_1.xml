@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Task4-jvm-4.10.1">
-    <output-path>$PROJECT_DIR$/build/libs</output-path>
-    <root id="archive" name="Task4-jvm-4.10.1.jar">
-      <element id="module-output" name="Task4.jvmMain" />
-    </root>
-  </artifact>
-</component>
