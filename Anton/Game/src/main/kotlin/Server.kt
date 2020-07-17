@@ -1,33 +1,51 @@
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.*
+import kotlin.reflect.typeOf
+
+sealed class ServerMsg
+class Register(val response : CompletableDeferred<Player>) : ServerMsg()
+class GetNewTarget (val playerId : Int, val response: CompletableDeferred<Int?>) : ServerMsg()
+class SetAngle (val playerId : Int, val newAngle : Double) : ServerMsg()
+class GetPositionById (val playerId: Int, val response: CompletableDeferred<Pair<Double, Double>?>) : ServerMsg()
+class Update() : ServerMsg()
+
+@ObsoleteCoroutinesApi
+fun CoroutineScope.serverActor() = actor<ServerMsg> {
+    for (msg in channel)
+    {
+        when (msg)
+        {
+            is Register -> Server.registerPlayer(msg.response)
+            is GetNewTarget -> Server.getNewTarget(msg.playerId, msg.response)
+            is SetAngle -> Server.setAngle(msg.playerId, msg.newAngle)
+            is GetPositionById -> Server.getPositionById(msg.playerId, msg.response)
+            is Update -> Server.update()
+        }
+    }
+}
 
 object Server
 {
     private val engine = Engine()
 
-    fun tick()
+    suspend fun update()
     {
-        GlobalScope.launch {
-            while (true)
-            {
-                engine.tick()
-                delay(100)
-            }
+        engine.tick()
+        delay(100)
+    }
+
+    fun getPositionById(playerId: Int, response: CompletableDeferred<Pair<Double, Double>?>)
+    {
+        if (playerId in engine.playerMap.keys)
+        {
+            val position = engine.getPositions(playerId)
+            //println("Player ($playerId) position is: {$position}")
+            response.complete(position)
         }
-    }
-
-    fun getTargetPosition(playerId : Int) : Pair<Double, Double>?
-    {
-        val target = engine.playerMap[playerId]!!.getTargetId()
-        if (target != null)
-            return Pair(engine.playerMap[target]!!.getX(), engine.playerMap[target]!!.getY())
         else
-            return null
-    }
-
-    fun getPosition(playerId : Int) : Pair<Double, Double>
-    {
-        return Pair(engine.playerMap[playerId]!!.getX(), engine.playerMap[playerId]!!.getY())
+        {
+            response.complete(null)
+        }
     }
 
     fun setAngle(playerId : Int, angle : Double)
@@ -35,14 +53,21 @@ object Server
         engine.setAngle(playerId, angle)
     }
 
-    fun getNewTarget(playerId : Int) : Int?
+    fun getNewTarget(playerId : Int, response: CompletableDeferred<Int?>)
     {
-        return engine.getNewTarget(playerId)
+        if (playerId in engine.playerMap.keys)
+        {
+            val newTarget = engine.getNewTarget(playerId)
+            engine.playerMap[playerId]?.setTarget(newTarget)
+            response.complete(newTarget)
+        }
+        else
+            response.complete(null)
     }
 
-    fun registerPlayer() : Player
+    fun registerPlayer(response: CompletableDeferred<Player>)
     {
-        return engine.registerPlayer()
+        response.complete(engine.registerPlayer())
     }
 
 }

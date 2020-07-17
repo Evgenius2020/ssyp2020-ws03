@@ -1,47 +1,59 @@
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlin.math.acos
-import kotlin.math.sqrt
+import kotlinx.coroutines.channels.*
+import kotlin.math.atan2
 
 val mutex = Mutex()
 
-class Client ()
+class Client (private val serverActor : SendChannel<ServerMsg>)
 {
-    private lateinit var player : Player
-
-    fun start()
+    private var playerId : Int = -1
+    private var targetId : Int? = null
+    suspend fun start()
     {
-        player = Server.registerPlayer()
-        GlobalScope.launch {
-            if (player.getTargetId() == null)
-            {
-                mutex.withLock {
-                    var id = player.getId()
-                    player.setTarget(Server.getNewTarget(id!!))
+        val responseRegister = CompletableDeferred<Player>()
+        serverActor.send(Register(responseRegister))
+        val answer = responseRegister.await()
+        playerId = answer.getId()!!
+        targetId = answer.getTargetId()
+        if (playerId != -1) {
+
+            println("Player is registered with id: $playerId ") // Debug
+
+            while (true) {
+                if (targetId == null)
+                {
+                    val responseNewTarget = CompletableDeferred<Int?>()
+                    serverActor.send(GetNewTarget(playerId, responseNewTarget))
+                    targetId = responseNewTarget.await()
+                    println("New target for player with id: $playerId is $targetId")
+                    delay(1000)
                 }
-                delay(1000)
-            }
-            if (player.getTargetId() != null)
-            {
-                var angle : Double
-                var pP = Server.getPosition(player.getId()!!) // first - X, second - Y
-                var tP = Server.getTargetPosition(player.getId()!!)!! // first - X, second - Y
-                angle = ((pP.first * tP.first) + (pP.first * tP.first)) /
-                        (sqrt(pP.first * pP.first + pP.second * pP.second) * sqrt(tP.first * tP.first + tP.second * tP.second)) // угол между векторами
-                angle = acos(angle)
-                mutex.withLock {
-                    Server.setAngle(player.getId()!!, angle)
+                else
+                {
+
+                    val responseTargetPos = CompletableDeferred<Pair<Double, Double>?>()
+                    serverActor.send(GetPositionById(targetId!!, responseTargetPos))
+                    val targetPos = responseTargetPos.await()!!
+
+                    val responsePlayerPos = CompletableDeferred<Pair<Double, Double>?>()
+                    serverActor.send(GetPositionById(playerId, responsePlayerPos))
+                    val playerPos = responsePlayerPos.await()!!
+
+                    println("Player ($playerId): {$playerPos}, target ($targetId): {$targetPos}")
+
+                    val angle = atan2(targetPos.second - playerPos.second, targetPos.first - playerPos.first)
+
+                    serverActor.send(SetAngle(playerId, angle))
+                    println("Player ($playerId) new angle is $angle")
+
                 }
-                delay(1000)
-            }
-            else
-            {
-                delay(1000)
             }
         }
-
+        else
+        {
+            println("Registration failed")
+        }
     }
 }

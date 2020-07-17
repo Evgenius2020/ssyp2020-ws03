@@ -3,6 +3,7 @@ import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 fun border (a : Double, small : Double, big : Double) : Double
 {
@@ -18,8 +19,8 @@ class Engine
 {
     var playerMap = mutableMapOf<Int, Player>()
     var nextFreeId = 0
-    var maxX = 640.0
-    var maxY = 640.0
+    val maxX = 640.0
+    val maxY = 640.0
     val radius = 5.0
 
     fun getNewTarget(playerId : Int) : Int?
@@ -44,10 +45,10 @@ class Engine
 
     fun registerPlayer() : Player
     {
-        var x = ThreadLocalRandom.current().nextDouble(0.0, 640.0)
-        var y = ThreadLocalRandom.current().nextDouble(0.0, 640.0)
+        val x = Random.nextDouble(maxX)
+        val y = Random.nextDouble(maxY)
 
-        var newPlayer = Player(nextFreeId, getNewTarget(nextFreeId), x, y)
+        val newPlayer = Player(nextFreeId, getNewTarget(nextFreeId), x, y)
 
         playerMap[nextFreeId] = newPlayer
 
@@ -58,7 +59,7 @@ class Engine
 
     fun getPositions(id : Int) : Pair<Double, Double>?
     {
-        if (id < nextFreeId)
+        if (id in playerMap.keys)
             return Pair(playerMap[id]!!.getX(), playerMap[id]!!.getY())
         else
             return null
@@ -93,10 +94,10 @@ class Engine
             {
                 val target = playerMap[player.getTargetId()!!]!!
 
-                var tX = target.getX()
-                var tY = target.getY()
-                var pX = player.getX()
-                var pY = player.getY()
+                val tX = target.getX()
+                val tY = target.getY()
+                val pX = player.getX()
+                val pY = player.getY()
 
                 if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius) {
                     var newTarget = getNewTarget(player.getId()!!)
@@ -104,11 +105,10 @@ class Engine
                         if (newTarget == player.getTargetId())
                             newTarget = null
                     playerMap[i] = Player(
-
                         player.getId(),
                         newTarget,
-                        ThreadLocalRandom.current().nextDouble(0.0, 640.0),
-                        ThreadLocalRandom.current().nextDouble(0.0, 640.0)
+                        Random.nextDouble(maxX),
+                        Random.nextDouble(maxY)
                     )
                 }
             }

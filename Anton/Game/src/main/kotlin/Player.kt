@@ -1,10 +1,6 @@
-class Player constructor(id : Int? = null, targetId : Int? = null, x : Double, y : Double)
+class Player constructor(private val id: Int? = null, private var targetId: Int? = null, private var x: Double, private var y: Double)
 {
 
-    private var x = x
-    private var y = y
-    private val id = id
-    private var targetId = targetId
     private var angle : Double = 0.0
     private var speed : Double = 1.0
 

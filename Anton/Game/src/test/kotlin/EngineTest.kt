@@ -7,7 +7,7 @@ class EngineTest
     @Test
     fun registerTest()
     {
-        var engine = Engine()
+        val engine = Engine()
         assertEquals(0, engine.playerMap.size)
 
         engine.registerPlayer()
@@ -30,7 +30,7 @@ class EngineTest
     @Test
     fun chooseTargetTest()
     {
-        var engine = Engine()
+        val engine = Engine()
 
         engine.registerPlayer()
         assertEquals(null, engine.playerMap[0]!!.getTargetId())
@@ -52,7 +52,7 @@ class EngineTest
     @Test
     fun setAngleTest()
     {
-        var engine = Engine()
+        val engine = Engine()
 
         engine.registerPlayer()
         assertEquals(0.0, engine.playerMap[0]!!.getAngle())
@@ -77,7 +77,7 @@ class EngineTest
     @Test
     fun getPositionsTest()
     {
-        var engine = Engine()
+        val engine = Engine()
 
         engine.registerPlayer()
         engine.registerPlayer()
@@ -96,27 +96,27 @@ class EngineTest
     @Test
     fun tickTest()
     {
-        var engine = Engine()
+        val engine = Engine()
 
         engine.registerPlayer()
 
-        var x = engine.getPositions(0)!!.first
-        var y = engine.getPositions(0)!!.second
+        val x = engine.getPositions(0)!!.first
+        val y = engine.getPositions(0)!!.second
 
         engine.tick()
-        assertEquals(x + 1, engine.getPositions(0)!!.first)
+        assertEquals(x + 1, engine.getPositions(0)!!.first, 1e-6)
 
         engine.setAngle(0, PI)
         engine.tick()
-        assertEquals(x, engine.getPositions(0)!!.first)
+        assertEquals(x, engine.getPositions(0)!!.first, 1e-6)
 
         engine.setAngle(0, 5 * PI / 2)
         engine.tick()
-        assertEquals(y + 1, engine.getPositions(0)!!.second)
+        assertEquals(y + 1, engine.getPositions(0)!!.second, 1e-6)
 
         engine.setAngle(0, 7 * PI / 2)
         engine.tick()
-        assertEquals(y, engine.getPositions(0)!!.second)
+        assertEquals(y, engine.getPositions(0)!!.second, 1e-6)
 
         engine.setAngle(0, PI / 4)
 
@@ -128,7 +128,7 @@ class EngineTest
     @Test
     fun collideTest()
     {
-        var engine = Engine()
+        val engine = Engine()
 
         engine.registerPlayer()
         engine.registerPlayer()
