@@ -2,6 +2,7 @@ import com.soywiz.korge.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.sync.withLock
 import java.awt.Color
 
@@ -9,18 +10,18 @@ import java.awt.Color
 @ExperimentalCoroutinesApi
 suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
     solidRect(640, 480, Colors.WHITE)
-    var user: UserClient = UserClient()
+    val serverManager = ServerManager()
+    val futureChannel = CompletableDeferred<SendChannel<ServerMsg>>()
 
     launch {
-        val server = startServer(this)
+        serverManager.startServer(this)
+        futureChannel.complete(serverManager.channel)
         withContext(Dispatchers.Default) {
             coroutineScope {
-                user = UserClient(server)
-                user.start(this)
                 repeat(10) {
                     launch {
                         delay((1000 * Math.random()).toLong())
-                        val c = BotClient(server)
+                        val c = BotClient(serverManager.channel)
                         c.start()
                     }
                 }
@@ -28,13 +29,18 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
         }
     }
 
+    val user = UserClient(futureChannel.await())
+    launch {
+        user.start(this)
+    }
+
     val idToView = hashMapOf<Long, Circle>()
 
     fun drawPlayer(player: Player) {
         if (!idToView.containsKey(player.id)) {
-            idToView[player.id] = Circle(Engine.playerRadius, Colors.DARKBLUE)
+            idToView[player.id] = Circle(10.0, Colors.DARKBLUE)
         }
-        when(player.id){
+        when (player.id) {
             user.targetId -> {
                 idToView[player.id]!!.color = Colors.GREEN
             }
@@ -54,18 +60,18 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
     }
 
     addUpdater {
+        launch {
+            user.changeDirection(Dot(mouseX, mouseY))
+        }
     }
 
     addUpdater {
-        if (Engine.changed) {
-            runBlocking {
-                Engine.mutex.withLock {
-                    for (p in Engine.getPlayers()) {
-                        drawPlayer(p.component2())
-                    }
-                }
+        launch {
+            val request = CompletableDeferred<HashMap<Long, Player>>()
+            serverManager.channel.send(GetPlayers(request))
+            for (p in request.await()) {
+                drawPlayer(p.component2())
             }
-            Engine.changed = false
         }
     }
 }

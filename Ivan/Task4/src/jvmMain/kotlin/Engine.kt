@@ -1,16 +1,14 @@
 import kotlinx.coroutines.sync.Mutex
 import kotlin.random.Random
 
-object Engine{
-    const val playerRadius = 10.0 // Player's hitbox is circle
-    const val minY = playerRadius
-    const val minX = 0.0
-    const val maxX = 640.0 - playerRadius
-    const val maxY = 480.0
-    const val speed = 5.0
-    const val dt = 1.0
-
-    var mutex = Mutex()
+class Engine{
+    val playerRadius = 10.0 // Player's hitbox is circle
+    val minY = playerRadius
+    val minX = 0.0
+    val maxX = 640.0 - playerRadius
+    val maxY = 480.0
+    val speed = 5.0
+    val dt = 1.0
 
     var changed = true
 

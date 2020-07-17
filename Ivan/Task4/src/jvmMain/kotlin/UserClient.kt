@@ -38,7 +38,6 @@ class UserClient(var server: SendChannel<ServerMsg>? = null) {
                 }
                 targetId = players[pId]!!.targetId
                 pos = players[pId]!!.pos
-                println("Here")
                 for(p in players){
                     if(p.component2().targetId == pId){
                         killerId = p.component1()
