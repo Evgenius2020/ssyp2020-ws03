@@ -19,7 +19,6 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
                 serverActor.isClosedForSend -> break@InfLoop
                 else -> serverActor.send(Update)
             }
-            delay(100)
         }
     }
     return serverActor

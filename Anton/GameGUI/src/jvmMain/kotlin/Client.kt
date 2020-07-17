@@ -21,23 +21,23 @@ class Client (private val serverActor : SendChannel<ServerMsg>)
                     val responseNewTarget = CompletableDeferred<Int?>()
                     serverActor.send(GetNewTarget(playerId, responseNewTarget))
                     targetId = responseNewTarget.await()
-                    delay(1000)
+                    println("{$playerId} is haunting {$targetId}")
                 }
                 else
                 {
 
                     val responseMap = CompletableDeferred<MutableMap<Int, Player>>()
                     serverActor.send(GetMap(responseMap))
-                    val map = responseMap.await()!!
+                    val map = responseMap.await()
 
                     val targetPos = Pair(map[targetId!!]!!.getX(), map[targetId!!]!!.getY())
-                    val playerPos = Pair(map[playerId!!]!!.getX(), map[playerId!!]!!.getY())
+                    val playerPos = Pair(map[playerId]!!.getX(), map[playerId]!!.getY())
 
                     val angle = atan2(targetPos.second - playerPos.second, targetPos.first - playerPos.first)
 
                     serverActor.send(SetAngle(playerId, angle))
-
                 }
+                delay(1000)
             }
         }
         else

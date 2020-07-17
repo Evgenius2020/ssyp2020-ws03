@@ -32,7 +32,7 @@ class Server
     suspend fun update()
     {
         engine.tick()
-        delay(100)
+        delay(16)
     }
 
     fun getMap(response: CompletableDeferred<MutableMap<Int, Player>>)
@@ -50,11 +50,13 @@ class Server
         if (playerId in engine.playerMap.keys)
         {
             val newTarget = engine.getNewTarget(playerId)
-            engine.playerMap[playerId]?.setTarget(newTarget)
+            engine.playerMap[playerId]!!.setTarget(newTarget)
             response.complete(newTarget)
         }
         else
+        {
             response.complete(null)
+        }
     }
 
     fun registerPlayer(response: CompletableDeferred<Player>)
