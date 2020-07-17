@@ -5,9 +5,9 @@
       <configuration version="3" platform="Native " allPlatforms="Native []" useProjectSettings="false" isTestModule="true" externalProjectId=":shared">
         <dependsOnModuleNames>:shared:commonTest</dependsOnModuleNames>
         <sourceSets>
+          <sourceSet>korge-samples-client-server.shared.commonTest</sourceSet>
           <sourceSet>korge-samples-client-server.shared.mingwX64Main</sourceSet>
           <sourceSet>korge-samples-client-server.shared.commonMain</sourceSet>
-          <sourceSet>korge-samples-client-server.shared.commonTest</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>mingwX64Test|:shared:mingwX64Test|mingwX64</externalSystemTestTasks>

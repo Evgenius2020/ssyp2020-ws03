@@ -6,8 +6,8 @@
         <dependsOnModuleNames>:client:commonTest</dependsOnModuleNames>
         <sourceSets>
           <sourceSet>korge-samples-client-server.client.jsMain</sourceSet>
-          <sourceSet>korge-samples-client-server.client.commonTest</sourceSet>
           <sourceSet>korge-samples-client-server.client.commonMain</sourceSet>
+          <sourceSet>korge-samples-client-server.client.commonTest</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>jsBrowserTest|:client:jsTest|js</externalSystemTestTasks>
