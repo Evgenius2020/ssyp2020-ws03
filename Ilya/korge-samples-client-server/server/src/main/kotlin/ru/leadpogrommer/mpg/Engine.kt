@@ -1,13 +1,11 @@
-import com.soywiz.korlibs.samples.clientserver.Action
+package ru.leadpogrommer.mpg
+
 import com.soywiz.korma.geom.Point
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 
 class Engine {
-    val clients = mutableMapOf<Long, Client>()
-    val state = State()
+    private val clients = mutableMapOf<Long, Client>()
+    private val state = State()
 
     suspend fun addClient(c: Client){
         state.m.withLock {
@@ -17,12 +15,9 @@ class Engine {
             clients[ce.id] = c
             println("Connected id ${ce.id}")
         }
-
     }
 
-
     suspend fun tick(delta: Double){
-
         state.m.withLock {
             for (entry in clients){
                 val ch = entry.value.getRequests()
@@ -39,32 +34,25 @@ class Engine {
 
             sendState()
         }
-
-
     }
 
 
-    suspend fun processRequest(id: Long, r: Request){
+    private fun processRequest(id: Long, r: Request){
         when(r.a){
             Action.MOVE -> {
                 val mp = r.args[0] as Map<String, Double>
                 var nv = Point(mp["x"]!!, mp["y"]!!)
-//                println("got spedd $nv")
                 nv = nv.normalized.mul(0.6)
                 if(nv.x.isNaN() || nv.y.isNaN())nv = Point(0 ,0)
-                state.getEntity(id)!!.vel = nv
+                state.getEntity(id).vel = nv
             }
         }
     }
 
-    suspend fun sendState(){
+    private suspend fun sendState(){
         val st = state.getSt()
         for (client in clients.values){
-//            println("sent state")
             client.sendRequest(Request(Action.SET_STATE, arrayOf(st)))
         }
-
-
     }
-
 }

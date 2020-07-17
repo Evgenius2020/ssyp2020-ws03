@@ -1,18 +1,13 @@
+package ru.leadpogrommer.mpg
+
 import com.soywiz.kmem.toInt
-import com.soywiz.korau.sound.NativeSoundChannel
-import com.soywiz.korau.sound.readMusic
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.keys
 import com.soywiz.korge.scene.Scene
-import com.soywiz.korge.service.process.NativeProcess
-import com.soywiz.korge.view.*
-import com.soywiz.korim.bitmap.Bitmap
+import com.soywiz.korge.view.Container
+import com.soywiz.korge.view.addUpdater
+import com.soywiz.korge.view.position
 import com.soywiz.korim.color.Colors
-import com.soywiz.korim.color.scale
-import com.soywiz.korim.format.readBitmap
-import com.soywiz.korio.async.runBlockingNoSuspensions
-import com.soywiz.korio.file.std.resourcesVfs
-import com.soywiz.korlibs.samples.clientserver.Action
 import com.soywiz.korma.geom.Point
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.aSocket
@@ -20,42 +15,24 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.SelectClause1
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.floor
-import kotlin.math.sin
-import kotlin.random.Random
+import kotlin.collections.set
 
-class GameScene(val ip: String, val port: Int) : Scene() {
-    lateinit var music: NativeSoundChannel
-    lateinit var ball: Circle
-    lateinit var overlay: GameOverOverlay
-    var numObstacles = 0
-    lateinit var bmp: Bitmap
-
-    var cCount = 0
-
-
-    lateinit var client: Client
-
-    var id: Long = -1
-
-    val vs = mutableMapOf<Long, NpcView>()
-
-
-    val vsmtx = Mutex()
+class GameScene(private val ip: String, private val port: Int) : Scene() {
+    private lateinit var client: Client
+    private var id: Long = -1
+    private val vs = mutableMapOf<Long, NpcView>()
+    private val vsmtx = Mutex()
 
     @KtorExperimentalAPI
-    suspend override fun Container.sceneInit() {
+    override suspend fun Container.sceneInit() {
         client = Client(aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(ip, port))
         client.run()
         val shit = client.getRequests().receive()
         id = (shit.args[0] as Double).toLong()
         println("Got id $id")
-        GlobalScope.launch() {
+        GlobalScope.launch {
             while(true){
                 val req = client.getRequests().receive()
                 vsmtx.withLock {
@@ -73,15 +50,14 @@ class GameScene(val ip: String, val port: Int) : Scene() {
     }
 
 
-    suspend fun sendSpeed(){
-//        println("sent speed")
+    private suspend fun sendSpeed(){
         val k = views.input.keys
         val spd = Point(k[Key.D].toInt() - k[Key.A].toInt(), k[Key.S].toInt() - k[Key.W].toInt())
 
         client.sendRequest(Request(Action.MOVE, arrayOf(spd)))
     }
 
-    fun entityFromShit(shit: Map<String, Any>): Entity{
+    private fun entityFromShit(shit: Map<String, Any>): Entity {
         val ent = Entity()
         ent.id = (shit["id"]!! as Double).toLong()
         fun pissToPoint(_p: Any): Point{
@@ -98,10 +74,9 @@ class GameScene(val ip: String, val port: Int) : Scene() {
     }
 
 
-    suspend fun processRequest(r: Request){
+    private fun processRequest(r: Request){
         when(r.a){
             Action.SET_STATE -> {
-//                println("Got state")
                 val starr = r.args[0] as  Map<String, Any>
 
                 starr.forEach { shit ->
@@ -114,7 +89,6 @@ class GameScene(val ip: String, val port: Int) : Scene() {
                         crcl.addUpdater {
                             x += vel.x * it.seconds
                             y += vel.y * it.seconds
-//                            println("${x.toInt()}\t${y.toInt()}")
                         }
                         vs[entity.id] = crcl
                         sceneView.addChild(crcl)

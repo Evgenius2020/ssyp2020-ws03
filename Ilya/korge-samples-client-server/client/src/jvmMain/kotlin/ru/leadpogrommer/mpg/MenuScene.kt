@@ -1,11 +1,16 @@
+package ru.leadpogrommer.mpg
+
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.scene.Scene
+import com.soywiz.korge.service.process.NativeProcess
 import com.soywiz.korge.ui.textButton
-import com.soywiz.korge.service.process.*
-import com.soywiz.korge.view.*
+import com.soywiz.korge.view.Container
+import com.soywiz.korge.view.alignBottomToBottomOf
+import com.soywiz.korge.view.alignLeftToLeftOf
+import com.soywiz.korge.view.centerOn
 
-class MenuScene() : Scene() {
-    suspend override fun Container.sceneInit() {
+class MenuScene : Scene() {
+    override suspend fun Container.sceneInit() {
         textButton{
             text = "Start"
             onClick {

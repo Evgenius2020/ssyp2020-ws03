@@ -6,8 +6,8 @@
         <dependsOnModuleNames>:client:commonTest</dependsOnModuleNames>
         <sourceSets>
           <sourceSet>korge-samples-client-server.client.jvmMain</sourceSet>
-          <sourceSet>korge-samples-client-server.client.commonMain</sourceSet>
           <sourceSet>korge-samples-client-server.client.commonTest</sourceSet>
+          <sourceSet>korge-samples-client-server.client.commonMain</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>jvmTest|:client:jvmTest|jvm</externalSystemTestTasks>

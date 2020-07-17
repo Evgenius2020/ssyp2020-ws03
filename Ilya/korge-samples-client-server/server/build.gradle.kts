@@ -15,9 +15,8 @@ dependencies {
     implementation(kotlin("stdlib", org.jetbrains.kotlin.config.KotlinCompilerVersion.VERSION)) // or "stdlib-jdk8"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0") //
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:0.20.0") //
-
 }
 
 application {
-    mainClassName = "MainKt"
+    mainClassName = "ru.leadpogrommer.mpg.MainKt"
 }

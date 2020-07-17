@@ -1,3 +1,5 @@
+package ru.leadpogrommer.mpg
+
 import com.soywiz.korge.view.Circle
 import com.soywiz.korim.color.RGBA
 import com.soywiz.korma.geom.Point

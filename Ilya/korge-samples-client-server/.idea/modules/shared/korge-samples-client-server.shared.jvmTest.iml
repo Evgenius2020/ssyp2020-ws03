@@ -5,9 +5,9 @@
       <configuration version="3" platform="JVM 1.6" allPlatforms="JVM [1.6]" useProjectSettings="false" isTestModule="true" externalProjectId=":shared">
         <dependsOnModuleNames>:shared:commonTest</dependsOnModuleNames>
         <sourceSets>
-          <sourceSet>korge-samples-client-server.shared.commonTest</sourceSet>
           <sourceSet>korge-samples-client-server.shared.jvmMain</sourceSet>
           <sourceSet>korge-samples-client-server.shared.commonMain</sourceSet>
+          <sourceSet>korge-samples-client-server.shared.commonTest</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>jvmTest|:shared:jvmTest|jvm</externalSystemTestTasks>

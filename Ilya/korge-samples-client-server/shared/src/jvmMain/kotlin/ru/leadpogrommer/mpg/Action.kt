@@ -1,7 +1,6 @@
-package com.soywiz.korlibs.samples.clientserver
+package ru.leadpogrommer.mpg
 
 enum class Action {
-    LOGIN,
     LOGIN_ACC,
     MOVE,
     SET_STATE
