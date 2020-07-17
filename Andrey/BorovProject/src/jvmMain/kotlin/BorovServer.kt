@@ -1,3 +1,5 @@
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.lang.Math.random
 import java.util.*
 import kotlin.collections.HashMap
@@ -5,24 +7,25 @@ import kotlin.math.*
 
 class BorovEngine(private val fieldw: Double, private val fieldh: Double) {
     private val players = HashMap<String, BorovPlayer>();
+    private val playerMutex = Mutex()
 
-    fun tick() {
+    suspend fun tick() {
         for(player in players.values) {
             player.tick()
 
             /* Prevent going outside the map */
             if(player.x + player.hitradius > fieldw) {
-                player.x = fieldw;
+                player.x = player.x + player.hitradius;
                 player.dir = PI;
             } else if(player.x - player.hitradius < 0.0) {
-                player.x = 0.0;
+                player.x = player.hitradius;
                 player.dir = 0.0;
             }
-            if(player.y + player.hitradius > fieldw) {
-                player.y = fieldh;
+            if(player.y + player.hitradius > fieldh) {
+                player.y = fieldh - player.hitradius;
                 player.dir = -PI / 2;
             } else if(player.y - player.hitradius < 0.0) {
-                player.y = 0.0;
+                player.y = player.hitradius;
                 player.dir = PI / 2;
             }
 
@@ -40,12 +43,16 @@ class BorovEngine(private val fieldw: Double, private val fieldh: Double) {
         }
     }
 
-    private fun findTarget(player: BorovPlayer) {
-        val candidates = players.values.filter { it.uuid != player.uuid && it.target != player.uuid }.filter { for(lplayer in players.values) if(lplayer.target == it.uuid) false; true; }
-        if(candidates.isEmpty()) player.target = null;
-        else {
-            player.target = candidates.random().uuid;
-            randomTeleport(player)
+    private suspend fun findTarget(player: BorovPlayer) {
+        playerMutex.withLock {
+            val candidates = players.values.filter { it.uuid != player.uuid && it.target != player.uuid }.filter {
+                !players.values.map { it.target }.contains(it.uuid)
+            }
+            if(candidates.isEmpty()) player.target = null;
+            else {
+                player.target = candidates.random().uuid;
+                randomTeleport(player)
+            }
         }
     }
     private fun randomTeleport(player: BorovPlayer) {
@@ -53,7 +60,7 @@ class BorovEngine(private val fieldw: Double, private val fieldh: Double) {
         player.y = random() * fieldh
     }
 
-    fun registerPlayer(): BorovPlayer {
+    suspend fun registerPlayer(): BorovPlayer {
         val uuid = UUID.randomUUID().toString()
         val player = BorovPlayer(uuid)
         randomTeleport(player)
@@ -72,24 +79,5 @@ class BorovEngine(private val fieldw: Double, private val fieldh: Double) {
 
     fun debug() {
         for(player in players.values) player.debug();
-    }
-}
-
-class BorovPlayer(val uuid: String) {
-    var x = 0.0
-    var y = 0.0
-    var dir = 0.0
-    var vel = 10.0
-    val hitradius = 10.0
-
-    var target: String? = null
-
-    fun tick() {
-        x += vel * cos(dir)
-        y += vel * sin(dir)
-    }
-
-    fun debug() {
-        println("$uuid ($x $y) > $target");
     }
 }

@@ -1,5 +1,7 @@
 import com.soywiz.klock.seconds
+import com.soywiz.korev.mouse
 import com.soywiz.korge.*
+import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.ARGB
@@ -31,6 +33,20 @@ suspend fun main() = Korge(width = 512, height = 512, bgcolor = Colors["#2b2b2b"
 	BorovBot(engine)
 	BorovBot(engine)
 	BorovBot(engine)
+
+	val cb = CompletableDeferred<HashMap<String, BorovPlayer>>()
+	engine.channel.send(BorovMessageMap(cb))
+	players = cb.await()
+
+	mouse {
+		onClick {
+			// Dump players and their targets
+			for(player in players.values) {
+				println("${player.uuid} > ${player.target}")
+			}
+			println()
+		}
+	}
 
 	while(true) {
 		val cb = CompletableDeferred<HashMap<String, BorovPlayer>>()
