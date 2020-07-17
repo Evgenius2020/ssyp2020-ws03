@@ -9,9 +9,9 @@ class Engine {
     var players = mutableListOf<Player>()
 
     fun findPl(id: Int): Player? =
-        players.find { player: Player ->
-            player.id == id
-    }
+            players.find { player: Player ->
+                player.id == id
+            }
     data class Player(val id: Int){
         var x: Double = 0.0
         var y: Double = 0.0
