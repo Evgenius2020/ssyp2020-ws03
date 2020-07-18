@@ -36,7 +36,7 @@ suspend fun main() = Korge(title = "WTF", virtualWidth = 600, virtualHeight = 60
     }
 
 
-    val client = Client(aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect("127.0.0.1", 1337))
+    val client = Communicator(aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect("127.0.0.1", 1337))
     client.run()
     launch {
         while (true) {

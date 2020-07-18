@@ -14,7 +14,7 @@ class Server(private val addr: String = "0.0.0.0", private val port: Int = 1337)
             val server = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().bind(addr, port)
             while (true){
                 val socket = server.accept()
-                val cl = Client(socket)
+                val cl = Communicator(socket)
                 engine.addClient(cl)
                 cl.run()
             }

@@ -7,11 +7,11 @@ import kotlin.random.Random
 //import com.soywiz.klock.
 
 class Engine {
-    private val clients = mutableMapOf<Long, Client>()
+    private val clients = mutableMapOf<Long, Communicator>()
     private val state = State()
     private var prevTickTime = DateTime.now()
 
-    suspend fun addClient(c: Client){
+    suspend fun addClient(c: Communicator){
         state.m.withLock {
             val ce = Player()
             state.registerPlayer(ce)

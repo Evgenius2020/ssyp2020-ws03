@@ -13,7 +13,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class Client(s: Socket) {
+class Communicator(s: Socket) {
     private val inputChannel = Channel<Request>(Channel.Factory.UNLIMITED)
     private val outputChannel = Channel<Request>(Channel.Factory.UNLIMITED)
 
