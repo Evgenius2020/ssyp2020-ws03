@@ -113,13 +113,13 @@ class Engine
                     //println("${player.getId()} COLLIDE WITH ${target.getId()}")
                     var newTarget = getNewTarget(player.getId()!!)
 
-                    println("${player!!.getId()} is chasing $newTarget")
+                    //println("${player!!.getId()} is chasing $newTarget")
 
                     var newX = Random.nextDouble(maxX)
                     var newY = Random.nextDouble(maxY)
                     playerMap[i] = Player(player.getId()!!, newTarget, newX, newY)
-                    playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() + 0.2)
-                    playerMap[target!!.getId()]!!.setMovement(playerMap[target!!.getId()]!!.getAngle(), playerMap[target!!.getId()]!!.getSpeed() - 0.2)
+                    playerMap[i]!!.setMovement(playerMap[i]!!.getAngle(), playerMap[i]!!.getSpeed() - 0.2)
+                    playerMap[target!!.getId()]!!.setMovement(playerMap[target!!.getId()]!!.getAngle(), playerMap[target!!.getId()]!!.getSpeed() + 0.2)
                 }
             }
             else

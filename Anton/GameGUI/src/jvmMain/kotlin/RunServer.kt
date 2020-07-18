@@ -31,16 +31,17 @@ fun main()
         val serverActor = serverStart(this)
         withContext(Dispatchers.Default) {
             coroutineScope {
-                launch {
-                    val gui = GUI(serverActor)
-                    gui.start()
-                }
-                repeat(2) {
+                repeat(9) {
                     launch {
-                        delay((random() * 10000).toLong())
+                        delay((random() * 20000).toLong())
                         val client = Client(serverActor)
                         client.start()
                     }
+                }
+                launch {
+                    delay(2000)
+                    val gui = GUI(serverActor)
+                    gui.start()
                 }
             }
         }
