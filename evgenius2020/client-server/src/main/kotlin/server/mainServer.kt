@@ -35,8 +35,8 @@ fun main() {
                 engineActor.send(Register(registerRequest))
                 val player = registerRequest.await()
                 println("${socket.remoteAddress} (player#${player.id}) connected")
-                val playerJson = serialize(player)
-                output.writeStringUtf8(playerJson + '\n')
+                val playerEncoded = serialize(player)
+                output.writeStringUtf8(playerEncoded + '\n')
 
                 try {
                     while (true) {
@@ -45,8 +45,8 @@ fun main() {
 
                         val playersRequest = CompletableDeferred<List<Player>>()
                         engineActor.send(GetPlayers(playersRequest))
-                        val playersJson = serialize(playersRequest.await())
-                        output.writeStringUtf8(playersJson + '\n')
+                        val playersEncoded = serialize(playersRequest.await())
+                        output.writeStringUtf8(playersEncoded + '\n')
                     }
                 } catch (e: IOException) {
                     println("${socket.remoteAddress} (player#${player.id}) disconnected")

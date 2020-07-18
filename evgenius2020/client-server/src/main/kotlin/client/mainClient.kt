@@ -14,13 +14,13 @@ fun main() {
         val input = socket.openReadChannel()
         val output = socket.openWriteChannel(autoFlush = true)
 
-        val player = deserialize<Player>(input.readUTF8Line()!!)
+        val player = deserialize(input.readUTF8Line()!!) as Player
         println("Registered: $player")
 
         while (true) {
             output.writeStringUtf8("GetPlayer\n")
             val response = input.readUTF8Line()!!
-            val players = deserialize<Array<Player>>(response)
+            val players = deserialize(response) as List<Player>
             println("Players (${players.size}) list:")
             for (pl in players)
                 println("${pl.id} at [${pl.x}, ${pl.y}]")

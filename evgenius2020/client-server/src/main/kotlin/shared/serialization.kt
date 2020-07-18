@@ -1,10 +1,24 @@
 package shared
 
-import com.google.gson.Gson
+import java.io.*
+import java.util.*
 
-val gson = Gson()
+// https://stackoverflow.com/questions/134492/how-to-serialize-an-object-into-a-string
 
-fun serialize(obj: Any) = gson.toJson(obj)
-inline fun <reified T> deserialize(json: String): T {
-    return gson.fromJson(json, T::class.java)
+fun deserialize(s: String): Any {
+    val data = Base64.getDecoder().decode(s)
+    val ois = ObjectInputStream(
+        ByteArrayInputStream(data)
+    )
+    val o = ois.readObject()
+    ois.close()
+    return o
+}
+
+fun serialize(o: Any): String {
+    val baos = ByteArrayOutputStream()
+    val oos = ObjectOutputStream(baos)
+    oos.writeObject(o)
+    oos.close()
+    return Base64.getEncoder().encodeToString(baos.toByteArray())
 }
