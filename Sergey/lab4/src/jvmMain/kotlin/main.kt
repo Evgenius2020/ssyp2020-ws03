@@ -24,39 +24,51 @@ class GetTar(val playerId: Int, val response: CompletableDeferred<Int?>) : Actor
 class GetInf(val response: CompletableDeferred<MutableList<Point>>) : ActorMsg()
 class UpdPl(val playerId: Int, val mul: Double) : ActorMsg()
 class CD(val playerId: Int, val angleToTar: Double) : ActorMsg()
-class GetInfo(val playerId: Int, val response: CompletableDeferred<Point>) : ActorMsg()
+class GetInfo(val playerId: Int, val response: CompletableDeferred<Point?>) : ActorMsg()
 class Run(val pls: String) : ActorMsg()
 
 @ObsoleteCoroutinesApi
 fun CoroutineScope.server() = actor<ActorMsg> {
     val eng = Engine()
     fun getTarget(id: Int): Int? {
-        val busyTargets: List<Int> = eng.players.filter { it.isTarget != 0 }.map { it.id }
-        var pl: Engine.Player? = null
-        var count = 0
-        var i = 0
-        while (((i in busyTargets) || (i == id)) && (pl == null)) {
-            if (eng.findPl(i) != null) {
-                count++
-            }
-            if ((count <= eng.numOfIds) && (i != id)) {
-                if (eng.players[i].isTarget != 0) {
-                    pl = eng.findPl(i)
+        if (eng.findPl(id) != null){
+            val busyTargets = mutableListOf<Int>()
+            for (player in eng.players){
+                if (player.isTarget != 0){
+                    busyTargets.add(player.id)
                 }
             }
-            i++
-        }
-        return when {
-            pl != null -> {
-                eng.players[i].isTarget = 1
-                eng.players[id].isTarget = i - 1
-                i
+            var pl: Engine.Player? = null
+            var count = 0
+            var i = 0
+            while (((i in busyTargets) || (i == id)) && (pl == null)) {
+                if (eng.findPl(i) != null) {
+                    count++
+                }
+                i++
+                if ((count <= eng.numOfIds) && (i != id) && (eng.findPl(i) != null)) {
+                    if (eng.players[i].isTarget == 0) {
+                        pl = eng.findPl(i)
+                    }
+                }
             }
-            else -> null
+            return when {
+                pl != null -> {
+                    eng.players[i].isTarget = 1
+                    eng.players[id].haveTarget = i
+                    i
+                }
+                i == 0  -> {
+                    eng.players[0].isTarget = 1
+                    eng.players[id].haveTarget =  0
+                    i
+                }
+                else -> null
+            }
         }
+        else return null
     }
     for (msg in channel) {
-        println("Server: Got meaasge $msg")
         when (msg) {
             is AddPl -> {
                 eng.addPlayer()
@@ -80,7 +92,12 @@ fun CoroutineScope.server() = actor<ActorMsg> {
                 eng.changeDir(msg.playerId, msg.angleToTar)
             }
             is GetInfo -> {
-                msg.response.complete(eng.players[msg.playerId].point)
+                if (eng.findPl(msg.playerId) == null){
+                    msg.response.complete(null)
+                }
+                else{
+                    msg.response.complete(eng.players[msg.playerId].point)
+                }
             }
             is Run -> {
                 eng.movePlayers()
@@ -111,10 +128,8 @@ class Client {
                 list = response.await()
                 if (sqrt((list[id].x - list[player.haveTarget!!].x).pow(2.0) +
                                 (list[id].y - list[player.haveTarget!!].y).pow(2.0)) < radiusc) {
-
                     ser.send(UpdPl(player.haveTarget!!, -1.0))
                     ser.send(UpdPl(id, 1.0))
-
                     player.haveTarget = null
                     while (player.haveTarget == null) {
                         delay(1000)
@@ -125,8 +140,7 @@ class Client {
                 }
                 angleToTarget = atan(
                         (list[player.haveTarget!!].x - list[id].x) /
-                                abs(list[id].y - list[player.haveTarget!!].y)
-                )
+                                (list[id].y - list[player.haveTarget!!].y))
                 if (list[player.haveTarget!!].y > list[id].y) angleToTarget += PI
                 ser.send(CD(id, angleToTarget))
                 delay(1000)
@@ -138,7 +152,6 @@ class Client {
 @ObsoleteCoroutinesApi
 suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
         bgcolor = Colors["White"]) {
-    var ls = mutableListOf<Point>()
     val ser = server()
     withContext(Dispatchers.Default) {
         coroutineScope {
@@ -148,23 +161,25 @@ suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
                     ser.send(Run("pls"))
                 }
             }
-            for (i in 0..3) {
+            for (i in 0..9) {
                 launch {
                     Client().play(ser)
                 }
-
-                println("Client $i received state")
-                val circle = circle(radius = radiusc, color = Colors.GREEN).xy(-100, -100)
+                var pnt: Point? = null
+                val p = (50*i).toDouble()
+                val circle = circle(radius = radiusc, color = Colors.GREEN).xy(p, p)
                 circle.addUpdater {
                     launch {
-                        val response = CompletableDeferred<Point>()
-                        ser.send(GetInfo(i, response))
-                        val pnt = response.await()
-                        x = pnt.x
-                        y = pnt.y
+                        val response = CompletableDeferred<Point?>()
+                        while (pnt == null){
+                            ser.send(GetInfo(i, response))
+                            pnt = response.await()
+                            delay(100)
+                        }
+                        x = pnt!!.x
+                        y = pnt!!.y
                     }
                 }
-
             }
         }
     }
