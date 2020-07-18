@@ -39,13 +39,13 @@ class GUI (private val serverActor : SendChannel<ServerMsg>)
                     if (i == playerId)
                     {
                         val circle = circle(radius, Colors.PURPLE).xy(map[i]!!.getX() - radius, map[i]!!.getY() - radius)
-                        val text = text("${map[i]!!.getId()}", 18.0).xy(map[i]!!.getX() - radius + 1.0, map[i]!!.getY() - radius + 1.0)
+                        val text = text("${map[i]!!.getId()}", 18.0).xy(map[i]!!.getX() - radius/2, map[i]!!.getY() - radius/2)
                         graphicsMap[i] = Pair(circle, text)
                     }
                     else
                     {
                         val circle = circle(radius, Colors.ORANGE).xy(map[i]!!.getX() - radius, map[i]!!.getY() - radius)
-                        val text = text("${map[i]!!.getId()}", 18.0).xy(map[i]!!.getX() - radius + 1.0, map[i]!!.getY() - radius + 1.0)
+                        val text = text("${map[i]!!.getId()}", 18.0).xy(map[i]!!.getX() - radius/2, map[i]!!.getY() - radius/2)
                         graphicsMap[i] = Pair(circle, text)
                     }
                 }
@@ -60,7 +60,7 @@ class GUI (private val serverActor : SendChannel<ServerMsg>)
 
                     if (targetId == null)
                     {
-                        delay(Config.ping)
+                        delay(Config.ping) // TODO: epic kostil'
                         val responseTarget = CompletableDeferred<Int?>()
                         serverActor.send(GetNewTarget(playerId, responseTarget))
                         targetId = responseTarget.await()

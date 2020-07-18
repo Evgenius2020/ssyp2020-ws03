@@ -11,7 +11,6 @@ buildscript {
 	}
 	dependencies {
 		classpath("com.soywiz.korlibs.korge.plugins:korge-gradle-plugin:1.13.8.3")
-
 	}
 }
 
@@ -21,3 +20,12 @@ korge {
 	id = "com.example.example"
 }
 
+allprojects {
+	repositories.apply {
+		mavenLocal()
+		maven { url = uri("https://dl.bintray.com/korlibs/korlibs") }
+		jcenter()
+		mavenCentral()
+		maven{ url = uri("https://artifactory.cronapp.io/public-release/")}
+	}
+}
