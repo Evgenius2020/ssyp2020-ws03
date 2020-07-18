@@ -17,7 +17,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.math.*
 import kotlin.random.Random
 
-val mutex = Mutex()
 
 sealed class ActorMsg
 class AddPl(val response: CompletableDeferred<Engine.Player>) : ActorMsg()
@@ -57,6 +56,7 @@ fun CoroutineScope.server() = actor<ActorMsg> {
         }
     }
     for (msg in channel) {
+        println("Server: Got meaasge $msg")
         when (msg) {
             is AddPl -> {
                 eng.addPlayer()
@@ -89,7 +89,7 @@ fun CoroutineScope.server() = actor<ActorMsg> {
     }
 }
 
-class Client{
+class Client {
     private var id: Int = -1
     private var list = mutableListOf<Point>()
     private var angleToTarget = -1.0
@@ -105,19 +105,16 @@ class Client{
             player.haveTarget = response.await()
         }
         while (true) {
-            if (player.haveTarget != null){
-                mutex.withLock {
-                    val response = CompletableDeferred<MutableList<Point>>()
-                    ser.send(GetInf(response))
-                    list = response.await()
-                }
+            if (player.haveTarget != null) {
+                val response = CompletableDeferred<MutableList<Point>>()
+                ser.send(GetInf(response))
+                list = response.await()
                 if (sqrt((list[id].x - list[player.haveTarget!!].x).pow(2.0) +
-                                (list[id].y - list[player.haveTarget!!].y).pow(2.0)) < radiusc)
-                {
-                    mutex.withLock {
-                        ser.send(UpdPl(player.haveTarget!!, -1.0))
-                        ser.send(UpdPl(id, 1.0))
-                    }
+                                (list[id].y - list[player.haveTarget!!].y).pow(2.0)) < radiusc) {
+
+                    ser.send(UpdPl(player.haveTarget!!, -1.0))
+                    ser.send(UpdPl(id, 1.0))
+
                     player.haveTarget = null
                     while (player.haveTarget == null) {
                         delay(1000)
@@ -131,9 +128,7 @@ class Client{
                                 abs(list[id].y - list[player.haveTarget!!].y)
                 )
                 if (list[player.haveTarget!!].y > list[id].y) angleToTarget += PI
-                mutex.withLock {
-                    ser.send(CD(id, angleToTarget))
-                }
+                ser.send(CD(id, angleToTarget))
                 delay(1000)
             }
         }
@@ -147,7 +142,7 @@ suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
     val ser = server()
     withContext(Dispatchers.Default) {
         coroutineScope {
-            launch{
+            launch {
                 while (true) {
                     delay(100)
                     ser.send(Run("pls"))
@@ -156,20 +151,20 @@ suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
             for (i in 0..3) {
                 launch {
                     Client().play(ser)
-                    val response = CompletableDeferred<MutableList<Point>>()
-                    ser.send(GetInf(response))
-                    ls = response.await()
-                    val circle = circle(radius = radiusc, color = Colors.GREEN).xy(ls[i].x, ls[i].y)
-                    circle.addUpdater {
-                        launch{
-                            val response = CompletableDeferred<Point>()
-                            ser.send(GetInfo(i, response))
-                            ls[i] = response.await()
-                            x = ls[i].x
-                            y = ls[i].y
-                        }
+                }
+
+                println("Client $i received state")
+                val circle = circle(radius = radiusc, color = Colors.GREEN).xy(-100, -100)
+                circle.addUpdater {
+                    launch {
+                        val response = CompletableDeferred<Point>()
+                        ser.send(GetInfo(i, response))
+                        val pnt = response.await()
+                        x = pnt.x
+                        y = pnt.y
                     }
                 }
+
             }
         }
     }
