@@ -1,3 +1,12 @@
 package ru.leadpogrommer.mpg
 
-class Request(val a: Action, val args: Array<Any>)
+import com.soywiz.korim.color.RGBA
+
+sealed class Request {
+    var __type__ = ""
+}
+class LoginRequest(val id: Long): Request()
+class StateRequest(val state: Map<Long, Player>): Request()
+class ColorRequest(val color: RGBA): Request()
+class DisconnectRequest : Request()
+class DeletePlayerRequest(val id: Long): Request()

@@ -7,23 +7,23 @@ class State {
     val m = Mutex()
 
 
-    private val entities = mutableMapOf<Long, Entity>()
+    private val players = mutableMapOf<Long, Player>()
     private var nextID = 1L
 
-    fun getEntity(id: Long) = entities[id]!!
+    fun getPlayer(id: Long) = players[id]!!
 
-    fun getIterator() = entities.iterator()
+    fun getIterator() = players.iterator()
 
-    fun getSt() = entities as Map<@ContextualSerialization Long, @ContextualSerialization Entity>
+    fun getSt() = players as Map<@ContextualSerialization Long, @ContextualSerialization Player>
 
 
-    fun registerEntity(e: Entity) {
+    fun registerPlayer(e: Player) {
         e.id = nextID
         nextID++
-        entities[e.id] = e
+        players[e.id] = e
     }
 
-    fun deleteEntity(e: Entity) {
-        entities.remove(e.id)
+    fun deletePlayer(id: Long) {
+        players.remove(id)
     }
 }

@@ -19,10 +19,9 @@ class Server(private val addr: String = "0.0.0.0", private val port: Int = 1337)
                 cl.run()
             }
         }
-        var prev = 16L
         while (true){
             runBlocking {
-                engine.tick(16.0)
+                engine.tick()
                 delay(16L)
             }
         }

@@ -1,23 +1,27 @@
 package ru.leadpogrommer.mpg
 
-import com.soywiz.korma.geom.Point
+import com.soywiz.klock.DateTime
 import kotlinx.coroutines.sync.withLock
+import kotlin.random.Random
+
+//import com.soywiz.klock.
 
 class Engine {
     private val clients = mutableMapOf<Long, Client>()
     private val state = State()
+    private var prevTickTime = DateTime.now()
 
     suspend fun addClient(c: Client){
         state.m.withLock {
-            val ce = Entity()
-            state.registerEntity(ce)
-            c.sendRequest(Request(Action.LOGIN_ACC, arrayOf(ce.id)))
+            val ce = Player()
+            state.registerPlayer(ce)
+            c.sendRequest(LoginRequest(ce.id))
             clients[ce.id] = c
             println("Connected id ${ce.id}")
         }
     }
 
-    suspend fun tick(delta: Double){
+    suspend fun tick(){
         state.m.withLock {
             for (entry in clients){
                 val ch = entry.value.getRequests()
@@ -27,32 +31,38 @@ class Engine {
                 }
             }
 
-            for(en in state.getIterator()){
-                en.value.pos.x += en.value.vel.x * delta
-                en.value.pos.y += en.value.vel.y * delta
+            if ((DateTime.now() - prevTickTime).milliseconds > 1000){
+                for(en in state.getIterator()){
+                    en.value.pos.x  = Random.nextDouble(500.0)
+                    en.value.pos.y  = Random.nextDouble(500.0)
+                }
+                prevTickTime = DateTime.now()
             }
+
 
             sendState()
         }
     }
 
 
-    private fun processRequest(id: Long, r: Request){
-        when(r.a){
-            Action.MOVE -> {
-                val mp = r.args[0] as Map<String, Double>
-                var nv = Point(mp["x"]!!, mp["y"]!!)
-                nv = nv.normalized.mul(0.6)
-                if(nv.x.isNaN() || nv.y.isNaN())nv = Point(0 ,0)
-                state.getEntity(id).vel = nv
+    private suspend fun processRequest(id: Long, r: Request){
+        when(r){
+            is ColorRequest -> {
+                state.getPlayer(id).color = r.color
+            }
+            is DisconnectRequest ->{
+                state.deletePlayer(id)
+                clients.remove(id)
+                for (client in clients.values){
+                    client.sendRequest(DeletePlayerRequest(id))
+                }
             }
         }
     }
 
     private suspend fun sendState(){
-        val st = state.getSt()
         for (client in clients.values){
-            client.sendRequest(Request(Action.SET_STATE, arrayOf(st)))
+            client.sendRequest(StateRequest(state.getSt()))
         }
     }
 }

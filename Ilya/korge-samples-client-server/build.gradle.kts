@@ -19,5 +19,6 @@ allprojects {
         maven { url = uri("https://dl.bintray.com/korlibs/korlibs") }
         jcenter()
         mavenCentral()
+        maven{ url = uri("https://artifactory.cronapp.io/public-release/")}
     }
 }
