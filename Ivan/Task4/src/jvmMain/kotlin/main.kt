@@ -59,6 +59,7 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
 
     addUpdater {
         launch {
+            mouseX
             user.changeDirection(Dot(mouseX, mouseY))
         }
     }
@@ -71,7 +72,6 @@ suspend fun main() = Korge(virtualHeight = 480, virtualWidth = 640) {
             for (p in ps) {
                 drawPlayer(p.component2())
             }
-
         }
     }
 }
