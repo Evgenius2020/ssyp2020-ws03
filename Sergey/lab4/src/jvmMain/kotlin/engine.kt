@@ -10,6 +10,8 @@ import com.soywiz.korma.geom.Point
 import com.soywiz.korma.geom.degrees
 import com.soywiz.korma.interpolation.Easing
 import kotlin.math.PI
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.random.Random
 const val width = 800.0
 const val height = 600.0
@@ -63,9 +65,18 @@ class Engine {
             }
             players[id].point.x += players[id].speedX
             players[id].point.y += players[id].speedY
+            if (player.haveTarget != null){
+                if (sqrt((player.point.x - players[player.haveTarget!!].point.x).pow(2.0) +
+                                (player.point.y - players[player.haveTarget!!].point.y).pow(2.0)) < radiusc) {
+                    players[player.haveTarget!!].isTarget = 0
+                    updatePlayerState(player.id, 1.0)
+                    updatePlayerState(player.haveTarget!!, -1.0)
+                    player.haveTarget = null
+                }
+            }
         }
     }
-    fun updatePlayerState(id: Int, mul: Double){
+    private fun updatePlayerState(id: Int, mul: Double){
         players[id].point.x = Random.nextDouble(radiusc, width-radiusc)
         players[id].point.y = Random.nextDouble(radiusc, height-radiusc)
         players[id].points += mul

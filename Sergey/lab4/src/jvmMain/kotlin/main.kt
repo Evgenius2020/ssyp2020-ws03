@@ -19,13 +19,13 @@ import kotlin.random.Random
 
 
 sealed class ActorMsg
-class AddPl(val response: CompletableDeferred<Engine.Player>) : ActorMsg()
-class GetTar(val playerId: Int, val response: CompletableDeferred<Int?>) : ActorMsg()
-class GetInf(val response: CompletableDeferred<MutableList<Point>>) : ActorMsg()
-class UpdPl(val playerId: Int, val mul: Double) : ActorMsg()
-class CD(val playerId: Int, val angleToTar: Double) : ActorMsg()
-class GetInfo(val playerId: Int, val response: CompletableDeferred<Point?>) : ActorMsg()
-class Run(val pls: String) : ActorMsg()
+class AddPl(val response: CompletableDeferred<Engine.Player>): ActorMsg()
+class GetTar(val playerId: Int, val response: CompletableDeferred<Int?>): ActorMsg()
+class GetInf(val response: CompletableDeferred<MutableList<Point>>): ActorMsg()
+class CD(val playerId: Int, val angleToTar: Double): ActorMsg()
+class GetStatus(val playerId: Int, val response: CompletableDeferred<Int?>): ActorMsg()
+class GetInfo(val playerId: Int, val response: CompletableDeferred<Point?>): ActorMsg()
+class Run(val pls: String): ActorMsg()
 
 @ObsoleteCoroutinesApi
 fun CoroutineScope.server() = actor<ActorMsg> {
@@ -83,11 +83,6 @@ fun CoroutineScope.server() = actor<ActorMsg> {
                 }
                 msg.response.complete(a)
             }
-            is UpdPl -> {
-                if (msg.mul < 0.0) eng.players[msg.playerId].isTarget = 0
-                else eng.players[msg.playerId].haveTarget = null
-                eng.updatePlayerState(msg.playerId, msg.mul)
-            }
             is CD -> {
                 eng.changeDir(msg.playerId, msg.angleToTar)
             }
@@ -98,6 +93,9 @@ fun CoroutineScope.server() = actor<ActorMsg> {
                 else{
                     msg.response.complete(eng.players[msg.playerId].point)
                 }
+            }
+            is GetStatus -> {
+                msg.response.complete(eng.players[msg.playerId].haveTarget)
             }
             is Run -> {
                 eng.movePlayers()
@@ -126,17 +124,14 @@ class Client {
                 val response = CompletableDeferred<MutableList<Point>>()
                 ser.send(GetInf(response))
                 list = response.await()
-                if (sqrt((list[id].x - list[player.haveTarget!!].x).pow(2.0) +
-                                (list[id].y - list[player.haveTarget!!].y).pow(2.0)) < radiusc) {
-                    ser.send(UpdPl(player.haveTarget!!, -1.0))
-                    ser.send(UpdPl(id, 1.0))
-                    player.haveTarget = null
-                    while (player.haveTarget == null) {
-                        delay(1000)
-                        val response = CompletableDeferred<Int?>()
-                        ser.send(GetTar(player.id, response))
-                        player.haveTarget = response.await()
-                    }
+                val responsible = CompletableDeferred<Int?>()
+                ser.send(GetStatus(id, responsible))
+                player.haveTarget = responsible.await()
+                while (player.haveTarget == null) {
+                    val response = CompletableDeferred<Int?>()
+                    ser.send(GetTar(player.id, response))
+                    player.haveTarget = response.await()
+                    delay(500)
                 }
                 angleToTarget = atan(
                         (list[player.haveTarget!!].x - list[id].x) /
@@ -161,7 +156,7 @@ suspend fun main() = Korge(width = width.toInt(), height = height.toInt(),
                     ser.send(Run("pls"))
                 }
             }
-            for (i in 0..9) {
+            for (i in 0..10) {
                 launch {
                     Client().play(ser)
                 }
