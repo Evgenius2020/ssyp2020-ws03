@@ -23,12 +23,12 @@ fun main() {
 
         val engineActor = engineActor()
 
-        /*launch {
+        launch {
             while (true) {
                 engineActor.send(Update)
                 delay(Config.updateTime)
             }
-        }*/
+        }
 
         while (true) {
             val socket = server.accept()
