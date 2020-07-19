@@ -4,9 +4,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.ContextualSerialization
 
 class State {
-    val m = Mutex()
-
-
     private val players = mutableMapOf<Long, Player>()
     private var nextID = 1L
 

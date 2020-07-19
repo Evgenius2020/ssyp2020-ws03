@@ -11,16 +11,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
-import java.io.IOException
+import java.io.*
 
 class Communicator(s: Socket) {
     private val inputChannel = Channel<Request>(Channel.Factory.UNLIMITED)
-    private val outputChannel = Channel<Request>(Channel.Factory.UNLIMITED)
+    private val outputChannel = Channel<ByteArray>(Channel.Factory.UNLIMITED)
 
     private val inStream = s.openReadChannel()
     private val outStream = s.openWriteChannel()
 
-    private lateinit var gson: Gson
+    private var gson: Gson
 
     private var connected = true
     init {
@@ -36,17 +36,14 @@ class Communicator(s: Socket) {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 while (connected){
-                    val req = outputChannel.receive()
-                    req.__type__ = req::class.simpleName!!
-                    val sered = gson.toJson(req)
-                    val ba = sered.toString().toByteArray()
+                    val ba = outputChannel.receive()
                     outStream.writeInt(ba.size)
                     outStream.writeFully(ba, 0, ba.size)
                     outStream.flush()
                 }
-            }catch (e: IOException){
+            }catch (e: Throwable){
                 connected = false
-                inputChannel.send(DisconnectRequest())
+                inputChannel.close()
             }
 
         }
@@ -59,18 +56,29 @@ class Communicator(s: Socket) {
                     val ser = ByteArray(size)
                     inStream.readFully(ser, 0, size)
                     val req: Request = gson.fromJson(ser.toString(charset = Charsets.UTF_8), Request::class.java)
+                    println(ser.toString(Charsets.UTF_8))
+//                    val ois = ObjectInputStream(ser.inputStream())
+//                    val req = ois.readObject() as Request
                     inputChannel.send(req)
-                }catch (e: IOException){
+                }catch (e: Throwable){
                     connected = false
-                    inputChannel.send(DisconnectRequest())
+                    inputChannel.close()
                 }
             }
         }
     }
 
 
-    suspend fun sendRequest(r: Request){
-        outputChannel.send(r)
+    suspend fun sendRequest(req: Request){
+        req.__type__ = req::class.simpleName!!
+        val sered = gson.toJson(req)
+        val ba = sered.toString().toByteArray()
+        outputChannel.send(ba)
+//        val buf = ByteArrayOutputStream()
+//        val ois = ObjectOutputStream(buf)
+//        ois.writeObject(req)
+//        outputChannel.send(buf.toByteArray())
+
     }
 
     fun getRequests():ReceiveChannel<Request>{
