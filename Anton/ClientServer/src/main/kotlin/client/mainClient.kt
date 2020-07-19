@@ -28,8 +28,7 @@ fun main() {
             when (request)
             {
                 "GetMap" -> {
-                    val result = mutableMapOf<Int, Player>()
-                    val GetMap = GetMapRequest(result)
+                    val GetMap = GetMapRequest()
                     output.writeStringUtf8(serialize(GetMap) + '\n')
                     val response = input.readUTF8Line()!!
                     val map = deserialize(response) as MutableMap<Int, Player>
@@ -46,8 +45,7 @@ fun main() {
                     output.writeStringUtf8(serialize(SetAngle) + '\n')
                 }
                 "GetNewTarget" -> {
-                    val result : Int? = 0
-                    val GetNewTarget = GetNewTargetRequest(player.getId()!!, result)
+                    val GetNewTarget = GetNewTargetRequest(player.getId()!!)
                     output.writeStringUtf8(serialize(GetNewTarget) + '\n')
                     val response = input.readUTF8Line()!!
                     val newTarget =  deserialize(response) as Int?

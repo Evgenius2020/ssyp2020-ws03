@@ -30,6 +30,13 @@ fun main() {
             }
         }
 
+        repeat (5) {
+            launch {
+                val bot = BotClient()
+                bot.run()
+            }
+        }
+
         while (true) {
             val socket = server.accept()
             launch {
@@ -50,18 +57,18 @@ fun main() {
                         when (line)
                         {
                             is GetMapRequest -> {
-                                println("Player {${player.getId()}} is requesting: Map")
+                                //println("Player {${player.getId()}} is requesting: Map")
                                 val mapRequest = CompletableDeferred<MutableMap<Int, Player>>()
                                 engineActor.send(GetMap(mapRequest))
                                 val mapEncoded = serialize(mapRequest.await())
                                 output.writeStringUtf8(mapEncoded + '\n')
                             }
                             is SetAngleRequest -> {
-                                println("Player {${player.getId()}} is requesting: Angle Set")
+                                //println("Player {${player.getId()}} is requesting: Angle Set")
                                 engineActor.send(SetAngle(line.playerId, line.newAngle))
                             }
                             is GetNewTargetRequest -> {
-                                println("Player {${player.getId()}} is requesting: New Target")
+                                //println("Player {${player.getId()}} is requesting: New Target")
                                 val getNewTargetRequest = CompletableDeferred<Int?>()
                                 engineActor.send(GetNewTarget(line.playerId, getNewTargetRequest))
                                 val result = getNewTargetRequest.await()
@@ -71,7 +78,7 @@ fun main() {
                         }
                     }
                 } catch (e: IOException) {
-                    println("${socket.remoteAddress} (player#${player.getId()}) disconnected")
+                    //println("${socket.remoteAddress} (player#${player.getId()}) disconnected")
                     engineActor.send(Remove(player.getId()!!))
                     socket.close()
                 }
