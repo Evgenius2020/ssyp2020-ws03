@@ -24,9 +24,7 @@ suspend fun serverStart(scope : CoroutineScope) : SendChannel<ServerMsg>
     return serverActor
 }
 
-@ExperimentalCoroutinesApi
-fun main()
-{
+fun main() {
     runBlocking {
         val serverActor = serverStart(this)
         withContext(Dispatchers.Default) {

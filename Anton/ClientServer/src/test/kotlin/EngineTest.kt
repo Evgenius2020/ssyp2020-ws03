@@ -1,13 +1,8 @@
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sqrt
-import kotlin.test.Test
-import kotlin.test.assertEquals
-
-fun assertEquals(a : Double, b : Double, delta : Double)
-{
-    assert((a - b) < delta)
-}
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertEquals
 
 class EngineTest
 {
