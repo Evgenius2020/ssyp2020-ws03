@@ -3,7 +3,7 @@ package shared
 import java.io.*
 import java.util.*
 
-fun deserialize(s: String): Any {
+fun deserialize(s: String): Any? {
     val data = Base64.getDecoder().decode(s)
     val ois = ObjectInputStream(
         ByteArrayInputStream(data)
@@ -13,7 +13,7 @@ fun deserialize(s: String): Any {
     return o
 }
 
-fun serialize(o: Any): String {
+fun serialize(o: Any?): String {
     val baos = ByteArrayOutputStream()
     val oos = ObjectOutputStream(baos)
     oos.writeObject(o)

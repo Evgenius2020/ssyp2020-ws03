@@ -2,28 +2,59 @@ package client
 
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.*
+import io.ktor.util.KtorExperimentalAPI
 import io.ktor.utils.io.*
 import kotlinx.coroutines.*
+import server.GetMapRequest
+import server.GetNewTargetRequest
+import server.SetAngleRequest
+import shared.Player
 import shared.deserialize
+import shared.serialize
 import java.net.InetSocketAddress
 
+@KtorExperimentalAPI
 fun main() {
     runBlocking {
         val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 2323))
         val input = socket.openReadChannel()
         val output = socket.openWriteChannel(autoFlush = true)
 
-        val player = deserialize(input.readUTF8Line()!!) as PlayerTest
+        val player = deserialize(input.readUTF8Line()!!) as Player
         println("Registered: $player")
 
         while (true) {
-            output.writeStringUtf8("GetPlayer\n")
-            val response = input.readUTF8Line()!!
-            val players = deserialize(response) as List<PlayerTest>
-            println("Players (${players.size}) list:")
-            for (pl in players)
-                println("${pl.id} at [${pl.x}, ${pl.y}]")
-            delay(1000)
+            val request = readLine()
+            when (request)
+            {
+                "GetMap" -> {
+                    val result = mutableMapOf<Int, Player>()
+                    val GetMap = GetMapRequest(result)
+                    output.writeStringUtf8(serialize(GetMap) + '\n')
+                    val response = input.readUTF8Line()!!
+                    val map = deserialize(response) as MutableMap<Int, Player>
+                    println("Player list:")
+                    for (i in map.values)
+                    {
+                        println("Player {${i.getId()}} position is: [${i.getX()}, ${i.getY()}]; target is: [${i.getTargetId()}]; angle is: [{${i.getAngle()}}]")
+                    }
+                }
+                "SetAngle" -> {
+                    print("Write new angle (in rads): ")
+                    val newAngle = readLine()!!.toDouble()
+                    val SetAngle = SetAngleRequest(player.getId()!!, newAngle)
+                    output.writeStringUtf8(serialize(SetAngle) + '\n')
+                }
+                "GetNewTarget" -> {
+                    val result : Int? = 0
+                    val GetNewTarget = GetNewTargetRequest(player.getId()!!, result)
+                    output.writeStringUtf8(serialize(GetNewTarget) + '\n')
+                    val response = input.readUTF8Line()!!
+                    val newTarget =  deserialize(response) as Int?
+                    println("New target is: $newTarget")
+                    player.setTarget(newTarget)
+                }
+            }
         }
     }
 }

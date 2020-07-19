@@ -1,3 +1,5 @@
+package shared
+
 class Player constructor(private val id: Int, private var targetId: Int? = null, private var x: Double, private var y: Double) : java.io.Serializable
 {
 

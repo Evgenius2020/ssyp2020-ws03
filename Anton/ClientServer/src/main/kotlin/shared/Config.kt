@@ -1,3 +1,5 @@
+package shared
+
 object Config
 {
     val radius = 10.0

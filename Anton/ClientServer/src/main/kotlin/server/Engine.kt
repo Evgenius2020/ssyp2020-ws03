@@ -1,3 +1,6 @@
+package server
+
+import shared.*
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -21,6 +24,9 @@ class Engine
 
     fun getNewTarget(playerId : Int) : Int?
     {
+        if (playerId in playerMap.keys && playerMap[playerId]!!.getTargetId() != null)
+            return playerMap[playerId]!!.getTargetId()
+
         val chosenTargets = mutableListOf<Int>()
 
         for (i in playerMap.keys)
@@ -57,6 +63,11 @@ class Engine
     {
         if (playerId in playerMap.keys)
             playerMap.remove(playerId)
+        for (i in playerMap.values)
+        {
+            if (i.getTargetId() == playerId)
+                i.setTarget(null)
+        }
     }
 
     fun getPositions(id : Int) : Pair<Double, Double>?
@@ -105,25 +116,30 @@ class Engine
             val player = playerMap[i]!!
             if (player.getTargetId() != null)
             {
-                val target = playerMap[player.getTargetId()!!]!!
+                if (playerMap[player.getTargetId()!!] != null) {
+                    val target = playerMap[player.getTargetId()!!]!!
+                    val tX = target.getX()
+                    val tY = target.getY()
+                    val pX = player.getX()
+                    val pY = player.getY()
 
-                val tX = target.getX()
-                val tY = target.getY()
-                val pX = player.getX()
-                val pY = player.getY()
+                    //println("${player.getId()}: {$pX; $pY} -> ${target.getId()}: {$tX; $tY")
 
-                //println("${player.getId()}: {$pX; $pY} -> ${target.getId()}: {$tX; $tY")
+                    if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius)
+                    {
+                        //println("${player.getId()} COLLIDE WITH ${target.getId()}")
+                        var newTarget = getNewTarget(player.getId()!!)
 
-                if (sqrt((tX - pX) * (tX - pX) + (tY - pY) * (tY - pY)) <= 2 * radius)
+                        //println("${player!!.getId()} is chasing $newTarget")
+
+                        var newX = Random.nextDouble(maxX)
+                        var newY = Random.nextDouble(maxY)
+                        playerMap[i] = Player(player.getId()!!, newTarget, newX, newY)
+                    }
+                }
+                else
                 {
-                    //println("${player.getId()} COLLIDE WITH ${target.getId()}")
-                    var newTarget = getNewTarget(player.getId()!!)
-
-                    //println("${player!!.getId()} is chasing $newTarget")
-
-                    var newX = Random.nextDouble(maxX)
-                    var newY = Random.nextDouble(maxY)
-                    playerMap[i] = Player(player.getId()!!, newTarget, newX, newY)
+                    player.setTarget(null)
                 }
             }
         }
