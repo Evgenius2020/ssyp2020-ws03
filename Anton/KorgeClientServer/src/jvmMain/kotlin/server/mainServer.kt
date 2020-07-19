@@ -30,7 +30,7 @@ fun main() {
             }
         }
 
-        repeat (5) {
+        repeat (1) {
             launch {
                 val bot = BotClient()
                 bot.run()

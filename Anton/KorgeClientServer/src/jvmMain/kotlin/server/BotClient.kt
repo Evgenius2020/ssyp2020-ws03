@@ -34,11 +34,13 @@ class BotClient {
                 if (targetId != null)
                 {
                     val tX = map[targetId]!!.getX()
-                    val tY = map[targetId]!!.getX()
+                    val tY = map[targetId]!!.getY()
                     val pX = map[player.getId()!!]!!.getX()
                     val pY = map[player.getId()!!]!!.getY()
 
                     val angle = atan2(tY - pY, tX - pX)
+
+                    delay(Config.ping)
 
                     val SetAngle = SetAngleRequest(player.getId()!!, angle)
                     output.writeStringUtf8(serialize(SetAngle) + '\n')

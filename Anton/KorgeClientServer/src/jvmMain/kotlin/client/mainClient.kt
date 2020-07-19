@@ -64,7 +64,6 @@ fun main()
 
                 while (true)
                 {
-                    delay(Config.ping)
                     val mapRequest = GetMapRequest()
                     output.writeStringUtf8(serialize(mapRequest) + '\n')
                     val response = input.readUTF8Line()!!
@@ -74,7 +73,7 @@ fun main()
 
                     if (targetId == null)
                     {
-                        delay(Config.ping) // TODO: epic kostil'
+                        //delay(Config.updateTime) // TODO: epic kostil'
 
                         val getTargetRequest = GetNewTargetRequest(player.getId()!!)
                         output.writeStringUtf8(serialize(getTargetRequest) + '\n')
@@ -106,6 +105,8 @@ fun main()
                     val pX = map[player.getId()]!!.getX()
                     val pY = map[player.getId()]!!.getY()
                     val angle = atan2(mY - pY, mX - pX)
+
+                    delay(Config.ping)
 
                     val setAngleRequest = SetAngleRequest(player.getId()!!, angle)
                     output.writeStringUtf8(serialize(setAngleRequest) + '\n')
