@@ -59,6 +59,7 @@ fun main()
                     if (i !in map.entities.map {it.id})
                     {
                         graphicsMap.remove(i)
+                        removeChild(graphicsMap[i])
                     }
                 }
 
