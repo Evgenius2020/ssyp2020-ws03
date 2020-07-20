@@ -1,6 +1,6 @@
 package server
 
-import engine.Entity
+import shared.Entity
 import kotlinx.coroutines.CompletableDeferred
 import shared.ClientServerPoint
 import shared.RenderInfo

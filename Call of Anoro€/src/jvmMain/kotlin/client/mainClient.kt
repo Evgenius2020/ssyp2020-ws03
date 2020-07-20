@@ -21,56 +21,43 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import shared.ClientServerPoint
-import shared.RenderInfo
-import shared.deserialize
-import shared.serialize
+import shared.*
 import java.net.InetSocketAddress
 
-fun main()
-{
+fun main() {
     runBlocking {
         val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         val input = socket.openReadChannel()
         val output = socket.openWriteChannel(autoFlush = true)
-        Korge (width = 640, height = 640, bgcolor = Colors["#2b2b2b"], title = "Call of Anoro€++ redux")
+        Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
             val graphicsMap = mutableMapOf<Int, SolidRect>()
-            output.writeStringUtf8(serialize("getRenderInfo") + '\n')
+            output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
-
-            for (i in initMap.entities)
-            {
+            for (i in initMap.entities) {
                 val square = SolidRect(20.0, 20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0).rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
             }
+            while (true) {
 
-            while (true)
-            {
-                output.writeStringUtf8(serialize("getRenderInfo") + '\n')
+                output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
                 val map = deserialize(initResponse) as RenderInfo
 
                 val exist = map.entities
 
-                for (i in graphicsMap.keys)
-                {
-                    if (i !in map.entities.map {it.id})
-                    {
+                for (i in graphicsMap.keys) {
+                    if (i !in map.entities.map { it.id }) {
                         graphicsMap.remove(i)
                         removeChild(graphicsMap[i])
                     }
                 }
 
-                for (i in map.entities)
-                {
-                    if (i.id in graphicsMap)
-                    {
+                for (i in map.entities) {
+                    if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
-                    }
-                    else
-                    {
+                    } else {
                         val square = SolidRect(20.0, 20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0).rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
                     }
@@ -79,8 +66,8 @@ fun main()
                 val mX = views.nativeMouseX
                 val mY = views.nativeMouseY
 
-                output.writeStringUtf8(serialize(ClientServerPoint(mX, mY)) + '\n')
-
+                output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
+                /*
                 views.mouse {
                     click {
                         launch {
@@ -88,6 +75,7 @@ fun main()
                         }
                     }
                 }
+                 */
             }
         }
     }

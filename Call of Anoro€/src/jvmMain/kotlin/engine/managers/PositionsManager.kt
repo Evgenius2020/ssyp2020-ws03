@@ -1,7 +1,7 @@
 package engine.managers
 
 import engine.Configuration
-import engine.Entity
+import shared.Entity
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin

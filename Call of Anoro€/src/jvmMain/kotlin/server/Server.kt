@@ -1,6 +1,6 @@
 package server
 
-import engine.Entity
+import shared.Entity
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.ServerSocket
 import io.ktor.network.sockets.aSocket
@@ -85,18 +85,15 @@ class Server {
     }
 
     private suspend fun communicate(input: ByteReadChannel, output: ByteWriteChannel, e: Entity) {
-        val s = input.readUTF8Line()
-        when(s){
-            "getRenderInfo" ->{
+        when (val message = deserialize(input.readUTF8Line()!!)) {
+            is shared.GetRenderInfo -> {
                 val res = CompletableDeferred<RenderInfo>()
                 serverActor.send(GetRenderInfo(e, res))
-                output.writeStringUtf8(serialize(res.await()))
+                output.writeStringUtf8(serialize(res.await()) + '\n')
+                println(message)
             }
-            "setAngle" ->{
-                val s2 = input.readUTF8Line()
-                serverActor.send(SetAngle(e, deserialize(s2!!) as ClientServerPoint))
-            }
-            "shoot" -> serverActor.send(Shoot(e))
+            is shared.SetAngle -> serverActor.send(SetAngle(e, message.point))
+            is shared.Shoot -> serverActor.send(Shoot(e))
         }
     }
 

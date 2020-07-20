@@ -1,7 +1,7 @@
 package server
 
 import com.soywiz.korio.async.launch
-import engine.Entity
+import shared.Entity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import shared.ClientServerPoint

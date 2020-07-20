@@ -1,12 +1,13 @@
 package engine
 
 import engine.managers.PositionsManager
+import shared.Entity
 
 data class PlayerInfo(
-    val pl: Entity,
-    val nick: String,
-    val health: Int,
-    val teamNumber: Int
+        val pl: Entity,
+        val nick: String,
+        val health: Int,
+        val teamNumber: Int
 )
 
 class Engine {
