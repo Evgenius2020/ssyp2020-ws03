@@ -1,4 +1,8 @@
 package engine
 
-open class Entity(x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0)
+open class Entity(
+    var x: Double = 0.0,
+    var y: Double = 0.0,
+    var angle: Double = 0.0
+)
 
