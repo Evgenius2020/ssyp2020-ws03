@@ -1,11 +1,10 @@
 package engine.managers
 
+import com.soywiz.klock.min
+import com.soywiz.korgw.min
 import engine.Configuration
 import shared.Entity
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 
 data class PositionsManagerData(
@@ -23,18 +22,27 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         super.delete(entity)
     }
 
-    fun moveAll(): Array<Pair<Entity, Entity>> {
-        var counter = 0
+    fun checkBorders(e: Entity){
+        //TODO: REWRITE THIS
+        e.x = min(e.x, Configuration.maxx)
+        e.y = min(e.y, Configuration.maxy)
+
+        e.x = max(e.x, Configuration.minx)
+        e.y = max(e.y, Configuration.miny)
+    }
+
+    fun moveAll(): List<Pair<Entity, Entity>> {
         val isChecked = mutableListOf<Entity>()
-        val listOfCol = arrayOf<Pair<Entity, Entity>>()
+        val listOfCol = mutableListOf<Pair<Entity, Entity>>()
         for ((entity, posData) in entitiesData) {
             entity.x += Configuration.speedOfPlayer * cos(entity.angle)
-            entity.y -= Configuration.speedOfPlayer * sin(entity.angle)
+            entity.y += Configuration.speedOfPlayer * sin(entity.angle)
+            checkBorders(entity)
             isChecked.add(entity)
             for ((entity1, posdata1) in entitiesData) {
                 if (entity1 !in isChecked && ((sqrt((entity.x - entity1.x).pow(2.0) +
                                 (entity.y - entity1.y).pow(2.0)) < posData.hitbox))) {
-                    listOfCol[counter++] = (Pair(entity, entity1))
+                    listOfCol.add(Pair(entity, entity1))
                 }
             }
         }

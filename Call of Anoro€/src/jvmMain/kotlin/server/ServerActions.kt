@@ -24,10 +24,14 @@ class ServerActions {
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
-        eng.setAngle(e, atan2(point.y - e.y, point.x - e.x))
+        eng.setAngle(e, kotlin.math.atan2(point.y - e.y, point.x - e.x))
     }
 
     fun shoot(e: Entity) {
         eng.shot(e)
+    }
+
+    fun disconnect(e: Entity) {
+        eng.removePlayer(e)
     }
 }

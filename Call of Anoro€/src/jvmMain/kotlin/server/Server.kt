@@ -76,8 +76,10 @@ class Server {
                     while (true) {
                         try {
                             communicate(input, output, e)
-                        } catch (e: IOException) {
-
+                        } catch (exc: Exception) {
+                            serverActor.send(Disconnect(e))
+                            println("Disconnected")
+                            break
                         }
                     }
                 }

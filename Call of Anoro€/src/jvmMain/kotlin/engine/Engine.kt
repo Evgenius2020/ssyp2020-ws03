@@ -50,6 +50,7 @@ class Engine {
 
     fun shot(entity: Entity) {
         // Creates bullet (based on cooldown)
+        println("SHOOT ${entity.id}")
 //        if (timersManager.checkCooldownTimer(entity)){
 
     }

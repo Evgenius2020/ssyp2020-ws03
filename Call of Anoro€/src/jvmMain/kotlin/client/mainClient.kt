@@ -15,6 +15,7 @@ import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.aSocket
 import io.ktor.network.sockets.openReadChannel
 import io.ktor.network.sockets.openWriteChannel
+import io.ktor.util.KtorExperimentalAPI
 import io.ktor.utils.io.readUTF8Line
 import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,7 @@ import kotlinx.coroutines.withContext
 import shared.*
 import java.net.InetSocketAddress
 
+@KtorExperimentalAPI
 fun main() {
     runBlocking {
         val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
@@ -45,9 +47,7 @@ fun main() {
             while (true) {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
-                val map = deserialize(initResponse) as RenderInfo
-
-                val exist = map.entities
+                val map = deserialize(response) as RenderInfo
 
                 for (i in graphicsMap.keys) {
                     if (i !in map.entities.map { it.id }) {
@@ -56,7 +56,7 @@ fun main() {
                     }
                 }
                 for (i in map.entities) {
-                    println("Bot id is: {${i.id}}, it's pos is: {${i.x}, ${i.y}}")
+//                    println("Bot id is: {${i.id}}, it's pos is: {${i.x}, ${i.y}}")
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
@@ -64,7 +64,7 @@ fun main() {
                         graphicsMap[i.id] = square
                     }
                 }
-                /*
+
                 val mX = views.nativeMouseX
                 val mY = views.nativeMouseY
 
@@ -73,11 +73,11 @@ fun main() {
                 views.mouse {
                     click {
                         launch {
-                            output.writeStringUtf8(serialize("shoot") + '\n')
+                            output.writeStringUtf8(serialize(Shoot) + '\n')
                         }
                     }
                 }
-                */
+
             }
         }
     }

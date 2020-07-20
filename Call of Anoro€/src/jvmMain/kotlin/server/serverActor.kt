@@ -18,6 +18,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
                 is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.e)
+                is Disconnect -> s.disconnect(msg.e)
             }
         }
     }
