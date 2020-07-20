@@ -39,17 +39,13 @@ fun main() {
             println(initMap)
 
             for (i in initMap.entities) {
-                println("Bot id is: {${i.id}}, it's pos is: {${i.x}, ${i.y}}")
                 val square = circle(20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0)//.rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
             }
             while (true) {
-
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
                 val map = deserialize(initResponse) as RenderInfo
-
-
 
                 val exist = map.entities
 
@@ -59,8 +55,8 @@ fun main() {
                         removeChild(graphicsMap[i])
                     }
                 }
-
                 for (i in map.entities) {
+                    println("Bot id is: {${i.id}}, it's pos is: {${i.x}, ${i.y}}")
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {

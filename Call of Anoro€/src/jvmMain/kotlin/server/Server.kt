@@ -52,6 +52,7 @@ class Server {
 
     private fun runUpdater(context: CoroutineScope) {
         context.launch {
+            println("UPDATER")
             while (true) {
                 delay(16)
                 serverActor.send(Tick)
@@ -90,7 +91,6 @@ class Server {
                 val res = CompletableDeferred<RenderInfo>()
                 serverActor.send(GetRenderInfo(e, res))
                 output.writeStringUtf8(serialize(res.await()) + '\n')
-                println(message)
             }
             is shared.SetAngle -> serverActor.send(SetAngle(e, message.point))
             is shared.Shoot -> serverActor.send(Shoot(e))

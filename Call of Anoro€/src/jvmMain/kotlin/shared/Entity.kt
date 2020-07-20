@@ -7,5 +7,5 @@ open class Entity(
     var y: Double = 0.0,
     var angle: Double = 0.0,
     val id: Int = nextId++
-)
+) : java.io.Serializable
 
