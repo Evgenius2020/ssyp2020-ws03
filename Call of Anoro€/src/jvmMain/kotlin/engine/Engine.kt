@@ -24,13 +24,18 @@ class Engine {
         listOfPlayers[entity.id] = player
         positionsManager.register(entity)
         timersManager.register(entity)
-        return Entity()
+        return entity
     }
 
     fun removePlayer(entity: Entity) {
         listOfPlayers.remove(entity.id)
         positionsManager.removeEntity(entity)
         timersManager.removePlayer(entity)
+    }
+
+    fun tick(){
+        positionsManager.moveAll()
+        timersManager.tick()
     }
 
     fun getEntities(player: Entity): Array<Entity> {
@@ -46,12 +51,9 @@ class Engine {
         // Creates bullet (based on cooldown)
 //        if (timersManager.checkCooldownTimer(entity)){
 
-        }
     }
 
     fun getPlayerInfos(): Array<PlayerInfo> {
         return arrayOf()
     }
-
-    fun tick() {}
 }
