@@ -16,6 +16,10 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         super.register(entity, PositionsManagerData())
     }
 
+    fun removeEntity(entity: Entity){
+        super.delete(entity)
+    }
+
     fun moveAll(): Array<Pair<Entity, Entity>> {
         var counter = 0
         val isChecked = mutableListOf<Entity>()
@@ -33,5 +37,6 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         }
         return listOfCol
     }
+
     fun getPositions(): Array<Entity> = entitiesData.keys.toTypedArray()
 }
