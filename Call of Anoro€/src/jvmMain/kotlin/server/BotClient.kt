@@ -15,7 +15,7 @@ class BotClient(val server: SendChannel<ServerMsg>) {
         val responsePlayer = CompletableDeferred<Entity>()
         server.send(Register(responsePlayer))
         val e = responsePlayer.await()
-
+/*
         runBlocking {
             launch {
                 while (true) {
@@ -29,6 +29,6 @@ class BotClient(val server: SendChannel<ServerMsg>) {
                     server.send(SetAngle(e, ClientServerPoint(Random.nextDouble(640.0), Random.nextDouble(480.0))))
                 }
             }
-        }
+        }*/
     }
 }

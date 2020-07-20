@@ -31,12 +31,16 @@ fun main() {
         val output = socket.openWriteChannel(autoFlush = true)
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
-            val graphicsMap = mutableMapOf<Int, SolidRect>()
+            val graphicsMap = mutableMapOf<Int, Circle>()
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
+
+            println(initMap)
+
             for (i in initMap.entities) {
-                val square = SolidRect(20.0, 20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0).rotation(Angle(i.angle))
+                println("Bot id is: {${i.id}}, it's pos is: {${i.x}, ${i.y}}")
+                val square = circle(20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0)//.rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
             }
             while (true) {
@@ -44,6 +48,8 @@ fun main() {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
                 val map = deserialize(initResponse) as RenderInfo
+
+
 
                 val exist = map.entities
 
@@ -58,16 +64,16 @@ fun main() {
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
-                        val square = SolidRect(20.0, 20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0).rotation(Angle(i.angle))
+                        val square = circle(20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0)//.rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
                     }
                 }
-
+                /*
                 val mX = views.nativeMouseX
                 val mY = views.nativeMouseY
 
                 output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
-                /*
+
                 views.mouse {
                     click {
                         launch {
@@ -75,7 +81,7 @@ fun main() {
                         }
                     }
                 }
-                 */
+                */
             }
         }
     }
