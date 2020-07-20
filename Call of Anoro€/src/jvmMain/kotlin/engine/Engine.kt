@@ -22,7 +22,7 @@ class Engine {
 
     fun getEntities(player: Entity): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return arrayOf()
+        return positionsManager.getPositions()
     }
 
     fun setAngle(entity: Entity, angle: Double) {}
