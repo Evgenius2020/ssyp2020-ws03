@@ -6,6 +6,7 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 data class PositionsManagerData(
         val hitbox: Double = Configuration.radiusOfPlayer
@@ -13,7 +14,13 @@ data class PositionsManagerData(
 
 class PositionsManager : BaseManager<PositionsManagerData>() {
     fun register(entity: Entity) {
+        entity.x = Random.nextDouble(640.0)
+        entity.y = Random.nextDouble(640.0)
         super.register(entity, PositionsManagerData())
+    }
+
+    fun removeEntity(entity: Entity){
+        super.delete(entity)
     }
 
     fun moveAll(): Array<Pair<Entity, Entity>> {
@@ -33,5 +40,6 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         }
         return listOfCol
     }
+
     fun getPositions(): Array<Entity> = entitiesData.keys.toTypedArray()
 }
