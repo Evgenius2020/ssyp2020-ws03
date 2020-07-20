@@ -12,7 +12,7 @@ class ServerActions {
     val eng = Engine()
 
     fun register(res: CompletableDeferred<Entity>){
-        res.complete(eng.registerPlayer())
+        res.complete(eng.registerPlayer("pepe"))
     }
 
     fun tick(){
