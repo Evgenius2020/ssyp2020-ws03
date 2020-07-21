@@ -45,15 +45,15 @@ fun main() {
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
+            val colorManager = ColorManager()
 
             for (i in initMap.entities) {
-                val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                val square = solidRect(size, size, colorManager.getColor(initMap.info[i.id]?.team)).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
             }
             while (true) {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
-                println(response)
                 val map = deserialize(response) as RenderInfo
 
                 val exist = mutableListOf<Int>()
@@ -74,7 +74,7 @@ fun main() {
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
-                        val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                        val square = solidRect(size, size, colorManager.getColor(initMap.info[i.id]?.team)).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
                     }
                 }

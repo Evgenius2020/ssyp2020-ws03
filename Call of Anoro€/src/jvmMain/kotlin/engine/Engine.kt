@@ -9,7 +9,7 @@ data class PlayerInfo(
         val pl: Entity,
         val nick: String,
         val health: Int
-) {
+) : java.io.Serializable {
     val team: Int = -1
 }
 
@@ -55,7 +55,7 @@ class Engine {
 
     }
 
-    fun getPlayerInfos(): Array<PlayerInfo> {
-        return arrayOf()
+    fun getPlayerInfos(): Map<Int, PlayerInfo> {
+        return listOfPlayers
     }
 }
