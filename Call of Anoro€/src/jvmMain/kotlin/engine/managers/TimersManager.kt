@@ -33,9 +33,14 @@ class TimersManager : BaseManager<TimersManagerData>() {
         else -> false
     }
 
-    fun checkRespawn(player: Player) = when {
-        entitiesData[player]!!.respawnTime < 0 -> true
-        else -> false
+    fun checkRespawn(player: Player): Boolean {
+        return when {
+            entitiesData[player]!!.respawnTime < 0 -> {
+                entitiesData[player]!!.cooldown = Configuration.shootCD
+                true
+            }
+            else -> false
+        }
     }
 
     fun getGameTimer() = when {
@@ -43,9 +48,6 @@ class TimersManager : BaseManager<TimersManagerData>() {
         else -> gameTime
     }
 
-    fun haveShooted(player: Player) {
-        entitiesData[player]!!.cooldown = Configuration.shootCD
-    }
 
     fun haveDead(player: Player) {
         entitiesData[player]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size.toDouble() *
