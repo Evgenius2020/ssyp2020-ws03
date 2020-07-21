@@ -1,6 +1,6 @@
 package server
 
-import shared.Entity
+import engine.Engine
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.ServerSocket
 import io.ktor.network.sockets.aSocket
@@ -13,12 +13,57 @@ import io.ktor.utils.io.readUTF8Line
 import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
-import shared.ClientServerPoint
-import shared.RenderInfo
-import shared.deserialize
-import shared.serialize
-import java.io.IOException
+import kotlinx.coroutines.channels.actor
+import shared.*
 import java.net.InetSocketAddress
+
+@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
+fun CoroutineScope.serverActor() = actor<ServerMsg> {
+    val s = ServerActions()
+
+    for (msg in channel) {
+        if (!isClosedForReceive) {
+            when (msg) {
+                is Register -> s.register(msg.u)
+                is Tick -> s.tick()
+                is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
+                is SetAngle -> s.setAngle(msg.e, msg.point)
+                is Shoot -> s.shoot(msg.e)
+                is Disconnect -> s.disconnect(msg.e)
+            }
+        }
+    }
+}
+
+class ServerActions {
+
+    val eng = Engine()
+
+    fun register(res: CompletableDeferred<Entity>){
+        res.complete(eng.registerPlayer("pepe"))
+    }
+
+    fun tick(){
+        eng.tick()
+    }
+
+    fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
+        res.complete(RenderInfo(eng.getEntities(e), eng.getPlayerInfos()))
+    }
+
+    fun setAngle(e: Entity, point: ClientServerPoint) {
+        eng.setAngle(e, kotlin.math.atan2(point.y - e.y, point.x - e.x))
+    }
+
+    fun shoot(e: Entity) {
+        eng.shot(e)
+    }
+
+    fun disconnect(e: Entity) {
+        eng.removePlayer(e)
+    }
+}
 
 class Server {
     val addr = "127.0.0.1"

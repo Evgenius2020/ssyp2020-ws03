@@ -74,7 +74,7 @@ fun main() {
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
-                        val square = solidRect(size, size, colorManager.getColor(initMap.info[i.id]?.team)).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                        val square = solidRect(size, size, colorManager.getColor(map.info[i.id]?.team)).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
                     }
                 }
