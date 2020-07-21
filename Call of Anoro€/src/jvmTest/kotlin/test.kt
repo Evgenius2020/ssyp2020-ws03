@@ -24,3 +24,4 @@ class MyTest : ViewsForTesting() {
 		assertEquals(listOf("clicked"), log)
 	}
 }
+
