@@ -2,8 +2,11 @@ package client
 
 import com.soywiz.korge.Korge
 import com.soywiz.korge.input.onClick
+import com.soywiz.korge.tiled.TiledMapView
+import com.soywiz.korge.tiled.readTiledMap
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
+import com.soywiz.korio.file.std.resourcesVfs
 import com.soywiz.korma.geom.Angle
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.aSocket
@@ -34,6 +37,9 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
+            val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
+            addChild(mapView)
+
             views.root.onClick {
                 output.writeStringUtf8(serialize(Shoot) + '\n')
             }
