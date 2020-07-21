@@ -3,6 +3,7 @@ package engine
 import engine.managers.DamageManager
 import engine.managers.PositionsManager
 import engine.managers.TimersManager
+import shared.Entity
 import kotlin.concurrent.timer
 
 data class PlayerInfo(

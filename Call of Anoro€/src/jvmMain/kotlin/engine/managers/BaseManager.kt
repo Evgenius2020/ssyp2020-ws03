@@ -1,6 +1,6 @@
 package engine.managers
 
-import engine.Entity
+import shared.Entity
 
 open class BaseManager<DataType> {
     val entitiesData = mutableMapOf<Entity, DataType>()

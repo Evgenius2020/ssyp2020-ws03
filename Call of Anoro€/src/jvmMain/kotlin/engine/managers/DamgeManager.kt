@@ -1,7 +1,7 @@
 package engine.managers
 
 import engine.Configuration
-import engine.Entity
+import shared.Entity
 
 class DamageManagerData(
         var health: Int = Configuration.healthOfPlayer,
