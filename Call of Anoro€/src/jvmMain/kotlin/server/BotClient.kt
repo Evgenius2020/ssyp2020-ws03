@@ -5,11 +5,12 @@ import shared.Entity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import shared.ClientServerPoint
+import shared.Player
 import kotlin.random.Random
 
 class BotClient(val server: SendChannel<ServerMsg>) {
     suspend fun start() {
-        val responsePlayer = CompletableDeferred<Entity>()
+        val responsePlayer = CompletableDeferred<Player>()
         server.send(Register(responsePlayer))
         val e = responsePlayer.await()
 

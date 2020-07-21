@@ -40,6 +40,7 @@ fun main() {
 
             val graphicsMap = mutableMapOf<Int, View>()
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
+            println("Here")
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
             val colorManager = ColorManager()
