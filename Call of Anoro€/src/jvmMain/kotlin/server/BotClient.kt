@@ -15,12 +15,12 @@ class BotClient(val server: SendChannel<ServerMsg>) {
 
         //Не страшно, честно
         runBlocking {
-//            launch {
-//                while (true) {
-//                    delay(100)
-//                    server.send(Shoot(e))
-//                }
-//            }
+            launch {
+                while (true) {
+                    delay(100)
+                    server.send(Shoot(e))
+                }
+            }
             launch {
                 while (true) {
                     delay(200)
