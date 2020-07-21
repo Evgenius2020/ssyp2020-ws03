@@ -136,7 +136,9 @@ class Server {
             is shared.GetRenderInfo -> {
                 val res = CompletableDeferred<RenderInfo>()
                 serverActor.send(GetRenderInfo(e, res))
+                println("Here")
                 output.writeStringUtf8(serialize(res.await()) + '\n')
+                println("printed")
             }
             is shared.SetAngle -> serverActor.send(SetAngle(e, message.point))
             is shared.Shoot -> serverActor.send(Shoot(e))

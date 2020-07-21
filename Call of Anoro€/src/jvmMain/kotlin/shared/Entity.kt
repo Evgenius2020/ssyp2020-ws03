@@ -8,4 +8,3 @@ open class Entity(
     var angle: Double = 0.0,
     val id: Int = nextId++
 ) : java.io.Serializable
-

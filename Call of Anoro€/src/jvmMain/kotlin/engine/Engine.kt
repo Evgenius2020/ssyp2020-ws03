@@ -1,5 +1,6 @@
 package engine
 
+import engine.managers.DamageManager
 import engine.managers.PositionsManager
 import engine.managers.TimersManager
 import shared.Entity
@@ -16,15 +17,17 @@ data class PlayerInfo(
 class Engine {
     private val positionsManager = PositionsManager()
     private val timersManager = TimersManager()
+    private val damageManager = DamageManager()
     private val listOfPlayers = mutableMapOf<Int, PlayerInfo>()
 
     fun registerPlayer(nick: String): Entity {
         val entity = Entity()
         val player = PlayerInfo(entity, nick, Configuration.healthOfPlayer)
-//        player.team = teamChooser(player)
+//        player.team = teamManager.teamChooser(player)
         listOfPlayers[entity.id] = player
-        positionsManager.register(entity)
+        positionsManager.register(entity, 0)
         timersManager.register(entity)
+        damageManager.register(entity, player.team, false)
         return entity
     }
 
@@ -35,13 +38,18 @@ class Engine {
     }
 
     fun tick(){
-        positionsManager.moveAll()
+        val deads = damageManager.processCollisions(positionsManager.moveAll())
+        if (deads != null){
+            for (ents in deads){
+                timersManager.haveDead(ents)
+            }
+        }
         timersManager.tick()
     }
 
     fun getEntities(player: Entity): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return positionsManager.getPositions()
+        return positionsManager.getEntities()
     }
 
     fun setAngle(entity: Entity, angle: Double) {
@@ -50,9 +58,14 @@ class Engine {
 
     fun shot(entity: Entity) {
         // Creates bullet (based on cooldown)
-        println("SHOOT ${entity.id}")
-//        if (timersManager.checkCooldownTimer(entity)){
-
+        if (timersManager.checkCooldownTimer(entity)){
+            val bullet = Entity()
+            damageManager.register(bullet, listOfPlayers[entity.id]!!.team, true)
+            positionsManager.register(bullet, 1)
+        }
+    }
+    fun setFriendlyFire(ff: Boolean){
+        damageManager.friendlyFire = ff
     }
 
     fun getPlayerInfos(): Map<Int, PlayerInfo> {
