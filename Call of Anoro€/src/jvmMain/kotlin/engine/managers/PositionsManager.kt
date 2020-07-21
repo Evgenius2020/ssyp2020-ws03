@@ -1,8 +1,10 @@
 package engine.managers
 
 import engine.Configuration
+import shared.Bullet
 import shared.Entity
 import shared.Object
+import shared.Player
 import kotlin.math.*
 
 data class PositionsManagerData(
@@ -15,21 +17,33 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     private val listOfTypes = mutableMapOf<Int, Int>()
 
     fun register(entity: Entity) {
+        listOfTypes[entity.id] = when(entity){
+            is Player -> 0
+            is Bullet -> 1
+            else -> 2
+        }
         super.register(entity, PositionsManagerData())
-//        listOfTypes[entity.id] = type
     }
 
     fun removeEntity(entity: Entity) {
-//        listOfTypes.remove(entity.id)
         super.delete(entity)
     }
 
-    fun checkBorders(e: Entity) {
-        e.x = min(e.x, Configuration.width - Configuration.radiusOfBullet)
-        e.y = min(e.y, Configuration.height - Configuration.radiusOfBullet)
+    private fun checkBorders(e: Entity) {
+        if (e is Bullet) {
+            e.x = min(e.x, Configuration.width - Configuration.radiusOfBullet)
+            e.y = min(e.y, Configuration.height - Configuration.radiusOfBullet)
 
-        e.x = max(e.x, Configuration.radiusOfBullet)
-        e.y = max(e.y, Configuration.radiusOfBullet)
+            e.x = max(e.x, Configuration.radiusOfBullet)
+            e.y = max(e.y, Configuration.radiusOfBullet)
+        }
+        if (e is Player) {
+            e.x = min(e.x, Configuration.width - Configuration.radiusOfPlayer)
+            e.y = min(e.y, Configuration.height - Configuration.radiusOfPlayer)
+
+            e.x = max(e.x, Configuration.radiusOfPlayer)
+            e.y = max(e.y, Configuration.radiusOfPlayer)
+        }
     }
 
     fun moveAll(): List<Pair<Entity, Entity>>? {

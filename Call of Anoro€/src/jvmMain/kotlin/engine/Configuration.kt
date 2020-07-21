@@ -1,8 +1,5 @@
 package engine
-//TYPES!!!!! -- for Positions Manager
-//type 0 = player
-//type 1 = bullet
-//type 2 = object
+
 object Configuration {
     const val radiusOfPlayer = 16.0
     const val radiusOfBullet = 2.0

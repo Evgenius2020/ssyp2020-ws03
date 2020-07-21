@@ -24,10 +24,10 @@ class Engine {
         return player
     }
 
-    fun removePlayer(entity: Entity) {
-        listOfPlayers.remove(entity.id)
-        positionsManager.removeEntity(entity)
-        timersManager.removePlayer(entity)
+    fun removePlayer(player: Player) {
+        listOfPlayers.remove(player.id)
+        positionsManager.removeEntity(player)
+        timersManager.removePlayer(player)
     }
 
     fun tick(){

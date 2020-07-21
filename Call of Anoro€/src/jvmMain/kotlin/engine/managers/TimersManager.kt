@@ -1,7 +1,6 @@
 package engine.managers
 
 import engine.Configuration
-import shared.Entity
 import shared.Player
 
 data class TimersManagerData(
@@ -13,24 +12,24 @@ data class TimersManagerData(
 class TimersManager : BaseManager<TimersManagerData>() {
     private var gameTime = Configuration.gameTime
 
-    fun register(entity: Entity) {
-        super.register(entity, TimersManagerData())
+    fun register(player: Player) {
+        super.register(player, TimersManagerData())
     }
 
-    fun removePlayer(entity: Entity){
-        super.delete(entity)
+    fun removePlayer(player: Player){
+        super.delete(player)
     }
 
     fun tick() {
-        for ((ent, dat) in entitiesData) {
-            entitiesData[ent]!!.cooldown -= Configuration.dt
-            entitiesData[ent]!!.respawnTime -= Configuration.dt
+        for (player in entitiesData.keys) {
+            entitiesData[player]!!.cooldown -= Configuration.dt
+            entitiesData[player]!!.respawnTime -= Configuration.dt
             gameTime -= Configuration.dt
         }
     }
 
-    fun checkCooldownTimer(ent: Entity) = when {
-        entitiesData[ent]!!.cooldown < 0 -> true
+    fun checkCooldownTimer(player: Player) = when {
+        entitiesData[player]!!.cooldown < 0 -> true
         else -> false
     }
 
@@ -48,9 +47,9 @@ class TimersManager : BaseManager<TimersManagerData>() {
         entitiesData[player]!!.cooldown = Configuration.shootCD
     }
 
-    fun haveDead(ent: Entity) {
-        entitiesData[ent]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size.toDouble() *
-                ++entitiesData[ent]!!.deaths
-        if (entitiesData[ent]!!.respawnTime > 30.0) entitiesData[ent]!!.respawnTime = 30.0
+    fun haveDead(player: Player) {
+        entitiesData[player]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size.toDouble() *
+                ++entitiesData[player]!!.deaths
+        if (entitiesData[player]!!.respawnTime > 30.0) entitiesData[player]!!.respawnTime = 30.0
     }
 }
