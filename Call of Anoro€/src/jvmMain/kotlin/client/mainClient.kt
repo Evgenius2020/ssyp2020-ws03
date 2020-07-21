@@ -32,17 +32,13 @@ fun main() {
         val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         val input = socket.openReadChannel()
         val output = socket.openWriteChannel(autoFlush = true)
-        var pepe = 1
 
         val size = ClientConfiguration.size
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
             views.root.onClick {
-                println("Oh shit I'm sorry")
                 output.writeStringUtf8(serialize(Shoot) + '\n')
-                println("Shot number $pepe")
-                pepe++
             }
 
             val graphicsMap = mutableMapOf<Int, SolidRect>()
@@ -57,6 +53,7 @@ fun main() {
             while (true) {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
+                println(response)
                 val map = deserialize(response) as RenderInfo
 
                 val exist = mutableListOf<Int>()
