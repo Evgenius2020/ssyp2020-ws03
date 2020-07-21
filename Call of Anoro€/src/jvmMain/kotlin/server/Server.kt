@@ -29,7 +29,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
                 is Tick -> s.tick()
                 is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
-                is Shoot -> s.shoot(msg.e)
+                is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.e)
             }
         }
@@ -44,7 +44,7 @@ class ServerActions {
         eng.setFriendlyFire(false)
     }
 
-    fun register(res: CompletableDeferred<Entity>){
+    fun register(res: CompletableDeferred<Player>){
         res.complete(eng.registerPlayer("pepe"))
     }
 
@@ -53,15 +53,15 @@ class ServerActions {
     }
 
     fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
-        res.complete(RenderInfo(eng.getEntities(e), eng.getPlayerInfos()))
+        res.complete(RenderInfo(eng.getEntities(e)))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
         eng.setAngle(e, kotlin.math.atan2(point.y - e.y, point.x - e.x))
     }
 
-    fun shoot(e: Entity) {
-        eng.shot(e)
+    fun shoot(p: Player) {
+        eng.shot(p)
     }
 
     fun disconnect(e: Entity) {
@@ -114,18 +114,18 @@ class Server {
                 val socket = serverSocket.accept()
 
                 launch {
-                    val futureEntity = CompletableDeferred<Entity>()
-                    serverActor.send(Register(futureEntity))
-                    val e = futureEntity.await()
+                    val futurePlayer = CompletableDeferred<Player>()
+                    serverActor.send(Register(futurePlayer))
+                    val p = futurePlayer.await()
 
                     val input = socket.openReadChannel()
                     val output = socket.openWriteChannel(autoFlush = true)
 
                     while (true) {
                         try {
-                            communicate(input, output, e)
+                            communicate(input, output, p)
                         } catch (exc: Exception) {
-                            serverActor.send(Disconnect(e))
+                            serverActor.send(Disconnect(p))
                             println("Disconnected")
                             break
                         }
@@ -135,17 +135,16 @@ class Server {
         }
     }
 
-    private suspend fun communicate(input: ByteReadChannel, output: ByteWriteChannel, e: Entity) {
+    private suspend fun communicate(input: ByteReadChannel, output: ByteWriteChannel, p: Player) {
         when (val message = deserialize(input.readUTF8Line()!!)) {
             is shared.GetRenderInfo -> {
                 val res = CompletableDeferred<RenderInfo>()
-                serverActor.send(GetRenderInfo(e, res))
-                println("Here")
+                serverActor.send(GetRenderInfo(p, res))
+
                 output.writeStringUtf8(serialize(res.await()) + '\n')
-                println("printed")
             }
-            is shared.SetAngle -> serverActor.send(SetAngle(e, message.point))
-            is shared.Shoot -> serverActor.send(Shoot(e))
+            is shared.SetAngle -> serverActor.send(SetAngle(p, message.point))
+            is shared.Shoot -> serverActor.send(Shoot(p))
         }
     }
 
