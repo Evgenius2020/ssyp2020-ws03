@@ -25,8 +25,6 @@ import kotlinx.coroutines.withContext
 import shared.*
 import java.net.InetSocketAddress
 
-
-
 @KtorExperimentalAPI
 fun main() {
     runBlocking {
@@ -80,6 +78,15 @@ fun main() {
                 val mY = views.nativeMouseY
 
                 output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
+
+                views.mouse {
+                    click {
+                        launch {
+                            output.writeStringUtf8(serialize(Shoot) + '\n')
+                            println("SHOOOOOOT")
+                        }
+                    }
+                }
 
             }
         }
