@@ -56,8 +56,9 @@ class Engine {
             bullet.x = player.x
             bullet.y = player.y
             bullet.angle = player.angle
-            damageManager.register(bullet, bullet.team)
             positionsManager.register(bullet)
+            timersManager.haveShooted(player)
+            damageManager.register(bullet, bullet.team)
         }
     }
 

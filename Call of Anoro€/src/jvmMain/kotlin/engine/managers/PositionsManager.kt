@@ -26,16 +26,16 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     fun removeEntity(entity: Entity) {
+        listOfTypes.remove(entity.id)
         super.delete(entity)
     }
 
     private fun checkBorders(e: Entity) {
         if (e is Bullet) {
-            e.x = min(e.x, Configuration.width - Configuration.radiusOfBullet)
-            e.y = min(e.y, Configuration.height - Configuration.radiusOfBullet)
-
-            e.x = max(e.x, Configuration.radiusOfBullet)
-            e.y = max(e.y, Configuration.radiusOfBullet)
+            if ((e.x > Configuration.width + Configuration.radiusOfBullet) ||
+                    (e.y > Configuration.height + Configuration.radiusOfBullet) ||
+                    (e.x < -Configuration.radiusOfBullet) ||
+                    (e.y < -Configuration.radiusOfBullet)) removeEntity(e)
         }
         if (e is Player) {
             e.x = min(e.x, Configuration.width - Configuration.radiusOfPlayer)
@@ -47,7 +47,6 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     fun moveAll(): List<Pair<Entity, Entity>>? {
-        var counter = 0
         val isChecked = mutableListOf<Entity>()
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
         for ((entity, posData) in entitiesData) {

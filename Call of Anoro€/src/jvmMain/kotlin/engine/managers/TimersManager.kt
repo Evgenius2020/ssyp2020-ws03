@@ -22,20 +22,21 @@ class TimersManager : BaseManager<TimersManagerData>() {
 
     fun tick() {
         for (player in entitiesData.keys) {
-            entitiesData[player]!!.cooldown -= Configuration.dt
+            if ((player is Player) && (!checkCooldownTimer(player))){
+                entitiesData[player]!!.cooldown -= Configuration.dt
+            }
             entitiesData[player]!!.respawnTime -= Configuration.dt
             gameTime -= Configuration.dt
         }
     }
 
-    fun checkCooldownTimer(player: Player): Boolean {
-        return when{
-            entitiesData[player]!!.cooldown < 0 ->{
-                entitiesData[player]!!.cooldown = Configuration.shootCD
-                true
-            }
-            else -> false
-        }
+    fun checkCooldownTimer(player: Player) = when {
+        entitiesData[player]!!.cooldown < 0.0 -> true
+        else -> false
+    }
+
+    fun haveShooted(player: Player) {
+        entitiesData[player]!!.cooldown = Configuration.shootCD
     }
 
     fun checkRespawn(player: Player) = when{
