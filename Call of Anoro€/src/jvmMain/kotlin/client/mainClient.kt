@@ -7,6 +7,7 @@ import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
+import com.soywiz.korim.color.RGBA
 import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.geom.Angle
@@ -38,8 +39,8 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
-
-            stage.onClick {
+            views.root.onClick {
+                println("Oh shit I'm sorry")
                 output.writeStringUtf8(serialize(Shoot) + '\n')
                 println("Shot number $pepe")
                 pepe++
@@ -82,8 +83,8 @@ fun main() {
                     }
                 }
 
-                val mX = views.nativeMouseX
-                val mY = views.nativeMouseY
+                val mX = mouseX
+                val mY = mouseY
 
                 output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
             }
