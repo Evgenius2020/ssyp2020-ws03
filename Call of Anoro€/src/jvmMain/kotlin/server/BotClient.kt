@@ -13,7 +13,7 @@ class BotClient(val server: SendChannel<ServerMsg>) {
         server.send(Register(responsePlayer))
         val e = responsePlayer.await()
 
-        //Не страшно, честно
+        //Не страшно, честно; страшно, честно
         runBlocking {
             launch {
                 while (true) {
