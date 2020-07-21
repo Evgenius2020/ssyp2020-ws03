@@ -2,7 +2,7 @@ package engine.managers
 
 import engine.Configuration
 import shared.Entity
-import engine.PlayerInfo
+import shared.Player
 
 data class TimersManagerData(
         var cooldown: Double = Configuration.shootCD,
@@ -34,8 +34,8 @@ class TimersManager : BaseManager<TimersManagerData>() {
         else -> false
     }
 
-    fun checkRespawn(player: PlayerInfo) = when {
-        entitiesData[player.pl]!!.respawnTime < 0 -> true
+    fun checkRespawn(player: Player) = when {
+        entitiesData[player]!!.respawnTime < 0 -> true
         else -> false
     }
 
@@ -44,8 +44,8 @@ class TimersManager : BaseManager<TimersManagerData>() {
         else -> gameTime
     }
 
-    fun haveShooted(player: PlayerInfo) {
-        entitiesData[player.pl]!!.cooldown = Configuration.shootCD
+    fun haveShooted(player: Player) {
+        entitiesData[player]!!.cooldown = Configuration.shootCD
     }
 
     fun haveDead(ent: Entity) {

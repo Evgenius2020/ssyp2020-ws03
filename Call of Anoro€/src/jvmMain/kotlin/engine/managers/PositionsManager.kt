@@ -25,12 +25,11 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     fun checkBorders(e: Entity) {
-        //TODO: REWRITE THIS
-        e.x = min(e.x, Configuration.maxx)
-        e.y = min(e.y, Configuration.maxy)
+        e.x = min(e.x, Configuration.width - Configuration.radiusOfBullet)
+        e.y = min(e.y, Configuration.height - Configuration.radiusOfBullet)
 
-        e.x = max(e.x, Configuration.minx)
-        e.y = max(e.y, Configuration.miny)
+        e.x = max(e.x, Configuration.radiusOfBullet)
+        e.y = max(e.y, Configuration.radiusOfBullet)
     }
 
     fun moveAll(): List<Pair<Entity, Entity>>? {

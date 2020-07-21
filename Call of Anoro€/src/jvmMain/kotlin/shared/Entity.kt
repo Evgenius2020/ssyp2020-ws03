@@ -1,5 +1,7 @@
 package shared
 
+import engine.Configuration
+
 private var nextId: Int = 1
 
 open class Entity(
@@ -9,14 +11,16 @@ open class Entity(
     val id: Int = nextId++
 ) : java.io.Serializable
 
-data class Bullet(val team: Int): Entity()
+data class Bullet(
+        val team: Int,
+        val damage: Int = Configuration.baseDamage
+): Entity()
 
 class Object: Entity()
 
 data class Player(
-        val pl: Entity,
         val nick: String,
-        val health: Int
+        var health: Int
 ) : Entity() {
     val team: Int = -1
 }

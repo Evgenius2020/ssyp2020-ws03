@@ -14,15 +14,14 @@ class Engine {
     private val damageManager = DamageManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
-    fun registerPlayer(nick: String): Entity {
-        val entity = Entity()
-        val player = Player(entity, nick, Configuration.healthOfPlayer)
+    fun registerPlayer(nick: String): Player {
+        val player = Player(nick, Configuration.healthOfPlayer)
 //        player.team = teamManager.teamChooser(player)
-        listOfPlayers[entity.id] = player
-        positionsManager.register(entity)
-        timersManager.register(entity)
-        damageManager.register(entity, player.team, false)
-        return entity
+        listOfPlayers[player.id] = player
+        positionsManager.register(player)
+        timersManager.register(player)
+        damageManager.register(player, player.team)
+        return player
     }
 
     fun removePlayer(entity: Entity) {
@@ -47,19 +46,19 @@ class Engine {
     }
 
     fun setAngle(entity: Entity, angle: Double) {
-        listOfPlayers[entity.id]!!.pl.angle = angle
+        listOfPlayers[entity.id]!!.angle = angle
     }
 
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)){
             val bullet = Bullet(player.team)
-            damageManager.register(bullet, listOfPlayers[player.id]!!.team, true)
+            damageManager.register(bullet, bullet.team)
             positionsManager.register(bullet)
         }
     }
 
-    fun setFriendlyFire(ff: Boolean){
+    fun setFriendlyFire(ff: Boolean?){
         damageManager.friendlyFire = ff
     }
 }

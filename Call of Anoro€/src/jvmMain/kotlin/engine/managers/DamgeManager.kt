@@ -1,7 +1,10 @@
 package engine.managers
 
 import engine.Configuration
+import shared.Bullet
 import shared.Entity
+import shared.Object
+import shared.Player
 
 class DamageManagerData(
         var health: Int = Configuration.healthOfPlayer,
@@ -11,44 +14,44 @@ class DamageManagerData(
 
 class DamageManager: BaseManager<DamageManagerData>(){
     var friendlyFire: Boolean? = null
-    private val listOfIsBullet = mutableMapOf<Int, Boolean>()
 
-    fun register(entity: Entity, team: Int, isBullet: Boolean){
+    fun register(entity: Entity, team: Int){
         super.register(entity, DamageManagerData())
         entitiesData[entity]!!.team = team
-        listOfIsBullet[entity.id] = isBullet
     }
     fun remove(entity: Entity){
         super.delete(entity)
-        listOfIsBullet.remove(entity.id)
     }
 
-    fun processCollisions(arr: Array<Pair<Entity, Entity>>?): Array<Entity>?{
+    fun processCollisions(arr: Array<Pair<Entity, Entity>>?): Array<Player>?{
         var cnt = 0
-        val arrDead = arrayOf<Entity>()
+        val arrDead = arrayOf<Player>()
         if (arr != null) {
             for ((ent1, ent2) in arr){
-                if (friendlyFire!!){
-                    if ((listOfIsBullet[ent1.id]!!) && !(listOfIsBullet[ent2.id]!!)){
-                        entitiesData[ent2]!!.health -= entitiesData[ent1]!!.damage
+                if ((ent1 !is Object) && (ent2 !is Object)){
+                    if (friendlyFire == true){
+                        if ((ent1 is Bullet) && (ent2 is Player)){
+                            ent2.health -= ent1.damage
+                            entitiesData[ent2]!!.health -= entitiesData[ent1]!!.damage
+                        }
+                        if ((ent1 is Player) && (ent2 is Bullet)){
+                            ent1.health -= ent2.damage
+                            entitiesData[ent1]!!.health -= entitiesData[ent2]!!.damage
+                        }
                     }
-                    if (!(listOfIsBullet[ent1.id]!!) && (listOfIsBullet[ent2.id]!!)){
-                        entitiesData[ent1]!!.health -= entitiesData[ent2]!!.damage
-                    }
-                }
-                if (!friendlyFire!!){
-                    if ((listOfIsBullet[ent1.id]!!) && !(listOfIsBullet[ent2.id]!!) &&
-                            (entitiesData[ent1]!!.team != entitiesData[ent2]!!.team)){
-                        entitiesData[ent2]!!.health -= entitiesData[ent1]!!.damage
-                    }
-                    if (!(listOfIsBullet[ent1.id]!!) && (listOfIsBullet[ent2.id]!!) &&
-                            (entitiesData[ent1]!!.team != entitiesData[ent2]!!.team)){
-                        entitiesData[ent1]!!.health -= entitiesData[ent2]!!.damage
+                    if (friendlyFire == false){
+                        if ((ent1 is Bullet) && (ent2 is Player) && (ent1.team != ent2.team)){
+                            entitiesData[ent2]!!.health -= entitiesData[ent1]!!.damage
+                        }
+                        if ((ent1 is Player) && (ent2 is Bullet) && (ent1.team != ent2.team)){
+                            ent1.health -= ent2.damage
+                            entitiesData[ent1]!!.health -= entitiesData[ent2]!!.damage
+                        }
                     }
                 }
             }
             for (ent in entitiesData.keys){
-                if (entitiesData[ent]!!.health <= 0){
+                if ((ent is Player) && (ent.health <= 0)){
                     arrDead[cnt++] = ent
                 }
             }

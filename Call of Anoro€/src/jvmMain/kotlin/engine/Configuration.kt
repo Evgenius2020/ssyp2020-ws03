@@ -4,9 +4,9 @@ package engine
 //type 1 = bullet
 //type 2 = object
 object Configuration {
-    const val radiusOfPlayer = 10.0
+    const val radiusOfPlayer = 16.0
     const val radiusOfBullet = 2.0
-    const val sizeOfObj = 10.0
+    const val sizeOfObj = 16.0
     const val speedOfPlayer = 1.0
     const val speedOfBullet = 5.0
     const val shootCD = 1.5 //seconds
@@ -15,8 +15,6 @@ object Configuration {
     const val healthOfPlayer = 100
     const val baseDamage = 35
     const val dt = 0.016
-    const val maxx = 640.0
-    const val maxy = 640.0
-    const val minx = 0.0
-    const val miny = 0.0
+    const val width = 640.0
+    const val height = 640.0
 }
