@@ -3,6 +3,7 @@ package client
 import com.soywiz.klock.seconds
 import com.soywiz.korev.mouse
 import com.soywiz.korge.*
+import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
@@ -31,9 +32,20 @@ fun main() {
         val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         val input = socket.openReadChannel()
         val output = socket.openWriteChannel(autoFlush = true)
+        var pepe = 1
+
+        val size = ClientConfiguration.size
+
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
-            val graphicsMap = mutableMapOf<Int, Circle>()
+
+            stage.onClick {
+                output.writeStringUtf8(serialize(Shoot) + '\n')
+                println("Shot number $pepe")
+                pepe++
+            }
+
+            val graphicsMap = mutableMapOf<Int, SolidRect>()
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
@@ -41,7 +53,7 @@ fun main() {
             println(initMap)
 
             for (i in initMap.entities) {
-                val square = circle(20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0)//.rotation(Angle(i.angle))
+                val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
             }
             while (true) {
@@ -55,11 +67,9 @@ fun main() {
                     exist.add(i.id)
 
                 val iterator = graphicsMap.iterator()
-                while (iterator.hasNext())
-                {
+                while (iterator.hasNext()) {
                     val item = iterator.next()
-                    if (item.key !in exist)
-                    {
+                    if (item.key !in exist) {
                         removeChild(item.value)
                         iterator.remove()
                     }
@@ -67,9 +77,9 @@ fun main() {
 
                 for (i in map.entities) {
                     if (i.id in graphicsMap) {
-                        graphicsMap[i.id]!!.xy(i.x, i.y)//.rotation(Angle(i.angle))
+                        graphicsMap[i.id]!!.anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
-                        val square = circle(20.0, Colors.PURPLE).xy(i.x - 10.0, i.y - 10.0)//.rotation(Angle(i.angle))
+                        val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
                     }
                 }
@@ -78,16 +88,6 @@ fun main() {
                 val mY = views.nativeMouseY
 
                 output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
-
-                views.mouse {
-                    click {
-                        launch {
-                            output.writeStringUtf8(serialize(Shoot) + '\n')
-                            println("SHOOOOOOT")
-                        }
-                    }
-                }
-
             }
         }
     }

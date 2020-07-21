@@ -52,7 +52,6 @@ class Server {
 
     private fun runUpdater(context: CoroutineScope) {
         context.launch {
-            println("UPDATER")
             while (true) {
                 delay(16)
                 serverActor.send(Tick)
