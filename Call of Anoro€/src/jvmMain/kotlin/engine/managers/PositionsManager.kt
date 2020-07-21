@@ -49,6 +49,7 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     fun moveAll(): List<Pair<Entity, Entity>>? {
         val isChecked = mutableListOf<Entity>()
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
+        val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
             if (entity !is Object) {
                 entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
@@ -64,11 +65,14 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                                 entity1 !is Bullet)) {
                     listOfCol.add(Pair(entity, entity1))
                     when{
-                        entity is Bullet -> removeEntity(entity)
-                        entity1 is Bullet -> removeEntity(entity1)
+//                        entity is Bullet -> toRemove.add(entity)
+//                        entity1 is Bullet -> toRemove.add(entity1)
                     }
                 }
             }
+        }
+        for(i in toRemove){
+            removeEntity(i)
         }
         return when {
             listOfCol.isEmpty() -> null

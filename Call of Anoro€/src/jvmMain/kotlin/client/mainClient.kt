@@ -42,11 +42,11 @@ fun main() {
 
             views.root.onClick {
                 output.writeStringUtf8(serialize(Shoot) + '\n')
+                println("SEND SHOOT")
             }
 
             val graphicsMap = mutableMapOf<Int, View>()
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
-            println("Here")
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
             val colorManager = ColorManager()

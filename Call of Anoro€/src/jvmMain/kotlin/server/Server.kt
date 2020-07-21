@@ -30,7 +30,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
                 is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.p)
-                is Disconnect -> s.disconnect(msg.e)
+                is Disconnect -> s.disconnect(msg.p)
             }
         }
     }
@@ -64,9 +64,8 @@ class ServerActions {
         eng.shot(p)
     }
 
-    fun disconnect(e: Entity) {
-        TODO("fix")
-        //eng.removePlayer(e)
+    fun disconnect(p: Player) {
+        eng.removePlayer(p)
     }
 }
 
@@ -141,11 +140,12 @@ class Server {
             is shared.GetRenderInfo -> {
                 val res = CompletableDeferred<RenderInfo>()
                 serverActor.send(GetRenderInfo(p, res))
-
                 output.writeStringUtf8(serialize(res.await()) + '\n')
             }
             is shared.SetAngle -> serverActor.send(SetAngle(p, message.point))
-            is shared.Shoot -> serverActor.send(Shoot(p))
+            is shared.Shoot -> {
+                serverActor.send(Shoot(p))
+            }
         }
     }
 

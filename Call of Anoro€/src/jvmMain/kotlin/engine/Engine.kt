@@ -14,9 +14,13 @@ class Engine {
     private val damageManager = DamageManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
+    //TODO: WRITE TEAM CHOOSER
+    private var teamCounter = 0
+
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
-//        player.team = teamManager.teamChooser(player)
+        player.team = teamCounter++
+        println("id: ${player.id}")
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
@@ -33,8 +37,9 @@ class Engine {
     fun tick(){
         val deads = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
         if (deads != null){
-            for (ents in deads){
-                timersManager.haveDead(ents)
+            for (ent in deads){
+                timersManager.haveDead(ent)
+                positionsManager.removeEntity(ent)
             }
         }
         timersManager.tick()
@@ -52,6 +57,7 @@ class Engine {
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)){
+            println("Shot in engine")
             val bullet = Bullet(player.team)
             bullet.x = player.x
             bullet.y = player.y
@@ -59,6 +65,7 @@ class Engine {
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
+            println("Registered in dmg manager")
         }
     }
 

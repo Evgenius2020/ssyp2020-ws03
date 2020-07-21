@@ -14,13 +14,66 @@ open class Entity(
 data class Bullet(
         val team: Int,
         val damage: Int = Configuration.baseDamage
-): Entity()
+): Entity(){
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-class Object: Entity()
+        other as Bullet
+
+        if (team != other.team) return false
+        if (damage != other.damage) return false
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = team
+        result = 31 * result + damage
+        result = 31 * result + id
+        return result
+    }
+}
+
+class Object: Entity(){
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Object
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
 
 data class Player(
         val nick: String,
         var health: Int
 ) : Entity() {
-    val team: Int = -1
+
+    var team: Int = -1
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Player
+
+        if (nick != other.nick) return false
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = nick.hashCode()
+        result = 31 * result + id
+        return result
+    }
 }
