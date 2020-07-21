@@ -65,7 +65,8 @@ class ServerActions {
     }
 
     fun disconnect(e: Entity) {
-        eng.removePlayer(e)
+        //TODO: fix
+        //eng.removePlayer(e)
     }
 }
 

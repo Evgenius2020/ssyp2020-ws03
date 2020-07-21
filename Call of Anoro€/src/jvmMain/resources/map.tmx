@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="desert1.tsx"/>
+ <tileset firstgid="257" source="desert3.tsx"/>
+ <layer id="1" name="ground" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   KLUv/WBABV0AACACAAAAAQA5/jsi
+  </data>
+ </layer>
+ <layer id="2" name="decor" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   KLUv/WBABU0AABAAAAEAO/4ACw==
+  </data>
+ </layer>
+ <layer id="3" name="solid" width="20" height="20">
+  <data encoding="base64" compression="zstd">
+   KLUv/WBABWUCAGB2AQAAdgEAAHYBdgEnoNDDAXADBaAEOfoik7xhkh6SJce4BxyYmzcxwPPXdgDvr3QifC7KGXCtU3o2qUSh/D4X3rPNOKWF6OtR8gM=
+  </data>
+ </layer>
+</map>
