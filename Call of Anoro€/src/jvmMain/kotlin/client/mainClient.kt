@@ -50,8 +50,6 @@ fun main() {
             val initResponse = input.readUTF8Line()!!
             val initMap = deserialize(initResponse) as RenderInfo
 
-            println(initMap)
-
             for (i in initMap.entities) {
                 val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                 graphicsMap[i.id] = square
@@ -77,7 +75,7 @@ fun main() {
 
                 for (i in map.entities) {
                     if (i.id in graphicsMap) {
-                        graphicsMap[i.id]!!.anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                        graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
                         val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                         graphicsMap[i.id] = square
