@@ -53,6 +53,9 @@ class Engine {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)){
             val bullet = Bullet(player.team)
+            bullet.x = player.x
+            bullet.y = player.y
+            bullet.angle = player.angle
             damageManager.register(bullet, bullet.team)
             positionsManager.register(bullet)
         }
