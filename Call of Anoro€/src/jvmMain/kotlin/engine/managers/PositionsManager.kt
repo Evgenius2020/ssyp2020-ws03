@@ -60,8 +60,13 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                 val dist = sqrt((entity.x - entity1.x).pow(2.0) +
                         (entity.y - entity1.y).pow(2.0))
                 if (entity1 !in isChecked && ((dist < posData.hitboxes[listOfTypes[entity.id]!!]) || (
-                                dist < posData.hitboxes[listOfTypes[entity1.id]!!]))) {
+                                dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
+                                entity1 !is Bullet)) {
                     listOfCol.add(Pair(entity, entity1))
+                    when{
+                        entity is Bullet -> removeEntity(entity)
+                        entity1 is Bullet -> removeEntity(entity1)
+                    }
                 }
             }
         }
