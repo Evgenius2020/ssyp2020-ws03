@@ -40,6 +40,10 @@ class ServerActions {
 
     val eng = Engine()
 
+    init {
+        eng.setFriendlyFire(false)
+    }
+
     fun register(res: CompletableDeferred<Entity>){
         res.complete(eng.registerPlayer("pepe"))
     }

@@ -3,29 +3,23 @@ package engine
 import engine.managers.DamageManager
 import engine.managers.PositionsManager
 import engine.managers.TimersManager
+import shared.Bullet
 import shared.Entity
-import kotlin.concurrent.timer
+import shared.Player
 
-data class PlayerInfo(
-        val pl: Entity,
-        val nick: String,
-        val health: Int
-) : java.io.Serializable {
-    val team: Int = -1
-}
 
 class Engine {
     private val positionsManager = PositionsManager()
     private val timersManager = TimersManager()
     private val damageManager = DamageManager()
-    private val listOfPlayers = mutableMapOf<Int, PlayerInfo>()
+    private val listOfPlayers = mutableMapOf<Int, Player>()
 
     fun registerPlayer(nick: String): Entity {
         val entity = Entity()
-        val player = PlayerInfo(entity, nick, Configuration.healthOfPlayer)
+        val player = Player(entity, nick, Configuration.healthOfPlayer)
 //        player.team = teamManager.teamChooser(player)
         listOfPlayers[entity.id] = player
-        positionsManager.register(entity, 0)
+        positionsManager.register(entity)
         timersManager.register(entity)
         damageManager.register(entity, player.team, false)
         return entity
@@ -38,7 +32,7 @@ class Engine {
     }
 
     fun tick(){
-        val deads = damageManager.processCollisions(positionsManager.moveAll())
+        val deads = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
         if (deads != null){
             for (ents in deads){
                 timersManager.haveDead(ents)
@@ -56,19 +50,16 @@ class Engine {
         listOfPlayers[entity.id]!!.pl.angle = angle
     }
 
-    fun shot(entity: Entity) {
+    fun shot(player: Player) {
         // Creates bullet (based on cooldown)
-        if (timersManager.checkCooldownTimer(entity)){
-            val bullet = Entity()
-            damageManager.register(bullet, listOfPlayers[entity.id]!!.team, true)
-            positionsManager.register(bullet, 1)
+        if (timersManager.checkCooldownTimer(player)){
+            val bullet = Bullet(player.team)
+            damageManager.register(bullet, listOfPlayers[player.id]!!.team, true)
+            positionsManager.register(bullet)
         }
     }
+
     fun setFriendlyFire(ff: Boolean){
         damageManager.friendlyFire = ff
-    }
-
-    fun getPlayerInfos(): Map<Int, PlayerInfo> {
-        return listOfPlayers
     }
 }

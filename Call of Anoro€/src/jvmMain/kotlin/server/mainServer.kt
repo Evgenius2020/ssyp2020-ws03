@@ -15,14 +15,14 @@ fun main() {
             s.run(this)
         }
 
-        launch {
-            delay(2000)
-            repeat(5) {
-                val c = BotClient(s.serverActor)
-                launch {
-                    c.start()
-                }
-            }
-        }
+//        launch {
+//            delay(2000)
+//            repeat(5) {
+//                val c = BotClient(s.serverActor)
+//                launch {
+//                    c.start()
+//                }
+//            }
+//        }
     }
 }

@@ -15,4 +15,8 @@ object Configuration {
     const val healthOfPlayer = 100
     const val baseDamage = 35
     const val dt = 0.016
+    const val maxx = 640.0
+    const val maxy = 640.0
+    const val minx = 0.0
+    const val miny = 0.0
 }
