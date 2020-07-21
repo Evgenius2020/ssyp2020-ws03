@@ -5,9 +5,9 @@
       <configuration version="3" platform="JavaScript " allPlatforms="JS []" useProjectSettings="false" isTestModule="true" externalProjectId=":shared">
         <dependsOnModuleNames>:shared:commonTest</dependsOnModuleNames>
         <sourceSets>
+          <sourceSet>korge-samples-client-server.shared.commonMain</sourceSet>
           <sourceSet>korge-samples-client-server.shared.jsMain</sourceSet>
           <sourceSet>korge-samples-client-server.shared.commonTest</sourceSet>
-          <sourceSet>korge-samples-client-server.shared.commonMain</sourceSet>
         </sourceSets>
         <newMppModelJpsModuleKind>COMPILATION_AND_SOURCE_SET_HOLDER</newMppModelJpsModuleKind>
         <externalSystemTestTasks>jsBrowserTest|:shared:jsTest|js</externalSystemTestTasks>

@@ -7,6 +7,8 @@ plugins {
 
 val ktorVersion: String by project
 
+
+
 dependencies {
     add("implementation", project(":shared"))
     add("implementation", "io.ktor:ktor-network:$ktorVersion")
@@ -15,6 +17,9 @@ dependencies {
     implementation(kotlin("stdlib", org.jetbrains.kotlin.config.KotlinCompilerVersion.VERSION)) // or "stdlib-jdk8"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0") //
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:0.20.0") //
+    implementation("org.mapeditor:libtiled:1.2.3")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.2")
 }
 
 application {

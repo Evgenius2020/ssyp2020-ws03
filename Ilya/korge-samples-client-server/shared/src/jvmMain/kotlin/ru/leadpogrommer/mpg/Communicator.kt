@@ -56,7 +56,7 @@ class Communicator(s: Socket) {
                     val ser = ByteArray(size)
                     inStream.readFully(ser, 0, size)
                     val req: Request = gson.fromJson(ser.toString(charset = Charsets.UTF_8), Request::class.java)
-                    println(ser.toString(Charsets.UTF_8))
+//                    println(ser.toString(Charsets.UTF_8))
 //                    val ois = ObjectInputStream(ser.inputStream())
 //                    val req = ois.readObject() as Request
                     inputChannel.send(req)
