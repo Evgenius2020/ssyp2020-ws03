@@ -23,9 +23,9 @@ class TimersManager : BaseManager<TimersManagerData>() {
 
     fun tick() {
         for ((ent, dat) in entitiesData) {
-            entitiesData[ent]!!.cooldown -= 0.016
-            entitiesData[ent]!!.respawnTime -= 0.016
-            gameTime -= 0.016
+            entitiesData[ent]!!.cooldown -= Configuration.dt
+            entitiesData[ent]!!.respawnTime -= Configuration.dt
+            gameTime -= Configuration.dt
         }
     }
 
@@ -48,9 +48,9 @@ class TimersManager : BaseManager<TimersManagerData>() {
         entitiesData[player.pl]!!.cooldown = Configuration.shootCD
     }
 
-    fun haveDead(player: PlayerInfo) {
-        entitiesData[player.pl]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size.toDouble() *
-                ++entitiesData[player.pl]!!.deaths
-        if (entitiesData[player.pl]!!.respawnTime > 30.0) entitiesData[player.pl]!!.respawnTime = 30.0
+    fun haveDead(ent: Entity) {
+        entitiesData[ent]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size.toDouble() *
+                ++entitiesData[ent]!!.deaths
+        if (entitiesData[ent]!!.respawnTime > 30.0) entitiesData[ent]!!.respawnTime = 30.0
     }
 }
