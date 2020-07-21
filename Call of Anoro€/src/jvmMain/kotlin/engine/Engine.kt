@@ -10,7 +10,7 @@ data class PlayerInfo(
         val nick: String,
         val health: Int
 ) {
-    val team: Int = -1
+    var team: Int = -1
 }
 
 class Engine {
@@ -22,6 +22,7 @@ class Engine {
         val entity = Entity()
         val player = PlayerInfo(entity, nick, Configuration.healthOfPlayer)
 //        player.team = teamChooser(player)
+        player.team = 1
         listOfPlayers[entity.id] = player
         positionsManager.register(entity)
         timersManager.register(entity)
@@ -50,12 +51,12 @@ class Engine {
 
     fun shot(entity: Entity) {
         // Creates bullet (based on cooldown)
-        println("SHOOT ${entity.id}")
+//        println("SHOOT ${entity.id}")
 //        if (timersManager.checkCooldownTimer(entity)){
 
     }
 
-    fun getPlayerInfos(): Array<PlayerInfo> {
-        return arrayOf()
+    fun getPlayerInfos(): MutableMap<Int, PlayerInfo> {
+        return listOfPlayers
     }
 }

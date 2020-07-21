@@ -38,6 +38,7 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
+            println("Here")
             views.root.onClick {
                 println("Oh shit I'm sorry")
                 output.writeStringUtf8(serialize(Shoot) + '\n')
@@ -47,11 +48,17 @@ fun main() {
 
             val graphicsMap = mutableMapOf<Int, SolidRect>()
             output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
+            println("Hee!e!")
             val initResponse = input.readUTF8Line()!!
+            println("Hee!e")
             val initMap = deserialize(initResponse) as RenderInfo
+
+            println("Heee")
 
             for (i in initMap.entities) {
                 val square = solidRect(size, size, Colors.PURPLE).anchor(0.5, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                println("Bot is $i")
+                addChild(square)
                 graphicsMap[i.id] = square
             }
             while (true) {
@@ -74,6 +81,7 @@ fun main() {
                 }
 
                 for (i in map.entities) {
+                    println("Bot is $i")
                     if (i.id in graphicsMap) {
                         graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {

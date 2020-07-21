@@ -11,7 +11,10 @@ class ColorManager {
     var counter = 0
     val colorsList = listOf("#c0c0c0", "#800000", "#ffa500", "#00ff00", "#00ffff", "#000080", "#ff00ff")
 
-    fun getColor(team: Int): RGBA{
+    fun getColor(team: Int?): RGBA{
+        if(team == null){
+            return Colors.PURPLE
+        }
         if(!colors.containsKey(team)){
             colors[team] = Colors[colorsList[counter++]]
         }
