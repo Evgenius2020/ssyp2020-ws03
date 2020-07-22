@@ -47,57 +47,38 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     private fun checkCol(
+            obj: Entity,
             entity: Entity,
-            entity1: Entity,
             isChecked: MutableList<Entity>,
             posData: PositionsManagerData
-    ) {
-        if (entity is Object && entity1 !is Object && entity1 !in isChecked) {
-            if (entity1.y > entity.y) {
-                if (entity1.x > entity.x) {
-                    val dist = sqrt((entity.x - entity1.x +
-                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
-                            (entity.y - entity1.y +
-                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
-                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
-                        entity1.x = entity.x + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
-                        entity1.y = entity.y + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
-                    }
+    ): List<Entity> {
+        val toRemove = mutableListOf<Entity>()
+        var dx = abs(entity.x - obj.x)
+        var dy = abs(entity.y - obj.y)
+
+        if (hypot(dx, dy) < posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfPlayer) {
+            if (obj is Object && entity is Player && entity !in isChecked) {
+                val koef = (posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfPlayer) / hypot(dx, dy)
+                dx *= koef
+                dy *= koef
+                if (entity.x < obj.x) {
+                    entity.x = obj.x - dx
+                } else {
+                    entity.x = obj.x + dx
                 }
-                if (entity1.x < entity.x) {
-                    val dist = sqrt((entity.x - entity1.x -
-                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
-                            (entity.y - entity1.y +
-                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
-                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
-                        entity1.x = entity.x - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
-                        entity1.y = entity.y + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
-                    }
-                }
-            }
-            if (entity1.y < entity.y) {
-                if (entity1.x > entity.x) {
-                    val dist = sqrt((entity.x - entity1.x +
-                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
-                            (entity.y - entity1.y -
-                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
-                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
-                        entity1.x = entity.x + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
-                        entity1.y = entity.y - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
-                    }
-                }
-                if (entity1.x < entity.x) {
-                    val dist = sqrt((entity.x - entity1.x -
-                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
-                            (entity.y - entity1.y -
-                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
-                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
-                        entity1.x = entity.x - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
-                        entity1.y = entity.y - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
-                    }
+                if (entity.y < obj.y) {
+                    entity.y = obj.y - dy
+                } else {
+                    entity.y = obj.y + dy
                 }
             }
         }
+        if(hypot(dx, dy) < posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfBullet){
+            if (obj is Object && entity is Bullet && entity !in isChecked) {
+                toRemove.add(entity)
+            }
+        }
+        return toRemove
     }
 
     fun moveAll(): List<Pair<Entity, Entity>>? {
@@ -118,8 +99,7 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
             }
             isChecked.add(entity)
             for (entity1 in entitiesData.keys) {
-                val dist = sqrt((entity.x - entity1.x).pow(2.0) +
-                        (entity.y - entity1.y).pow(2.0))
+                val dist = hypot((entity.x - entity1.x), (entity.y - entity1.y))
                 if (!(entity is Object || entity1 is Object)) {
                     if (entity1 !in isChecked && ((dist < posData.hitboxes[listOfTypes[entity.id]!!]) || (
                                     dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
@@ -135,13 +115,13 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                                 toRemove.add(entity1)
                                 listOfCol.add(Pair(entity, entity1))
                             }
-                                else -> {
+                            else -> {
                             }
                         }
                     }
                 } else {
-                    checkCol(entity, entity1, isChecked, posData)
-                    checkCol(entity1, entity, isChecked, posData)
+                    toRemove.addAll(checkCol(entity, entity1, isChecked, posData))
+                    toRemove.addAll(checkCol(entity1, entity, isChecked, posData))
                 }
             }
         }

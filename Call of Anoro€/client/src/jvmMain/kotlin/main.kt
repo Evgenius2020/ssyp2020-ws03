@@ -119,8 +119,8 @@ fun main() {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                                 val healthbarD = solidRect(30, 10, Colors.DARKGRAY).xy(i.x - 16, i.y - 40)
                                 val healthbarT = solidRect(30, 10, Colors.RED).xy(i.x - 16, i.y - 40)
-                                val nick = text(i.nick, 14.0).centerOn(player)
-                                nick.y -= 60
+                                val nick = text(i.nick, 14.0).centerXOn(player)
+                                nick.y = i.y - 40
                                 player.height = 32.0
                                 player.width = 40.0
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)
