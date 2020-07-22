@@ -95,6 +95,8 @@ fun main() {
                                 graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 40)
                                 graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 40)
                                 graphicsMap[i.id]!![2].width = max(0.3 * i.health, 0.0)
+                                graphicsMap[i.id]!![3].centerOn(graphicsMap[i.id]!![0])
+                                graphicsMap[i.id]!![3].y -= 60
                             }
                             else -> graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
                         }
@@ -117,10 +119,11 @@ fun main() {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                                 val healthbarD = solidRect(30, 10, Colors.DARKGRAY).xy(i.x - 16, i.y - 40)
                                 val healthbarT = solidRect(30, 10, Colors.RED).xy(i.x - 16, i.y - 40)
-
+                                val nick = text(i.nick, 14.0).centerOn(player)
+                                nick.y -= 60
                                 player.height = 32.0
                                 player.width = 40.0
-                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT)
+                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)
                             }
                             is Bullet -> {
                                 val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
