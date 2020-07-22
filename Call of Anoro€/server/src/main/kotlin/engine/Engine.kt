@@ -2,6 +2,7 @@ package engine
 
 import engine.managers.DamageManager
 import engine.managers.PositionsManager
+import engine.managers.TeamsManager
 import engine.managers.TimersManager
 import org.mapeditor.core.TileLayer
 import org.mapeditor.io.TMXMapReader
@@ -12,6 +13,7 @@ import shared.Object
 import shared.Player
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
 
 class Engine {
@@ -19,22 +21,18 @@ class Engine {
     private val positionsManager = PositionsManager()
     private val timersManager = TimersManager()
     private val damageManager = DamageManager()
+    private val teamsManager = TeamsManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
-    //TODO: WRITE TEAM CHOOSER
-    private var teamCounter = 0
 
     val map = TMXMapReader().readMap("..\\shared\\src\\jvmMain\\resources\\map.tmx")
 
     init {
-        for(i in map.layers.indices){
-            if(map.layers[i].name == "solid"){
-                for (x in 0 until map.width)
-                {
-                    for (y in 0 until map.height)
-                    {
-                        if ((map.layers[i] as TileLayer).getTileAt(x, y) != null)
-                        {
+        for (i in map.layers.indices) {
+            if (map.layers[i].name == "solid") {
+                for (x in 0 until map.width) {
+                    for (y in 0 until map.height) {
+                        if ((map.layers[i] as TileLayer).getTileAt(x, y) != null) {
                             registerEntity((x * 32).toDouble() + 16.0, (y * 32).toDouble() + 16.0)
                             println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
                         }
@@ -46,15 +44,15 @@ class Engine {
 
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
-        player.team = teamCounter++
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
         damageManager.register(player, player.team)
+        teamsManager.register(player)
         return player
     }
 
-    fun registerEntity(x : Double, y : Double) {
+    fun registerEntity(x: Double, y: Double) {
         val entity = Entity(x, y)
         positionsManager.register(entity)
     }
@@ -73,29 +71,33 @@ class Engine {
         timersManager.remove(player)
     }
 
-    fun tick(){
+    fun tick() {
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
-        if (deds != null){
-            for (player in deds){
+        if (deds != null) {
+            for (player in deds) {
                 deadPlayers.add(player)
                 player.isDead = 1
                 timersManager.haveDead(player)
             }
         }
-        for(ent in positionsManager.getEntities()){
-            if((ent is BOOM) && (timersManager.checkBoomTimer(ent))){
+        for (ent in positionsManager.getEntities()) {
+            if ((ent is BOOM) && (timersManager.checkBoomTimer(ent))) {
                 positionsManager.removeEntity(ent)
                 timersManager.remove(ent)
             }
         }
         timersManager.tick()
-        for (player in deadPlayers){
-            if (timersManager.checkRespawn(player)){
+        for (player in deadPlayers) {
+            if (timersManager.checkRespawn(player)) {
+                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.width - Configuration.radiusOfPlayer)
+                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.height - Configuration.radiusOfPlayer)
                 player.isDead = 0
                 player.health = Configuration.healthOfPlayer
             }
         }
-        for (player in listOfPlayers.values){
+        for (player in listOfPlayers.values) {
             if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
         }
     }
@@ -111,12 +113,12 @@ class Engine {
 
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
-        if (timersManager.checkCooldownTimer(player)){
+        if (timersManager.checkCooldownTimer(player)) {
             val bullet = Bullet(player.team)
             bullet.x = player.x + (Configuration.radiusOfBullet +
-                    Configuration.radiusOfPlayer + 1e-6)* cos(player.angle)
+                    Configuration.radiusOfPlayer + 1e-6) * cos(player.angle)
             bullet.y = player.y + (Configuration.radiusOfBullet +
-                    Configuration.radiusOfPlayer + 1e-6)* sin(player.angle)
+                    Configuration.radiusOfPlayer + 1e-6) * sin(player.angle)
             bullet.angle = player.angle
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
@@ -124,7 +126,7 @@ class Engine {
         }
     }
 
-    fun setFriendlyFire(ff: Boolean?){
+    fun setFriendlyFire(ff: Boolean?) {
         damageManager.friendlyFire = ff
     }
 }
