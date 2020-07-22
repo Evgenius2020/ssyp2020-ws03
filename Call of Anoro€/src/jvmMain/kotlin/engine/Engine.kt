@@ -52,7 +52,9 @@ class Engine {
     }
 
     fun registerEntity(x: Double, y: Double) {
-        val entity = Entity(x, y)
+        val entity = Object()
+        entity.x = x
+        entity.y = y
         positionsManager.register(entity)
     }
 
