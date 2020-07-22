@@ -51,15 +51,15 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
+            if (entity is Player && entity.isDead == 0) {
+                entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
+                entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+            }
+            if (entity is Bullet) {
+                entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
+                entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+            }
             if (entity !is Object) {
-                if (entity is Player && entity.isDead  == 0){
-                    entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
-                    entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
-                }
-                if (entity is Bullet){
-                    entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
-                    entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
-                }
                 checkBorders(entity)
             }
             isChecked.add(entity)
@@ -69,7 +69,13 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                 if (entity1 !in isChecked && ((dist < posData.hitboxes[listOfTypes[entity.id]!!]) || (
                                 dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
                                 entity1 !is Bullet)) {
-                    listOfCol.add(Pair(entity, entity1))
+                    when {
+                        entity1 is Player && entity is Player && entity.isDead + entity1.isDead == 0 ->
+                            listOfCol.add(Pair(entity, entity1))
+                        entity1 is Player && entity1.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
+                        entity is Player && entity.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
+                        else -> listOfCol.add(Pair(entity, entity1))
+                    }
                     when {
                         entity is Bullet -> toRemove.add(entity)
                         entity1 is Bullet -> toRemove.add(entity1)

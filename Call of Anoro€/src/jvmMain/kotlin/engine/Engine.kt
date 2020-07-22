@@ -24,7 +24,6 @@ class Engine {
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
         player.team = teamCounter++
-        println("id: ${player.id}")
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
@@ -47,9 +46,9 @@ class Engine {
     }
 
     fun tick(){
-        val deads = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
-        if (deads != null){
-            for (player in deads){
+        val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
+        if (deds != null){
+            for (player in deds){
                 deadPlayers.add(player)
                 player.isDead = 1
                 timersManager.haveDead(player)
@@ -68,7 +67,9 @@ class Engine {
                 player.health = Configuration.healthOfPlayer
             }
         }
-        deadPlayers.clear()
+        for (player in listOfPlayers.values){
+            if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
+        }
     }
 
     fun getEntities(player: Entity): Array<Entity> {
