@@ -46,6 +46,60 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         }
     }
 
+    private fun checkCol(
+            entity: Entity,
+            entity1: Entity,
+            isChecked: MutableList<Entity>,
+            posData: PositionsManagerData
+    ) {
+        if (entity is Object && entity1 !in isChecked) {
+            if (entity1.y > entity.y) {
+                if (entity1.x > entity.x) {
+                    val dist = sqrt((entity.x - entity1.x +
+                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
+                            (entity.y - entity1.y +
+                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
+                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
+                        entity1.x = entity.x + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
+                        entity1.y = entity.y + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
+                    }
+                }
+                if (entity1.x < entity.x) {
+                    val dist = sqrt((entity.x - entity1.x -
+                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
+                            (entity.y - entity1.y +
+                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
+                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
+                        entity1.x = entity.x - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
+                        entity1.y = entity.y + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
+                    }
+                }
+            }
+            if (entity1.y < entity.y) {
+                if (entity1.x > entity.x) {
+                    val dist = sqrt((entity.x - entity1.x +
+                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
+                            (entity.y - entity1.y -
+                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
+                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
+                        entity1.x = entity.x + posData.hitboxes[listOfTypes[entity.id]!!] + 1e-6
+                        entity1.y = entity.y - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
+                    }
+                }
+                if (entity1.x < entity.x) {
+                    val dist = sqrt((entity.x - entity1.x -
+                            posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0) +
+                            (entity.y - entity1.y -
+                                    posData.hitboxes[listOfTypes[entity.id]!!]).pow(2.0))
+                    if (dist < posData.hitboxes[listOfTypes[entity1.id]!!]) {
+                        entity1.x = entity.x - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
+                        entity1.y = entity.y - posData.hitboxes[listOfTypes[entity.id]!!] - 1e-6
+                    }
+                }
+            }
+        }
+    }
+
     fun moveAll(): List<Pair<Entity, Entity>>? {
         val isChecked = mutableListOf<Entity>()
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
@@ -64,27 +118,31 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
             }
             isChecked.add(entity)
             for (entity1 in entitiesData.keys) {
-                val dist = sqrt((entity.x - entity1.x).pow(2.0) +
+                var dist = sqrt((entity.x - entity1.x).pow(2.0) +
                         (entity.y - entity1.y).pow(2.0))
-                if (entity1 !in isChecked && ((dist < posData.hitboxes[listOfTypes[entity.id]!!]) || (
-                                dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
-                                entity1 !is Bullet)) {
-                    when {
-                        entity1 is Player && entity is Player && entity.isDead + entity1.isDead == 0 ->
-                            listOfCol.add(Pair(entity, entity1))
-                        entity1 is Player && entity1.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
-                        entity is Player && entity.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
-                        else -> listOfCol.add(Pair(entity, entity1))
+                if (entity !is Object && entity1 !is Object) {
+                    if (entity1 !in isChecked && ((dist < posData.hitboxes[listOfTypes[entity.id]!!]) || (
+                                    dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
+                                    entity1 !is Bullet)) {
+                        when {
+                            entity1 is Player && entity is Player && entity.isDead + entity1.isDead == 0 ->
+                                listOfCol.add(Pair(entity, entity1))
+                            entity1 is Player && entity1.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
+                            entity is Player && entity.isDead == 0 -> listOfCol.add(Pair(entity, entity1))
+                            else -> listOfCol.add(Pair(entity, entity1))
+                        }
+                        when {
+                            entity is Bullet -> toRemove.add(entity)
+                            entity1 is Bullet -> toRemove.add(entity1)
+                        }
                     }
-                    when {
-                        entity is Bullet -> toRemove.add(entity)
-                        entity1 is Bullet -> toRemove.add(entity1)
-                    }
+                } else {
+                    checkCol(entity, entity1, isChecked, posData)
+                    checkCol(entity1, entity, isChecked, posData)
                 }
             }
         }
         for (i in toRemove) {
-            isChecked.remove(i)
             removeEntity(i)
         }
         return when {
