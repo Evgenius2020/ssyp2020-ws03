@@ -3,9 +3,12 @@ package engine
 import engine.managers.DamageManager
 import engine.managers.PositionsManager
 import engine.managers.TimersManager
+import org.mapeditor.core.TileLayer
+import org.mapeditor.io.TMXMapReader
 import shared.BOOM
 import shared.Bullet
 import shared.Entity
+import shared.Object
 import shared.Player
 import kotlin.math.cos
 import kotlin.math.sin
@@ -21,6 +24,26 @@ class Engine {
     //TODO: WRITE TEAM CHOOSER
     private var teamCounter = 0
 
+    val map = TMXMapReader().readMap("src\\jvmMain\\resources\\map.tmx")
+
+    init {
+        for(i in map.layers.indices){
+            if(map.layers[i].name == "solid"){
+                for (x in 0 until map.width)
+                {
+                    for (y in 0 until map.height)
+                    {
+                        if ((map.layers[i] as TileLayer).getTileAt(x, y) != null)
+                        {
+                            registerEntity((x * 32).toDouble() + 16.0, (y * 32).toDouble() + 16.0)
+                            println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
         player.team = teamCounter++
@@ -29,6 +52,11 @@ class Engine {
         timersManager.register(player)
         damageManager.register(player, player.team)
         return player
+    }
+
+    fun registerEntity(x : Double, y : Double) {
+        val entity = Entity(x, y)
+        positionsManager.register(entity)
     }
 
     fun removePlayer(player: Player) {
