@@ -17,7 +17,7 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     private val listOfTypes = mutableMapOf<Int, Int>()
 
     fun register(entity: Entity) {
-        listOfTypes[entity.id] = when(entity){
+        listOfTypes[entity.id] = when (entity) {
             is Player -> 0
             is Bullet -> 1
             else -> 2
@@ -64,14 +64,15 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                                 dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
                                 entity1 !is Bullet)) {
                     listOfCol.add(Pair(entity, entity1))
-                    when{
+                    when {
                         entity is Bullet -> toRemove.add(entity)
                         entity1 is Bullet -> toRemove.add(entity1)
                     }
                 }
             }
         }
-        for(i in toRemove){
+        for (i in toRemove) {
+            isChecked.remove(i)
             removeEntity(i)
             toRemove.remove(i)
         }
