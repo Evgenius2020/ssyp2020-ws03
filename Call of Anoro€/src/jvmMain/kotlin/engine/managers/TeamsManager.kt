@@ -23,11 +23,11 @@ class TeamsManager : BaseManager<Unit>() {
     }
 
     private fun nextTeam() = teams.withIndex().minBy { (_, f) -> f.nicknames.size }?.index ?: 0
-    private fun addPlayer(team: Int, nickname: String) = teams[team]!!.nicknames.add(nickname)
-    private fun removePlayer(team: Int, nickname: String) = teams[team]!!.nicknames.remove(nickname)
+    private fun addPlayer(team: Int, nickname: String) = teams[team].nicknames.add(nickname)
+    private fun removePlayer(team: Int, nickname: String) = teams[team].nicknames.remove(nickname)
 
     fun addScore(team: Int, score: Double) {
-        teams[team]!!.score += score
+        teams[team].score += score
     }
     fun getNames(team: Int) = teams[team].nicknames.toTypedArray()
     fun getScore(team: Int) = teams[team].score
