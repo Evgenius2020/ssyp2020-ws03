@@ -38,8 +38,6 @@ class DamageManager: BaseManager<DamageManagerData>(){
                         }
                     }
                     if (friendlyFire == false){
-                        println("Here")
-
                         if((ent1 is Bullet) && (ent2 is Player)) println("bullet team: ${ent1.team}\n player team: ${ent2.team}")
 
                         if((ent2 is Bullet) && (ent1 is Player)) println("bullet team: ${ent2.team}\n player team: ${ent1.team}")

@@ -3,6 +3,7 @@ package engine
 import engine.managers.DamageManager
 import engine.managers.PositionsManager
 import engine.managers.TimersManager
+import shared.BOOM
 import shared.Bullet
 import shared.Entity
 import shared.Player
@@ -29,9 +30,17 @@ class Engine {
     }
 
     fun removePlayer(player: Player) {
+        val boom = BOOM()
+        boom.x = player.x
+        boom.y = player.y
+        positionsManager.register(boom)
+        timersManager.register(boom)
+
+        println("BOOM")
+
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
-        timersManager.removePlayer(player)
+        timersManager.remove(player)
     }
 
     fun tick(){
@@ -40,6 +49,12 @@ class Engine {
             for (ent in deads){
                 timersManager.haveDead(ent)
                 positionsManager.removeEntity(ent)
+            }
+        }
+        for(ent in positionsManager.getEntities()){
+            if((ent is BOOM) && (timersManager.checkBoomTimer(ent))){
+                positionsManager.removeEntity(ent)
+                timersManager.remove(ent)
             }
         }
         timersManager.tick()

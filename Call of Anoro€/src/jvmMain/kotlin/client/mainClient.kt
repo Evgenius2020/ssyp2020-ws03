@@ -1,13 +1,16 @@
 package client
 
+import com.soywiz.klock.seconds
 import com.soywiz.korge.Korge
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tiled.TiledMapView
 import com.soywiz.korge.tiled.readTiledMap
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
+import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
 import com.soywiz.korma.geom.Angle
+import engine.Configuration
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.aSocket
 import io.ktor.network.sockets.openReadChannel
@@ -37,6 +40,16 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
+            val spriteMap = resourcesVfs["BOOM.png"].readBitmap()
+
+            val boomAnimation = SpriteAnimation(
+                    spriteMap = spriteMap,
+                    spriteWidth = 960 / 5,
+                    spriteHeight = 384 / 2,
+                    columns = 5,
+                    rows = 2
+            )
+
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
 
@@ -53,6 +66,19 @@ fun main() {
 
             for (i in initMap.entities)
                 when (i) {
+                    is BOOM -> {
+                        println("BOOM START CHECK")
+                        if (!i.started) {
+                            println("BOOM START")
+                            val sprite = Sprite(boomAnimation)
+                            sprite.x = i.x - sprite.width / 2
+                            sprite.y = i.y - sprite.height / 2
+                            sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
+                            i.started = true
+                            addChild(sprite)
+                            graphicsMap[i.id] = sprite
+                        }
+                    }
                     is Player -> {
                         val player = circle(playerSize, colorManager.getColor(i.team)).anchor(0.5, 0.5).xy(i.x, i.y)
                         graphicsMap[i.id] = player
@@ -92,6 +118,19 @@ fun main() {
                         graphicsMap[i.id]!!.xy(i.x, i.y)
                     } else {
                         when (i) {
+                            is BOOM -> {
+                                println("BOOM START CHECK")
+                                if (!i.started) {
+                                    println("BOOM START")
+                                    val sprite = Sprite(boomAnimation)
+                                    sprite.x = i.x - sprite.width / 2
+                                    sprite.y = i.y - sprite.height / 2
+                                    sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
+                                    i.started = true
+                                    addChild(sprite)
+                                    graphicsMap[i.id] = sprite
+                                }
+                            }
                             is Player -> {
                                 val player = circle(playerSize, colorManager.getColor(i.team)).anchor(0.5, 0.5).xy(i.x, i.y)
                                 graphicsMap[i.id] = player
