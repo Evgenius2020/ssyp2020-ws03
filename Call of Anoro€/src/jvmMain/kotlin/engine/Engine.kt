@@ -12,6 +12,7 @@ import kotlin.math.sin
 
 
 class Engine {
+    private val deadPlayers = mutableListOf<Player>()
     private val positionsManager = PositionsManager()
     private val timersManager = TimersManager()
     private val damageManager = DamageManager()
@@ -48,9 +49,10 @@ class Engine {
     fun tick(){
         val deads = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
         if (deads != null){
-            for (ent in deads){
-                timersManager.haveDead(ent)
-                positionsManager.removeEntity(ent)
+            for (player in deads){
+                deadPlayers.add(player)
+                player.isDead = 1
+                timersManager.haveDead(player)
             }
         }
         for(ent in positionsManager.getEntities()){
@@ -60,6 +62,13 @@ class Engine {
             }
         }
         timersManager.tick()
+        for (player in deadPlayers){
+            if (timersManager.checkRespawn(player)){
+                player.isDead = 0
+                player.health = Configuration.healthOfPlayer
+            }
+        }
+        deadPlayers.clear()
     }
 
     fun getEntities(player: Entity): Array<Entity> {

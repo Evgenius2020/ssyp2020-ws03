@@ -7,7 +7,7 @@ import shared.Player
 
 data class TimersManagerData(
         var cooldown: Double = Configuration.shootCD,
-        var respawnTime: Double = Configuration.baseRespawnTime,
+        var respawnTime: Double = 0.0,
         var deaths: Double = 0.0,
         var boomDuration: Double = Configuration.boomDuration
 )
@@ -31,13 +31,14 @@ class TimersManager : BaseManager<TimersManagerData>() {
             if((entity is BOOM) && (!checkBoomTimer(entity))){
                 entitiesData[entity]!!.boomDuration -= Configuration.dt
             }
+            if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0)
             entitiesData[entity]!!.respawnTime -= Configuration.dt
             gameTime -= Configuration.dt
         }
     }
 
     fun checkCooldownTimer(player: Player) = when {
-        entitiesData[player]!!.cooldown < 0.0 -> true
+        entitiesData[player]!!.cooldown < 0.0 && player.isDead == 0 -> true
         else -> false
     }
 

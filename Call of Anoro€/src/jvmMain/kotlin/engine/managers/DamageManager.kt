@@ -17,7 +17,7 @@ class DamageManager: BaseManager<DamageManagerData>(){
         super.register(entity, DamageManagerData())
         entitiesData[entity]!!.team = team
     }
-    fun remove(entity: Entity){
+    private fun remove(entity: Entity){
         super.delete(entity)
     }
 

@@ -52,8 +52,14 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
             if (entity !is Object) {
-                entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
-                entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+                if (entity is Player && entity.isDead  == 0){
+                    entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
+                    entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+                }
+                if (entity is Bullet){
+                    entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
+                    entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+                }
                 checkBorders(entity)
             }
             isChecked.add(entity)

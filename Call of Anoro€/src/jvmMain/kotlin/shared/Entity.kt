@@ -59,7 +59,7 @@ data class Player(
         val nick: String,
         var health: Int
 ) : Entity() {
-
+    var isDead = 0
     var team: Int = -1
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
