@@ -36,7 +36,7 @@ data class Bullet(
     }
 }
 
-class Object: Entity(){
+open class Object: Entity(){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -52,6 +52,8 @@ class Object: Entity(){
         return id.hashCode()
     }
 }
+
+class BOOM(var started: Boolean = false): Object()
 
 data class Player(
         val nick: String,
@@ -77,3 +79,4 @@ data class Player(
         return result
     }
 }
+

@@ -1,31 +1,37 @@
 package engine.managers
 
 import engine.Configuration
+import shared.BOOM
+import shared.Entity
 import shared.Player
 
 data class TimersManagerData(
         var cooldown: Double = Configuration.shootCD,
         var respawnTime: Double = Configuration.baseRespawnTime,
-        var deaths: Double = 0.0
+        var deaths: Double = 0.0,
+        var boomDuration: Double = Configuration.boomDuration
 )
 
 class TimersManager : BaseManager<TimersManagerData>() {
     private var gameTime = Configuration.gameTime
 
-    fun register(player: Player) {
-        super.register(player, TimersManagerData())
+    fun register(entity: Entity) {
+        super.register(entity, TimersManagerData())
     }
 
-    fun removePlayer(player: Player){
-        super.delete(player)
+    fun remove(entity: Entity){
+        super.delete(entity)
     }
 
     fun tick() {
-        for (player in entitiesData.keys) {
-            if ((player is Player) && (!checkCooldownTimer(player))){
-                entitiesData[player]!!.cooldown -= Configuration.dt
+        for (entity in entitiesData.keys) {
+            if ((entity is Player) && (!checkCooldownTimer(entity))){
+                entitiesData[entity]!!.cooldown -= Configuration.dt
             }
-            entitiesData[player]!!.respawnTime -= Configuration.dt
+            if((entity is BOOM) && (!checkBoomTimer(entity))){
+                entitiesData[entity]!!.boomDuration -= Configuration.dt
+            }
+            entitiesData[entity]!!.respawnTime -= Configuration.dt
             gameTime -= Configuration.dt
         }
     }
@@ -34,6 +40,8 @@ class TimersManager : BaseManager<TimersManagerData>() {
         entitiesData[player]!!.cooldown < 0.0 -> true
         else -> false
     }
+
+    fun checkBoomTimer(boom: BOOM) = (entitiesData[boom]!!.boomDuration < 0.0)
 
     fun haveShooted(player: Player) {
         entitiesData[player]!!.cooldown = Configuration.shootCD

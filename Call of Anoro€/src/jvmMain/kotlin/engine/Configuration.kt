@@ -14,4 +14,5 @@ object Configuration {
     const val dt = 0.016
     const val width = 640.0
     const val height = 640.0
+    const val boomDuration = 2.0
 }
