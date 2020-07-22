@@ -24,7 +24,7 @@ class Engine {
     //TODO: WRITE TEAM CHOOSER
     private var teamCounter = 0
 
-    val map = TMXMapReader().readMap("src\\jvmMain\\resources\\map.tmx")
+    val map = TMXMapReader().readMap("..\\shared\\src\\jvmMain\\resources\\map.tmx")
 
     init {
         for(i in map.layers.indices){
