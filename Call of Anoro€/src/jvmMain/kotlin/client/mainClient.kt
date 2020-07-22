@@ -59,39 +59,7 @@ fun main() {
             }
 
             val graphicsMap = mutableMapOf<Int, View>()
-            output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
-            val initResponse = input.readUTF8Line()!!
-            val initMap = deserialize(initResponse) as RenderInfo
             val colorManager = ColorManager()
-
-            for (i in initMap.entities)
-                when (i) {
-                    is BOOM -> {
-                        if (!i.started) {
-                            val sprite = Sprite(boomAnimation)
-                            sprite.anchor(0.5, 0.5)
-                            sprite.x = i.x
-                            sprite.y = i.y
-                            sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
-                            i.started = true
-                            addChild(sprite)
-                            graphicsMap[i.id] = sprite
-                        }
-                    }
-                    is Player -> {
-                        val player = circle(playerSize, colorManager.getColor(i.team)).anchor(0.5, 0.5).xy(i.x, i.y)
-                        graphicsMap[i.id] = player
-                    }
-                    //TODO: delete after adding tilemaps
-                    is Object -> {
-                        val wall = solidRect(objectSize, objectSize, Colors.BLACK).anchor(0.5, 0.5).xy(i.x, i.y)
-                        graphicsMap[i.id] = wall
-                    }
-                    is Bullet -> {
-                        val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
-                        graphicsMap[i.id] = bullet
-                    }
-                }
 
             while (true) {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
@@ -114,7 +82,7 @@ fun main() {
 
                 for (i in map.entities) {
                     if (i.id in graphicsMap) {
-                        graphicsMap[i.id]!!.xy(i.x, i.y)
+                        graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
                     } else {
                         when (i) {
                             is BOOM -> {
@@ -130,13 +98,8 @@ fun main() {
                                 }
                             }
                             is Player -> {
-                                val player = circle(playerSize, colorManager.getColor(i.team)).anchor(0.5, 0.5).xy(i.x, i.y)
+                                val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
                                 graphicsMap[i.id] = player
-                            }
-                            //TODO: delete after adding tilemaps
-                            is Object -> {
-                                val wall = solidRect(objectSize, objectSize, Colors.BLACK).anchor(0.5, 0.5).xy(i.x, i.y)
-                                graphicsMap[i.id] = wall
                             }
                             is Bullet -> {
                                 val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
