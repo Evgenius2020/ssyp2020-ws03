@@ -25,4 +25,7 @@ korge {
 kotlin.sourceSets.getByName("jvmMain").dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7")
 	implementation ("io.ktor:ktor-server-netty:1.3.2")
+	implementation("org.mapeditor:libtiled:1.2.3")
+	implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+	implementation("org.glassfish.jaxb:jaxb-runtime:2.3.2")
 }
