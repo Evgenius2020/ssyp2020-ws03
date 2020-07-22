@@ -67,12 +67,11 @@ fun main() {
             for (i in initMap.entities)
                 when (i) {
                     is BOOM -> {
-                        println("BOOM START CHECK")
                         if (!i.started) {
-                            println("BOOM START")
                             val sprite = Sprite(boomAnimation)
-                            sprite.x = i.x - sprite.width / 2
-                            sprite.y = i.y - sprite.height / 2
+                            sprite.anchor(0.5, 0.5)
+                            sprite.x = i.x
+                            sprite.y = i.y
                             sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
                             i.started = true
                             addChild(sprite)
@@ -119,12 +118,11 @@ fun main() {
                     } else {
                         when (i) {
                             is BOOM -> {
-                                println("BOOM START CHECK")
                                 if (!i.started) {
-                                    println("BOOM START")
                                     val sprite = Sprite(boomAnimation)
-                                    sprite.x = i.x - sprite.width / 2
-                                    sprite.y = i.y - sprite.height / 2
+                                    sprite.anchor(0.5, 0.5)
+                                    sprite.x = i.x
+                                    sprite.y = i.y
                                     sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
                                     i.started = true
                                     addChild(sprite)
