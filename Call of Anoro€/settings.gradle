@@ -1,1 +1,5 @@
 enableFeaturePreview("GRADLE_METADATA")
+
+include(":shared")
+include(":client")
+include(":server")

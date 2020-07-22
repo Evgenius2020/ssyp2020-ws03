@@ -24,7 +24,8 @@ class Engine {
     private val teamsManager = TeamsManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
-    val map = TMXMapReader().readMap("src\\jvmMain\\resources\\map.tmx")
+
+    val map = TMXMapReader().readMap("..\\shared\\src\\jvmMain\\resources\\map.tmx")
 
     init {
         for (i in map.layers.indices) {

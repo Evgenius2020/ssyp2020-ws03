@@ -1,6 +1,5 @@
 package engine.managers
 
-import engine.Configuration
 import shared.Bullet
 import shared.Entity
 import shared.Object
