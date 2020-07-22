@@ -27,6 +27,7 @@ import kotlin.collections.iterator
 import kotlin.collections.mutableListOf
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
+import kotlin.math.max
 
 @KtorExperimentalAPI
 fun main() {
@@ -53,12 +54,17 @@ fun main() {
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
 
+            val fps = text("", 20.0).xy(0, 0)
+            fps.addUpdater {
+                fps.text = (1000 / it.milliseconds).toInt().toString()
+            }
+
             views.root.onClick {
                 output.writeStringUtf8(serialize(Shoot) + '\n')
                 println("SEND SHOOT")
             }
 
-            val graphicsMap = mutableMapOf<Int, View>()
+            val graphicsMap = mutableMapOf<Int, List<View>>()
             val colorManager = ColorManager()
 
             while (true) {
@@ -75,14 +81,24 @@ fun main() {
                 while (iterator.hasNext()) {
                     val item = iterator.next()
                     if (item.key !in exist) {
-                        removeChild(item.value)
+                        for (l in item.value)
+                            removeChild(l)
                         iterator.remove()
                     }
                 }
 
                 for (i in map.entities) {
                     if (i.id in graphicsMap) {
-                        graphicsMap[i.id]!!.xy(i.x, i.y).rotation(Angle(i.angle))
+                        when (i) {
+                            is Player -> {
+                                graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
+                                graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 40)
+                                graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 40)
+                                graphicsMap[i.id]!![2].width = max(0.3 * i.health, 0.0)
+                            }
+                            else -> graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
+                        }
+
                     } else {
                         when (i) {
                             is BOOM -> {
@@ -94,16 +110,21 @@ fun main() {
                                     sprite.playAnimation(spriteDisplayTime = Configuration.boomDuration.seconds)
                                     i.started = true
                                     addChild(sprite)
-                                    graphicsMap[i.id] = sprite
+                                    graphicsMap[i.id] = listOf(sprite)
                                 }
                             }
                             is Player -> {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
-                                graphicsMap[i.id] = player
+                                val healthbarD = solidRect(30, 10, Colors.DARKGRAY).xy(i.x - 16, i.y - 40)
+                                val healthbarT = solidRect(30, 10, Colors.RED).xy(i.x - 16, i.y - 40)
+
+                                player.height = 32.0
+                                player.width = 40.0
+                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT)
                             }
                             is Bullet -> {
                                 val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
-                                graphicsMap[i.id] = bullet
+                                graphicsMap[i.id] = listOf(bullet)
                             }
                         }
                     }

@@ -10,7 +10,7 @@ object Configuration {
     const val baseRespawnTime = 0.2 //seconds
     const val gameTime = 300.0 //seconds = 5 min
     const val healthOfPlayer = 100
-    const val baseDamage = 1000
+    const val baseDamage = 33
     const val dt = 0.016
     const val width = 640.0
     const val height = 640.0
