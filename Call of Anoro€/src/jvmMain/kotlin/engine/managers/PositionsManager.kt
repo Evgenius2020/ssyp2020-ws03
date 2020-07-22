@@ -74,7 +74,6 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         for (i in toRemove) {
             isChecked.remove(i)
             removeEntity(i)
-            toRemove.remove(i)
         }
         return when {
             listOfCol.isEmpty() -> null
