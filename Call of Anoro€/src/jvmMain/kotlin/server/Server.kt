@@ -39,6 +39,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
 class ServerActions {
 
     val eng = Engine()
+    val imageManager = ImageManager()
 
     init {
         eng.setFriendlyFire(false)
@@ -53,7 +54,13 @@ class ServerActions {
     }
 
     fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
-        res.complete(RenderInfo(eng.getEntities(e)))
+        val entities = eng.getEntities(e)
+        for(ent in entities){
+            if(ent is Player){
+                imageManager.setImage(ent.team)
+            }
+        }
+        res.complete(RenderInfo(entities, imageManager.base))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
