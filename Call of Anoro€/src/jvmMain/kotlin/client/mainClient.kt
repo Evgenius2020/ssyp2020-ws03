@@ -99,6 +99,8 @@ fun main() {
                             }
                             is Player -> {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
+                                player.scaledHeight = 32.0
+                                player.scaledWidth = 40.0
                                 graphicsMap[i.id] = player
                             }
                             is Bullet -> {
