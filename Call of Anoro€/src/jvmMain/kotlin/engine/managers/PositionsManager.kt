@@ -65,14 +65,15 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                                 entity1 !is Bullet)) {
                     listOfCol.add(Pair(entity, entity1))
                     when{
-//                        entity is Bullet -> toRemove.add(entity)
-//                        entity1 is Bullet -> toRemove.add(entity1)
+                        entity is Bullet -> toRemove.add(entity)
+                        entity1 is Bullet -> toRemove.add(entity1)
                     }
                 }
             }
         }
         for(i in toRemove){
             removeEntity(i)
+            toRemove.remove(i)
         }
         return when {
             listOfCol.isEmpty() -> null

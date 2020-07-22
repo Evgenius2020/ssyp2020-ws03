@@ -22,7 +22,6 @@ class DamageManager: BaseManager<DamageManagerData>(){
     }
 
     fun processCollisions(arr: Array<Pair<Entity, Entity>>?): Array<Player>?{
-        var cnt = 0
         val arrDead = mutableListOf<Player>()
         if (arr != null) {
             for ((ent1, ent2) in arr){
@@ -38,11 +37,6 @@ class DamageManager: BaseManager<DamageManagerData>(){
                         }
                     }
                     if (friendlyFire == false){
-                        if((ent1 is Bullet) && (ent2 is Player)) println("bullet team: ${ent1.team}\n player team: ${ent2.team}")
-
-                        if((ent2 is Bullet) && (ent1 is Player)) println("bullet team: ${ent2.team}\n player team: ${ent1.team}")
-
-
                         if ((ent1 is Bullet) && (ent2 is Player) && (ent1.team != ent2.team)){
                             ent2.health -= ent1.damage
                             remove(ent1)

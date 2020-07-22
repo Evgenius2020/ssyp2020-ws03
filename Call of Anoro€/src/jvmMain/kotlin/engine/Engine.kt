@@ -7,6 +7,8 @@ import shared.BOOM
 import shared.Bullet
 import shared.Entity
 import shared.Player
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class Engine {
@@ -72,15 +74,15 @@ class Engine {
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)){
-            println("Shot in engine")
             val bullet = Bullet(player.team)
-            bullet.x = player.x
-            bullet.y = player.y
+            bullet.x = player.x + (Configuration.radiusOfBullet +
+                    Configuration.radiusOfPlayer + 1e-6)* cos(player.angle)
+            bullet.y = player.y + (Configuration.radiusOfBullet +
+                    Configuration.radiusOfPlayer + 1e-6)* sin(player.angle)
             bullet.angle = player.angle
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
-            println("Registered in dmg manager")
         }
     }
 
