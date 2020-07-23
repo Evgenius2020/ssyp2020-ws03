@@ -29,6 +29,7 @@ class TeamsManager : BaseManager<Unit>() {
     fun addScore(team: Int, score: Double) {
         teams[team].score += score
     }
+
     fun getNames(team: Int) = teams[team].nicknames.toTypedArray()
     fun getScore(team: Int) = teams[team].score
 }
