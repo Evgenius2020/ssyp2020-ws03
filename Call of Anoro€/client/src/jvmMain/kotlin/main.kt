@@ -110,10 +110,11 @@ fun main() {
                                 graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 50)
                                 graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 50)
                                 graphicsMap[i.id]!![2].width = max(0.3 * i.health, 0.0)
-
-                                graphicsMap[i.id]!![3].xy(i.x - 16, i.y - 45)
-                                graphicsMap[i.id]!![4].xy(i.x - 16, i.y - 45)
-                                graphicsMap[i.id]!![4].width = min(30 - (map.shootCooldown * 30), 30.0)
+                                if (i.id == map.pId) {
+                                    graphicsMap[i.id]!![3].xy(i.x - 16, i.y - 45)
+                                    graphicsMap[i.id]!![4].xy(i.x - 16, i.y - 45)
+                                    graphicsMap[i.id]!![4].width = min(30 - (map.shootCooldown * 30), 30.0)
+                                }
 
                                 graphicsMap[i.id]!![5].centerOn(graphicsMap[i.id]!![1])
                                 graphicsMap[i.id]!![5].y -= 10
@@ -140,15 +141,19 @@ fun main() {
                                 val healthbarD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 50)
                                 val healthbarT = solidRect(30, 5, Colors.RED).xy(i.x - 16, i.y - 50)
 
-                                val cooldownD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 45)
-                                val cooldownT = solidRect(30, 5, Colors.LIGHTGRAY).xy(i.x - 16, i.y - 45)
-
                                 val nick = text(i.nick, 10.0, color = Colors.BLACK).centerOn(healthbarD)
+
                                 nick.y -= 10
                                 player.height = 32.0
                                 player.width = 40.0
 
-                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, cooldownD, cooldownT, nick)
+                                if (map.pId == i.id) {
+                                    val cooldownD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 45)
+                                    val cooldownT = solidRect(30, 5, Colors.LIGHTGRAY).xy(i.x - 16, i.y - 45)
+                                    graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick, cooldownD, cooldownT)
+                                } else
+                                    graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)
+
                             }
                             is Bullet -> {
                                 val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
