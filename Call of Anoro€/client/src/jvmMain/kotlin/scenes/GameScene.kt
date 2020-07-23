@@ -4,6 +4,7 @@ import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.mouse
+import com.soywiz.korge.input.onClick
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.tiled.TiledMapView
 import com.soywiz.korge.tiled.readTiledMap
@@ -71,6 +72,13 @@ class GameScene : Scene() {
         }
 
         graphicsMap = mutableMapOf()
+
+        // Shoot
+
+        views.root.onClick {
+            output.writeStringUtf8(serialize(Shoot) + '\n')
+        }
+
     }
 
     override suspend fun Container.sceneMain() {
@@ -175,6 +183,8 @@ class GameScene : Scene() {
             val x = (inputWASD[Key.D].toInt()) - (inputWASD[Key.A].toInt())
             val y = (-inputWASD[Key.W].toInt()) + (inputWASD[Key.S].toInt())
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
+
+            // Shoot
         }
     }
 }
