@@ -111,13 +111,13 @@ fun main() {
                                 graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 50)
                                 graphicsMap[i.id]!![2].width = max(0.3 * i.health, 0.0)
                                 if (i.id == map.pId) {
-                                    graphicsMap[i.id]!![3].xy(i.x - 16, i.y - 45)
                                     graphicsMap[i.id]!![4].xy(i.x - 16, i.y - 45)
-                                    graphicsMap[i.id]!![4].width = min(30 - (map.shootCooldown * 30), 30.0)
+                                    graphicsMap[i.id]!![5].xy(i.x - 16, i.y - 45)
+                                    graphicsMap[i.id]!![5].width = min(30 - (map.shootCooldown * 30), 30.0)
                                 }
 
-                                graphicsMap[i.id]!![5].centerOn(graphicsMap[i.id]!![1])
-                                graphicsMap[i.id]!![5].y -= 10
+                                graphicsMap[i.id]!![3].centerOn(graphicsMap[i.id]!![1])
+                                graphicsMap[i.id]!![3].y -= 10
                             }
                             else -> graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
                         }
