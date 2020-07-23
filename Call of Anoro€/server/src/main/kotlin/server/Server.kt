@@ -96,6 +96,8 @@ class ServerActions {
     fun getStatistic(statistic: CompletableDeferred<Statistic>) {
         val teamMembers = hashMapOf<Int, Array<String>>()
         val teamScore = hashMapOf<Int, Int>()
+        val nickToKills = hashMapOf<String, Int>()
+        val nickToDeaths = hashMapOf<String, Int>()
 
         for(team in 0..Configuration.teamCount){
             teamMembers[team] = eng.teamsManager.getNames(team)
@@ -103,7 +105,13 @@ class ServerActions {
         for(team in 0..Configuration.teamCount){
             teamScore[team] = eng.teamsManager.getScore(team).toInt()
         }
-        val stat = Statistic(teamMembers, teamScore)
+        for(p in eng.positionsManager.getEntities()){
+            if(p is Player){
+                nickToDeaths[p.nick] = p.deaths
+                nickToKills[p.nick] = p.kills
+            }
+        }
+        val stat = Statistic(teamMembers, teamScore, nickToKills, nickToDeaths)
         statistic.complete(stat)
     }
 }

@@ -136,7 +136,7 @@ class Engine {
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)) {
-            val bullet = Bullet(player.team, player.angle)
+            val bullet = Bullet(player.team, player.angle, Configuration.baseDamage, player)
             bullet.x = player.x + (Configuration.radiusOfBullet +
                     Configuration.radiusOfPlayer + 1e-6) * cos(player.angle)
             bullet.y = player.y + (Configuration.radiusOfBullet +

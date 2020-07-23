@@ -20,7 +20,8 @@ open class Moveable(var speedX: Double = 0.0,
 data class Bullet(
         val team: Int,
         override var angle: Double,
-        val damage: Int = Configuration.baseDamage
+        val damage: Int = Configuration.baseDamage,
+        val source: Player
 ): Moveable(speedX = Configuration.speedOfBullet * cos(angle), speedY = Configuration.speedOfBullet * sin(angle)){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -70,6 +71,8 @@ data class Player(
     var team = -1
     var oldX = 0.0
     var oldY = 0.0
+    var deaths = 0
+    var kills = 0
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
