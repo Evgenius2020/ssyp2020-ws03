@@ -42,15 +42,15 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
-//            val spriteMap = resourcesVfs["BOOM.png"].readBitmap()
+            val spriteMap = resourcesVfs["BOOM.png"].readBitmap()
 
-//            val boomAnimation = SpriteAnimation(
-//                    spriteMap = spriteMap,
-//                    spriteWidth = 960 / 5,
-//                    spriteHeight = 384 / 2,
-//                    columns = 5,
-//                    rows = 2
-//            )
+            val boomAnimation = SpriteAnimation(
+                    spriteMap = spriteMap,
+                    spriteWidth = 960 / 5,
+                    spriteHeight = 384 / 2,
+                    columns = 5,
+                    rows = 2
+            )
 
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
@@ -106,7 +106,7 @@ fun main() {
                     } else {
                         when (i) {
                             is BOOM -> {
-                             /*   if (!i.started) {
+                                if (!i.started) {
                                     val sprite = Sprite(boomAnimation)
                                     sprite.anchor(0.5, 0.5)
                                     sprite.x = i.x
@@ -115,7 +115,7 @@ fun main() {
                                     i.started = true
                                     addChild(sprite)
                                     graphicsMap[i.id] = listOf(sprite)
-                                }*/
+                                }
                             }
                             is Player -> {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
