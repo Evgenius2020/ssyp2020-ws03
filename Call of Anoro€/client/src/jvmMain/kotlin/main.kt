@@ -1,6 +1,7 @@
 package client
 
 import com.soywiz.klock.seconds
+import com.soywiz.korev.Key
 import com.soywiz.korge.Korge
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tiled.TiledMapView
@@ -92,11 +93,14 @@ fun main() {
                         when (i) {
                             is Player -> {
                                 graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
-                                graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 40)
-                                graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 40)
+                                graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 50)
+                                graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 50)
                                 graphicsMap[i.id]!![2].width = max(0.3 * i.health, 0.0)
-                                graphicsMap[i.id]!![3].centerOn(graphicsMap[i.id]!![0])
-                                graphicsMap[i.id]!![3].y -= 60
+                                graphicsMap[i.id]!![3].xy(i.x - 16, i.x - 45)
+                                graphicsMap[i.id]!![4].xy(i.x - 16, i.x - 45)
+                                graphicsMap[i.id]!![4].width = 30 - (map.shootCooldown * 30)
+                                graphicsMap[i.id]!![5].centerOn(graphicsMap[i.id]!![1])
+                                graphicsMap[i.id]!![5].y -= 10
                             }
                             else -> graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
                         }
@@ -104,7 +108,7 @@ fun main() {
                     } else {
                         when (i) {
                             is BOOM -> {
-                                if (!i.started) {
+                             /*   if (!i.started) {
                                     val sprite = Sprite(boomAnimation)
                                     sprite.anchor(0.5, 0.5)
                                     sprite.x = i.x
@@ -113,17 +117,21 @@ fun main() {
                                     i.started = true
                                     addChild(sprite)
                                     graphicsMap[i.id] = listOf(sprite)
-                                }
+                                }*/
                             }
                             is Player -> {
                                 val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
-                                val healthbarD = solidRect(30, 10, Colors.DARKGRAY).xy(i.x - 16, i.y - 40)
-                                val healthbarT = solidRect(30, 10, Colors.RED).xy(i.x - 16, i.y - 40)
-                                val nick = text(i.nick, 14.0).centerXOn(player)
-                                nick.y = i.y - 40
+                                val healthbarD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 50)
+                                val healthbarT = solidRect(30, 5, Colors.RED).xy(i.x - 16, i.y - 50)
+
+                                val cooldownD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 45)
+                                val cooldownT = solidRect(30, 5, Colors.LIGHTGRAY).xy(i.x - 16, i.y - 45)
+
+                                val nick = text(i.nick, 10.0, color = Colors.BLACK).centerOn(healthbarD)
+                                nick.y -= 10
                                 player.height = 32.0
                                 player.width = 40.0
-                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)
+                                graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, cooldownD, cooldownT, nick)
                             }
                             is Bullet -> {
                                 val bullet = circle(bulletSize, Colors.ORANGERED).anchor(0.5, 0.5).xy(i.x, i.y)
