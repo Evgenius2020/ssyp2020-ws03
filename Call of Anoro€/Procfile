@@ -1,0 +1,1 @@
+web: bash -c "java -jar server-all.jar"
