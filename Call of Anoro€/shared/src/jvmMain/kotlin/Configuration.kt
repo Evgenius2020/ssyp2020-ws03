@@ -15,4 +15,5 @@ object Configuration {
     const val width = 640.0
     const val height = 640.0
     const val boomDuration = 1 * fps // seconds * fps => frames
+    const val teamCount = 2
 }

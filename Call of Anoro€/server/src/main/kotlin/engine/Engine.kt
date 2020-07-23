@@ -17,12 +17,12 @@ import kotlin.random.Random
 
 
 class Engine {
-    private val deadPlayers = mutableListOf<Player>()
-    private val positionsManager = PositionsManager()
-    private val timersManager = TimersManager()
-    private val damageManager = DamageManager()
-    private val teamsManager = TeamsManager()
-    private val listOfPlayers = mutableMapOf<Int, Player>()
+    val deadPlayers = mutableListOf<Player>()
+    val positionsManager = PositionsManager()
+    val timersManager = TimersManager()
+    val damageManager = DamageManager()
+    val teamsManager = TeamsManager()
+    val listOfPlayers = mutableMapOf<Int, Player>()
 
     val map = TMXMapReader().readMap("../shared/src/jvmMain/resources/map.tmx")
 
@@ -73,6 +73,7 @@ class Engine {
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
+        teamsManager.removePlayer(player)
     }
 
     fun tick() {

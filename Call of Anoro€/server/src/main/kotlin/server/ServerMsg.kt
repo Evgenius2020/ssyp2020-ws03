@@ -1,5 +1,6 @@
 package server
 
+import Statistic
 import kotlinx.coroutines.CompletableDeferred
 import shared.*
 
@@ -11,3 +12,4 @@ class SetAngle(val e: Entity, val point: ClientServerPoint): ServerMsg()
 class Shoot(val p: Player): ServerMsg()
 class Disconnect(val p: Player): ServerMsg()
 class ChangeSpeed(val m: Moveable, val x: Int, val y: Int): ServerMsg()
+class GetStatistic(val statistic: CompletableDeferred<Statistic>): ServerMsg()
