@@ -24,7 +24,7 @@ class VisibilityManager : BaseManager<Unit>() {
         visibleEntities.add(player)
         for (ent2 in entitiesData.keys) {
             var cnt = 0
-            if (sqrt((player.x - ent2.x).pow(2.0) + (player.y - ent2.y).pow(2.0)) <
+            if (hypot(player.x - ent2.x, player.y - ent2.y) <
                     Configuration.width / 1.8) {
                 if (ent2 is Object) visibleEntities.add(ent2)
                 if ((ent2 is Bullet || ent2 is Object) && ent2.id != player.id) {
