@@ -132,4 +132,8 @@ class Engine {
     fun setFriendlyFire(ff: Boolean?) {
         damageManager.friendlyFire = ff
     }
+
+    fun getShootCooldown(player: Player): Double {
+        return timersManager.getShootCooldown(player)
+    }
 }

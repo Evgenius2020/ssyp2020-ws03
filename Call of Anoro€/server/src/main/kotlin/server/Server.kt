@@ -27,7 +27,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
             when (msg) {
                 is Register -> s.register(msg.u)
                 is Tick -> s.tick()
-                is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
+                is GetRenderInfo -> s.getRenderInfo(msg.p, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.p)
@@ -54,14 +54,15 @@ class ServerActions {
         eng.tick()
     }
 
-    fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
-        val entities = eng.getEntities(e)
+    fun getRenderInfo(p: Player, res: CompletableDeferred<RenderInfo>){
+        val entities = eng.getEntities(p)
         for(ent in entities){
             if(ent is Player){
                 imageManager.setImage(ent.team)
             }
         }
-        res.complete(RenderInfo(entities, imageManager.base))
+        val cooldown = eng.getShootCooldown(p)
+        res.complete(RenderInfo(entities, imageManager.base, cooldown))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {

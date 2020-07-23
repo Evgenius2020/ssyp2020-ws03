@@ -37,6 +37,10 @@ class TimersManager : BaseManager<TimersManagerData>() {
         }
     }
 
+    fun getShootCooldown(player: Player): Double {
+        return entitiesData[player]!!.cooldown / Configuration.shootCD
+    }
+
     fun checkCooldownTimer(player: Player) = when {
         entitiesData[player]!!.cooldown < 0.0 && player.isDead == 0 -> true
         else -> false
