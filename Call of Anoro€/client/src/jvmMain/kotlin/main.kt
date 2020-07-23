@@ -22,6 +22,8 @@ object MainModule : Module() {
         get() = "Call of Anoro€"
     override val windowSize: SizeInt
         get() = SizeInt(640, 640)
+    override val size: SizeInt
+        get() = SizeInt(640, 640)
 
     override suspend fun AsyncInjector.configure() {
         mapPrototype { MainScene() }

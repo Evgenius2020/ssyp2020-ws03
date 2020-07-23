@@ -4,6 +4,8 @@ import client.util.LoadingProxyScene
 import com.soywiz.klock.seconds
 import com.soywiz.korge.input.mouse
 import com.soywiz.korge.scene.Scene
+import com.soywiz.korge.tiled.TiledMapView
+import com.soywiz.korge.tiled.readTiledMap
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
 import com.soywiz.korim.format.readBitmap
@@ -15,9 +17,8 @@ class MainScene : Scene() {
     private lateinit var button: View
 
     override suspend fun Container.sceneInit() {
-        bg = solidRect(views.virtualWidth, views.virtualHeight, Colors.SANDYBROWN) {
-            position(0.0, 0.0)
-        }
+        bg = TiledMapView(resourcesVfs["menuBg.tmx"].readTiledMap())
+        addChild(bg)
 
         title = image(resourcesVfs["title.png"].readBitmap()) {
             anchor(0.5, 0.5)
