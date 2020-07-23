@@ -52,30 +52,70 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
             isChecked: MutableList<Entity>,
             posData: PositionsManagerData
     ): List<Entity> {
+        val re = posData.hitboxes[listOfTypes[entity.id]!!]
+        val ro = posData.hitboxes[listOfTypes[obj.id]!!]
+        var nocorn = true
         val toRemove = mutableListOf<Entity>()
-        var dx = abs(entity.x - obj.x)
-        var dy = abs(entity.y - obj.y)
-
-        if (hypot(dx, dy) < posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfPlayer) {
-            if (obj is Object && entity is Player && entity !in isChecked) {
-                val koef = (posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfPlayer) / hypot(dx, dy)
-                dx *= koef
-                dy *= koef
-                if (entity.x < obj.x) {
-                    entity.x = obj.x - dx
-                } else {
-                    entity.x = obj.x + dx
-                }
-                if (entity.y < obj.y) {
-                    entity.y = obj.y - dy
-                } else {
-                    entity.y = obj.y + dy
+        if (obj is Object && entity !is Object && entity !in isChecked) {
+            if (entity.y > obj.y && entity.x > obj.x) {
+                val dist = hypot(obj.x - entity.x + ro,
+                        obj.y - entity.y + ro)
+                if (dist < re) {
+                    nocorn = false
+                    if (entity is Bullet) toRemove.add(entity)
+                    if (entity is Player) {
+                        entity.x = entity.oldX
+                        entity.x = entity.oldX
+                    }
                 }
             }
-        }
-        if(hypot(dx, dy) < posData.hitboxes[listOfTypes[obj.id]!!] + Configuration.radiusOfBullet){
-            if (obj is Object && entity is Bullet && entity !in isChecked) {
-                toRemove.add(entity)
+            if (entity.y > obj.y && entity.x < obj.x) {
+                val dist = hypot(obj.x - entity.x - ro,
+                        obj.y - entity.y + ro)
+                if (dist < re) {
+                    nocorn = false
+                    if (entity is Bullet) toRemove.add(entity)
+                    if (entity is Player) {
+                        entity.x = entity.oldX
+                        entity.x = entity.oldX
+                    }
+                }
+            }
+            if (entity.y < obj.y && entity.x > obj.x) {
+                val dist = hypot(obj.x - entity.x + ro,
+                        obj.y - entity.y - ro)
+                if (dist < re) {
+                    nocorn = false
+                    if (entity is Bullet) toRemove.add(entity)
+                    if (entity is Player) {
+                        entity.x = entity.oldX
+                        entity.x = entity.oldX
+                    }
+                }
+            }
+            if (entity.y < obj.y && entity.x < obj.x) {
+                val dist = hypot(obj.x - entity.x - ro,
+                        obj.y - entity.y - ro)
+                if (dist < re) {
+                    nocorn = false
+                    if (entity is Bullet) toRemove.add(entity)
+                    if (entity is Player) {
+                        entity.x = entity.oldX
+                        entity.x = entity.oldX
+                    }
+                }
+            }
+            if (nocorn) {
+                if ((entity.x - re < obj.x + ro && entity.x + re > obj.x - ro && entity.y < obj.y + ro &&
+                                entity.y > obj.y - ro) ||
+                        (entity.y - re < obj.x + ro && entity.y + re > obj.y - ro && entity.x < obj.x + ro &&
+                                entity.x > obj.x - ro)) {
+                    if (entity is Bullet) toRemove.add(entity)
+                    if (entity is Player) {
+                        entity.x = entity.oldX
+                        entity.x = entity.oldX
+                    }
+                }
             }
         }
         return toRemove
@@ -87,6 +127,8 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
             if (entity is Player && entity.isDead == 0) {
+                entity.oldX = entity.x
+                entity.oldY = entity.y
                 entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
                 entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
             }

@@ -60,7 +60,9 @@ data class Player(
         var health: Int
 ) : Entity() {
     var isDead = 0
-    var team: Int = -1
+    var team = -1
+    var oldX = 0.0
+    var oldY = 0.0
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
