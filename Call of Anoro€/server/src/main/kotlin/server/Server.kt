@@ -69,7 +69,8 @@ class ServerActions {
         }
         val cooldown = eng.getShootCooldown(p)
         val endGame = eng.getEndGameTime()
-        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame))
+        val pId = p.id
+        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, pId))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
