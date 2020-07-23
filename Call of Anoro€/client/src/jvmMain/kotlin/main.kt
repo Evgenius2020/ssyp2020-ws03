@@ -1,6 +1,7 @@
 package client
 
 import com.soywiz.klock.seconds
+import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
 import com.soywiz.korge.Korge
 import com.soywiz.korge.input.onClick
@@ -139,10 +140,20 @@ fun main() {
                     }
                 }
 
+                // Rotation
+
                 val mX = mouseX
                 val mY = mouseY
 
                 output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
+
+                // Move
+
+                val inputWASD = views.input.keys
+                val x = (inputWASD[Key.D].toInt()) - (inputWASD[Key.A].toInt())
+                val y = (inputWASD[Key.W].toInt()) - (inputWASD[Key.S].toInt())
+                output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
+
             }
         }
     }
