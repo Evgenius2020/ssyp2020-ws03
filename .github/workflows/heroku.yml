@@ -5,7 +5,10 @@ on:
     branches:
       - production
 
-
+defaults:
+  run:
+    working-directory: 'Call of Anoro€'
+    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,6 +19,5 @@ jobs:
           java-version: '11' # The JDK version to make available on the path.
           java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
-      - run: cd "Call of Anoro€"
       - run: chmod u+x ./gradlew
       - run: ./gradlew server:assembleShadowDist 
