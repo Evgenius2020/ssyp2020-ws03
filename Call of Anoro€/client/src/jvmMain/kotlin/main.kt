@@ -40,6 +40,7 @@ fun main() {
         val playerSize = ClientConfiguration.sizeOfPlayer
         val objectSize = ClientConfiguration.sizeOfObject
         val bulletSize = ClientConfiguration.sizeOfBullet
+        var gameTime = 300
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
@@ -52,6 +53,9 @@ fun main() {
                     columns = 5,
                     rows = 2
             )
+
+            val textGameTimeCenter = solidRect(0, 0, Colors.BLACK).xy(views.virtualWidth / 2, 0)
+            val gameTimeText = text("300 seconds").centerOn(textGameTimeCenter)
 
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
@@ -71,6 +75,8 @@ fun main() {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
                 val response = input.readUTF8Line()!!
                 val map = deserialize(response) as RenderInfo
+
+                gameTimeText.text = map.endGameTimer.toString()
 
                 val exist = mutableListOf<Int>()
 
