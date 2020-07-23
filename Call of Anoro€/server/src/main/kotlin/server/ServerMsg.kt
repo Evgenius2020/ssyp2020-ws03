@@ -1,10 +1,7 @@
 package server
 
-import shared.Entity
 import kotlinx.coroutines.CompletableDeferred
-import shared.ClientServerPoint
-import shared.Player
-import shared.RenderInfo
+import shared.*
 
 sealed class ServerMsg
 class Register(val u: CompletableDeferred<Player>): ServerMsg()
@@ -13,3 +10,4 @@ class GetRenderInfo(val e: Entity, val res: CompletableDeferred<RenderInfo>): Se
 class SetAngle(val e: Entity, val point: ClientServerPoint): ServerMsg()
 class Shoot(val p: Player): ServerMsg()
 class Disconnect(val p: Player): ServerMsg()
+class ChangeSpeed(val m: Moveable, val speedX: Double?, val speedY: Double?): ServerMsg()

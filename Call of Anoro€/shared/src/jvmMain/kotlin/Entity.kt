@@ -1,20 +1,27 @@
 package shared
 
 import engine.Configuration
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private var nextId: Int = 1
 
 open class Entity(
-    var x: Double = 0.0,
-    var y: Double = 0.0,
-    var angle: Double = 0.0,
-    val id: Int = nextId++
+        var x: Double = 0.0,
+        var y: Double = 0.0,
+        open var angle: Double = 0.0,
+        val id: Int = nextId++
 ) : java.io.Serializable
+
+open class Moveable(var speedX: Double = 0.0,
+                    var speedY: Double = 0.0): Entity()
 
 data class Bullet(
         val team: Int,
+        override var angle: Double,
         val damage: Int = Configuration.baseDamage
-): Entity(){
+): Moveable(speedX = Configuration.speedOfBullet * cos(angle), speedY = Configuration.speedOfBullet * sin(angle)){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -58,7 +65,7 @@ class BOOM(var started: Boolean = false): Object()
 data class Player(
         val nick: String,
         var health: Int
-) : Entity() {
+) : Moveable() {
     var isDead = 0
     var team: Int = -1
     override fun equals(other: Any?): Boolean {
