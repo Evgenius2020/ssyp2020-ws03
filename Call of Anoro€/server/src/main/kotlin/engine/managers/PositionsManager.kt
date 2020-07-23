@@ -54,24 +54,28 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         var nocorn = true
         val toRemove = mutableListOf<Entity>()
         if (obj is Object && entity !is Object && entity !in isChecked) {
-            var dist = -1.0
-            if (entity.y > obj.y && entity.x > obj.x) {
+            var dist = 0.0
+            if (entity.y > obj.y + ro && entity.x > obj.x + ro) {
+                nocorn = false
                 dist = hypot(obj.x - entity.x + ro,
                         obj.y - entity.y + ro)
             }
-            if (entity.y > obj.y && entity.x < obj.x) {
+            if (entity.y > obj.y + ro && entity.x < obj.x - ro) {
+                nocorn = false
                 dist = hypot(obj.x - entity.x - ro,
                         obj.y - entity.y + ro)
             }
-            if (entity.y < obj.y && entity.x > obj.x) {
+            if (entity.y < obj.y - ro && entity.x > obj.x + ro) {
+                nocorn = false
                 dist = hypot(obj.x - entity.x + ro,
                         obj.y - entity.y - ro)
             }
-            if (entity.y < obj.y && entity.x < obj.x) {
+            if (entity.y < obj.y - ro && entity.x < obj.x - ro) {
+                nocorn = false
                 dist = hypot(obj.x - entity.x - ro,
                         obj.y - entity.y - ro)
             }
-            if (dist < re && dist != -1.0) {
+            if (dist < re && !nocorn) {
                 nocorn = false
                 if (entity is Bullet) toRemove.add(entity)
                 if (entity is Player) {

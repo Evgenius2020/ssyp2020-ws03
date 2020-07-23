@@ -43,10 +43,8 @@ class Engine {
 
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
-        player.x = 100.0
-        player.y = 100.0
-        player.oldX = player.x
-        player.oldY = player.y
+        player.x = 0.0
+        player.y = 0.0
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
@@ -99,11 +97,19 @@ class Engine {
                         Configuration.width - Configuration.radiusOfPlayer)
                 player.y = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.height - Configuration.radiusOfPlayer)
+                player.oldX = 0.0
+                player.oldY = 0.0
                 player.isDead = 0
                 player.health = Configuration.healthOfPlayer
             }
         }
         for (player in listOfPlayers.values) {
+            if (player.x == Configuration.radiusOfPlayer && player.y == Configuration.radiusOfPlayer) {
+                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.width - Configuration.radiusOfPlayer)
+                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.height - Configuration.radiusOfPlayer)
+            }
             if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
         }
     }
