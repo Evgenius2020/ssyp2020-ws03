@@ -1,9 +1,6 @@
 package engine
 
-import engine.managers.DamageManager
-import engine.managers.PositionsManager
-import engine.managers.TeamsManager
-import engine.managers.TimersManager
+import engine.managers.*
 import org.mapeditor.core.TileLayer
 import org.mapeditor.io.TMXMapReader
 import shared.BOOM
@@ -22,6 +19,7 @@ class Engine {
     private val timersManager = TimersManager()
     private val damageManager = DamageManager()
     private val teamsManager = TeamsManager()
+    private val visibilityManager = VisibilityManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
     val map = TMXMapReader().readMap("../shared/src/jvmMain/resources/map.tmx")
@@ -50,6 +48,7 @@ class Engine {
         timersManager.register(player)
         damageManager.register(player, player.team)
         teamsManager.register(player)
+        visibilityManager.register(player)
         println("player: ${player.x} ${player.y}")
         return player
     }
@@ -59,6 +58,7 @@ class Engine {
         entity.x = x
         entity.y = y
         positionsManager.register(entity)
+        visibilityManager.register(entity)
     }
 
     fun removePlayer(player: Player) {
@@ -73,6 +73,7 @@ class Engine {
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
+        visibilityManager.remove(player)
     }
 
     fun tick() {
@@ -114,9 +115,9 @@ class Engine {
         }
     }
 
-    fun getEntities(player: Entity): Array<Entity> {
+    fun getEntities(player: Player): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return positionsManager.getEntities()
+        return visibilityManager.visible(player)
     }
 
     fun setAngle(entity: Entity, angle: Double) {
@@ -134,6 +135,7 @@ class Engine {
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
+            visibilityManager.register(bullet)
         }
     }
 
