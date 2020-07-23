@@ -1,5 +1,8 @@
 package server
 
+import com.soywiz.korgw.delay
+import com.soywiz.korio.async.delay
+import engine.Configuration
 import engine.Engine
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.ServerSocket
@@ -14,8 +17,11 @@ import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.time.delay
 import shared.*
 import java.net.InetSocketAddress
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -120,7 +126,7 @@ class Server {
     private fun runUpdater(context: CoroutineScope) {
         context.launch {
             while (true) {
-                delay(16)
+                delay(timeMillis = (1000 / Configuration.fps).toLong())
                 serverActor.send(Tick)
             }
         }
