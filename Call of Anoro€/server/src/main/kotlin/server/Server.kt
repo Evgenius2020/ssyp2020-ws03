@@ -1,5 +1,7 @@
 package server
 
+import Statistic
+import engine.Configuration
 import engine.Engine
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.ServerSocket
@@ -27,10 +29,12 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
             when (msg) {
                 is Register -> s.register(msg.u)
                 is Tick -> s.tick()
-                is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
+                is GetRenderInfo -> s.getRenderInfo(msg.p, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.p)
+                is ChangeSpeed -> s.changeSpeed(msg.m, msg.x, msg.y)
+                is GetStatistic -> s.getStatistic(msg.statistic)
             }
         }
     }
@@ -53,14 +57,17 @@ class ServerActions {
         eng.tick()
     }
 
-    fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
-        val entities = eng.getEntities(e)
+    fun getRenderInfo(p: Player, res: CompletableDeferred<RenderInfo>){
+        val entities = eng.getEntities(p)
         for(ent in entities){
             if(ent is Player){
                 imageManager.setImage(ent.team)
             }
         }
-        res.complete(RenderInfo(entities, imageManager.base))
+        val cooldown = eng.getShootCooldown(p)
+        val endGame = eng.getEndGameTime()
+        val pId = p.id
+        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, pId))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
@@ -73,6 +80,39 @@ class ServerActions {
 
     fun disconnect(p: Player) {
         eng.removePlayer(p)
+    }
+
+    fun changeSpeed(m: Moveable, x: Int, y: Int) {
+        if(x < -1 || x > 1){
+            throw Exception("Cheater")
+        }
+        if(y < -1 || y > 1){
+            throw Exception("Cheater")
+        }
+        m.speedX = x * Configuration.speedOfPlayer
+        m.speedY = y * Configuration.speedOfPlayer
+    }
+
+    fun getStatistic(statistic: CompletableDeferred<Statistic>) {
+        val teamMembers = hashMapOf<Int, Array<String>>()
+        val teamScore = hashMapOf<Int, Int>()
+        val nickToKills = hashMapOf<String, Int>()
+        val nickToDeaths = hashMapOf<String, Int>()
+
+        for(team in 0..Configuration.teamCount){
+            teamMembers[team] = eng.teamsManager.getNames(team)
+        }
+        for(team in 0..Configuration.teamCount){
+            teamScore[team] = eng.teamsManager.getScore(team).toInt()
+        }
+        for(p in eng.positionsManager.getEntities()){
+            if(p is Player){
+                nickToDeaths[p.nick] = p.deaths
+                nickToKills[p.nick] = p.kills
+            }
+        }
+        val stat = Statistic(teamMembers, teamScore, nickToKills, nickToDeaths)
+        statistic.complete(stat)
     }
 }
 
@@ -109,7 +149,7 @@ class Server {
     private fun runUpdater(context: CoroutineScope) {
         context.launch {
             while (true) {
-                delay(16)
+                delay(timeMillis = (1000 / Configuration.fps).toLong())
                 serverActor.send(Tick)
             }
         }
@@ -152,6 +192,12 @@ class Server {
             is shared.SetAngle -> serverActor.send(SetAngle(p, message.point))
             is shared.Shoot -> {
                 serverActor.send(Shoot(p))
+            }
+            is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.x, message.y))
+            is shared.GetStatistic ->{
+                val futureStat = CompletableDeferred<Statistic>()
+                serverActor.send(GetStatistic(futureStat))
+                output.writeStringUtf8(serialize(futureStat.await()) + '\n')
             }
         }
     }

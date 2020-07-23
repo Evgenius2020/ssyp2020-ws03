@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 fun main() {
     val s = Server()
     s.start()
-
+    //TODO: он упал
     runBlocking {
         launch {
             s.run(this)

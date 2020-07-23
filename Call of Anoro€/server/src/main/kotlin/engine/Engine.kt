@@ -17,15 +17,16 @@ import kotlin.random.Random
 
 
 class Engine {
-    private val deadPlayers = mutableListOf<Player>()
-    private val positionsManager = PositionsManager()
-    private val timersManager = TimersManager()
-    private val damageManager = DamageManager()
-    private val teamsManager = TeamsManager()
-    private val listOfPlayers = mutableMapOf<Int, Player>()
+    val deadPlayers = mutableListOf<Player>()
+    val positionsManager = PositionsManager()
+    val timersManager = TimersManager()
+    val damageManager = DamageManager()
+    val teamsManager = TeamsManager()
+    val listOfPlayers = mutableMapOf<Int, Player>()
 
 
     val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
+
 
     init {
         for (i in map.layers.indices) {
@@ -44,16 +45,21 @@ class Engine {
 
     fun registerPlayer(nick: String): Player {
         val player = Player(nick, Configuration.healthOfPlayer)
+        player.x = 0.0
+        player.y = 0.0
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
         damageManager.register(player, player.team)
         teamsManager.register(player)
+        println("player: ${player.x} ${player.y}")
         return player
     }
 
     fun registerEntity(x: Double, y: Double) {
-        val entity = Entity(x, y)
+        val entity = Object()
+        entity.x = x
+        entity.y = y
         positionsManager.register(entity)
     }
 
@@ -69,10 +75,20 @@ class Engine {
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
+        teamsManager.removePlayer(player)
     }
 
     fun tick() {
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
+
+        for(team in damageManager.upScore){
+            teamsManager.addScore(team, 10.0)
+        }
+
+        for(team in damageManager.downScore){
+            teamsManager.addScore(team, -100.0)
+        }
+
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
@@ -93,11 +109,19 @@ class Engine {
                         Configuration.width - Configuration.radiusOfPlayer)
                 player.y = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.height - Configuration.radiusOfPlayer)
+                player.oldX = 0.0
+                player.oldY = 0.0
                 player.isDead = 0
                 player.health = Configuration.healthOfPlayer
             }
         }
         for (player in listOfPlayers.values) {
+            if (player.x == Configuration.radiusOfPlayer && player.y == Configuration.radiusOfPlayer) {
+                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.width - Configuration.radiusOfPlayer)
+                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                        Configuration.height - Configuration.radiusOfPlayer)
+            }
             if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
         }
     }
@@ -114,12 +138,11 @@ class Engine {
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)) {
-            val bullet = Bullet(player.team)
+            val bullet = Bullet(player.team, player.angle, Configuration.baseDamage, player)
             bullet.x = player.x + (Configuration.radiusOfBullet +
                     Configuration.radiusOfPlayer + 1e-6) * cos(player.angle)
             bullet.y = player.y + (Configuration.radiusOfBullet +
                     Configuration.radiusOfPlayer + 1e-6) * sin(player.angle)
-            bullet.angle = player.angle
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
@@ -128,5 +151,13 @@ class Engine {
 
     fun setFriendlyFire(ff: Boolean?) {
         damageManager.friendlyFire = ff
+    }
+
+    fun getShootCooldown(player: Player): Double {
+        return timersManager.getShootCooldown(player)
+    }
+
+    fun getEndGameTime(): Int {
+        return timersManager.getGameTimer()
     }
 }
