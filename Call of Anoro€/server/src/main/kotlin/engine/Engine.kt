@@ -77,6 +77,15 @@ class Engine {
 
     fun tick() {
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
+
+        for(team in damageManager.upScore){
+            teamsManager.addScore(team, 10.0)
+        }
+
+        for(team in damageManager.downScore){
+            teamsManager.addScore(team, -100.0)
+        }
+
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
