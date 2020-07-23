@@ -84,10 +84,8 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                 }
             }
             if (nocorn) {
-                if ((entity.x - re < obj.x + ro && entity.x + re > obj.x - ro && entity.y < obj.y + ro &&
-                                entity.y > obj.y - ro) ||
-                        (entity.y - re < obj.x + ro && entity.y + re > obj.y - ro && entity.x < obj.x + ro &&
-                                entity.x > obj.x - ro)) {
+                if ((abs(entity.x - obj.x) < re + ro && abs(entity.y - obj.y) < ro) ||
+                        (abs(entity.y - obj.y) < re + ro && abs(entity.x - obj.x) < ro)) {
                     if (entity is Bullet) toRemove.add(entity)
                     if (entity is Player) {
                         entity.x = entity.oldX

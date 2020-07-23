@@ -55,7 +55,6 @@ class Engine {
     }
 
     fun registerEntity(x: Double, y: Double) {
-        println("ENGINE: $x, $y")
         val entity = Object()
         entity.x = x
         entity.y = y
@@ -105,7 +104,6 @@ class Engine {
             }
         }
         for (player in listOfPlayers.values) {
-            println("ENGINE: ${player.x}, ${player.y}")
             if (player.x == Configuration.radiusOfPlayer && player.y == Configuration.radiusOfPlayer) {
                 player.x = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.width - Configuration.radiusOfPlayer)
