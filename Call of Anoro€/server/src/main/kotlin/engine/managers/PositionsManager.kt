@@ -54,52 +54,29 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         var nocorn = true
         val toRemove = mutableListOf<Entity>()
         if (obj is Object && entity !is Object && entity !in isChecked) {
+            var dist = -1.0
             if (entity.y > obj.y && entity.x > obj.x) {
-                val dist = hypot(obj.x - entity.x + ro,
+                dist = hypot(obj.x - entity.x + ro,
                         obj.y - entity.y + ro)
-                if (dist < re) {
-                    nocorn = false
-                    if (entity is Bullet) toRemove.add(entity)
-                    if (entity is Player) {
-                        entity.x = entity.oldX
-                        entity.x = entity.oldX
-                    }
-                }
             }
             if (entity.y > obj.y && entity.x < obj.x) {
-                val dist = hypot(obj.x - entity.x - ro,
+                dist = hypot(obj.x - entity.x - ro,
                         obj.y - entity.y + ro)
-                if (dist < re) {
-                    nocorn = false
-                    if (entity is Bullet) toRemove.add(entity)
-                    if (entity is Player) {
-                        entity.x = entity.oldX
-                        entity.x = entity.oldX
-                    }
-                }
             }
             if (entity.y < obj.y && entity.x > obj.x) {
-                val dist = hypot(obj.x - entity.x + ro,
+                dist = hypot(obj.x - entity.x + ro,
                         obj.y - entity.y - ro)
-                if (dist < re) {
-                    nocorn = false
-                    if (entity is Bullet) toRemove.add(entity)
-                    if (entity is Player) {
-                        entity.x = entity.oldX
-                        entity.x = entity.oldX
-                    }
-                }
             }
             if (entity.y < obj.y && entity.x < obj.x) {
-                val dist = hypot(obj.x - entity.x - ro,
+                dist = hypot(obj.x - entity.x - ro,
                         obj.y - entity.y - ro)
-                if (dist < re) {
-                    nocorn = false
-                    if (entity is Bullet) toRemove.add(entity)
-                    if (entity is Player) {
-                        entity.x = entity.oldX
-                        entity.x = entity.oldX
-                    }
+            }
+            if (dist < re && dist != -1.0) {
+                nocorn = false
+                if (entity is Bullet) toRemove.add(entity)
+                if (entity is Player) {
+                    entity.x = entity.oldX
+                    entity.y = entity.oldY
                 }
             }
             if (nocorn) {
@@ -110,7 +87,7 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                     if (entity is Bullet) toRemove.add(entity)
                     if (entity is Player) {
                         entity.x = entity.oldX
-                        entity.x = entity.oldX
+                        entity.y = entity.oldY
                     }
                 }
             }
@@ -124,6 +101,7 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
             if(entity is Moveable){
+                println("Entity pos: ${entity.x} ${entity.y}")
                 if (entity is Player){
                     entity.oldX = entity.x
                     entity.oldY = entity.y

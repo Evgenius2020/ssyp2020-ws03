@@ -42,15 +42,15 @@ fun main() {
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
-            val spriteMap = resourcesVfs["BOOM.png"].readBitmap()
+//            val spriteMap = resourcesVfs["BOOM.png"].readBitmap()
 
-            val boomAnimation = SpriteAnimation(
-                    spriteMap = spriteMap,
-                    spriteWidth = 960 / 5,
-                    spriteHeight = 384 / 2,
-                    columns = 5,
-                    rows = 2
-            )
+//            val boomAnimation = SpriteAnimation(
+//                    spriteMap = spriteMap,
+//                    spriteWidth = 960 / 5,
+//                    spriteHeight = 384 / 2,
+//                    columns = 5,
+//                    rows = 2
+//            )
 
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
@@ -62,11 +62,9 @@ fun main() {
 
             views.root.onClick {
                 output.writeStringUtf8(serialize(Shoot) + '\n')
-                println("SEND SHOOT")
             }
 
             val graphicsMap = mutableMapOf<Int, List<View>>()
-            val colorManager = ColorManager()
 
             while (true) {
                 output.writeStringUtf8(serialize(GetRenderInfo) + '\n')

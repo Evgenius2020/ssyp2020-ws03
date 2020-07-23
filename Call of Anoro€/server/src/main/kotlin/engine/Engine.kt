@@ -24,7 +24,7 @@ class Engine {
     private val teamsManager = TeamsManager()
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
-    val map = TMXMapReader().readMap("shared/src/jvmMain/resources/map.tmx")
+    val map = TMXMapReader().readMap("../shared/src/jvmMain/resources/map.tmx")
 
     init {
         for (i in map.layers.indices) {
@@ -45,11 +45,14 @@ class Engine {
         val player = Player(nick, Configuration.healthOfPlayer)
         player.x = 100.0
         player.y = 100.0
+        player.oldX = player.x
+        player.oldY = player.y
         listOfPlayers[player.id] = player
         positionsManager.register(player)
         timersManager.register(player)
         damageManager.register(player, player.team)
         teamsManager.register(player)
+        println("player: ${player.x} ${player.y}")
         return player
     }
 
