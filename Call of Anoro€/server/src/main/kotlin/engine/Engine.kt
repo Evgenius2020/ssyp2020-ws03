@@ -25,7 +25,7 @@ class Engine {
     private val listOfPlayers = mutableMapOf<Int, Player>()
 
 
-    val map = TMXMapReader().readMap("..\\shared\\src\\jvmMain\\resources\\map.tmx")
+    val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
 
     init {
         for (i in map.layers.indices) {
