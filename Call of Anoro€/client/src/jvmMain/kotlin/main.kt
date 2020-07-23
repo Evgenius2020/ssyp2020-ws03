@@ -42,7 +42,6 @@ fun main() {
         val playerSize = ClientConfiguration.sizeOfPlayer
         val objectSize = ClientConfiguration.sizeOfObject
         val bulletSize = ClientConfiguration.sizeOfBullet
-        var gameTime = 300
 
         Korge(width = 640, height = 640, bgcolor = Colors["#2B2B2B"], title = "Call of Anoro€++ redux")
         {
