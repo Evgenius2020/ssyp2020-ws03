@@ -1,10 +1,7 @@
 package engine.managers
 
 import engine.Configuration
-import shared.Bullet
-import shared.Entity
-import shared.Object
-import shared.Player
+import shared.*
 import kotlin.math.*
 
 data class PositionsManagerData(
@@ -126,15 +123,13 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
-            if (entity is Player && entity.isDead == 0) {
-                entity.oldX = entity.x
-                entity.oldY = entity.y
-                entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
-                entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
-            }
-            if (entity is Bullet) {
-                entity.x += posData.speeds[listOfTypes[entity.id]!!] * cos(entity.angle)
-                entity.y += posData.speeds[listOfTypes[entity.id]!!] * sin(entity.angle)
+            if(entity is Moveable){
+                if (entity is Player){
+                    entity.oldX = entity.x
+                    entity.oldY = entity.y
+                }
+                entity.x += entity.speedX
+                entity.y += entity.speedY
             }
             if (entity !is Object) {
                 checkBorders(entity)

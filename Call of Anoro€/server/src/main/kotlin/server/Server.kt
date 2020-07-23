@@ -1,5 +1,8 @@
 package server
 
+import com.soywiz.korgw.delay
+import com.soywiz.korio.async.delay
+import engine.Configuration
 import engine.Engine
 import io.ktor.network.selector.ActorSelectorManager
 import io.ktor.network.sockets.ServerSocket
@@ -14,8 +17,11 @@ import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.time.delay
 import shared.*
 import java.net.InetSocketAddress
+import kotlin.time.milliseconds
+import kotlin.time.seconds
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -27,10 +33,11 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
             when (msg) {
                 is Register -> s.register(msg.u)
                 is Tick -> s.tick()
-                is GetRenderInfo -> s.getRenderInfo(msg.e, msg.res)
+                is GetRenderInfo -> s.getRenderInfo(msg.p, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.p)
+                is ChangeSpeed -> s.changeSpeed(msg.m, msg.speedX, msg.speedY)
             }
         }
     }
@@ -53,14 +60,15 @@ class ServerActions {
         eng.tick()
     }
 
-    fun getRenderInfo(e: Entity, res: CompletableDeferred<RenderInfo>){
-        val entities = eng.getEntities(e)
+    fun getRenderInfo(p: Player, res: CompletableDeferred<RenderInfo>){
+        val entities = eng.getEntities(p)
         for(ent in entities){
             if(ent is Player){
                 imageManager.setImage(ent.team)
             }
         }
-        res.complete(RenderInfo(entities, imageManager.base))
+        val cooldown = eng.getShootCooldown(p)
+        res.complete(RenderInfo(entities, imageManager.base, cooldown))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
@@ -73,6 +81,15 @@ class ServerActions {
 
     fun disconnect(p: Player) {
         eng.removePlayer(p)
+    }
+
+    fun changeSpeed(m: Moveable, speedX: Double?, speedY: Double?) {
+        if(speedX != null){
+            m.speedX = speedX
+        }
+        if(speedY != null){
+            m.speedY = speedY
+        }
     }
 }
 
@@ -109,7 +126,7 @@ class Server {
     private fun runUpdater(context: CoroutineScope) {
         context.launch {
             while (true) {
-                delay(16)
+                delay(timeMillis = (1000 / Configuration.fps).toLong())
                 serverActor.send(Tick)
             }
         }
@@ -153,6 +170,7 @@ class Server {
             is shared.Shoot -> {
                 serverActor.send(Shoot(p))
             }
+            is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.speedX, message.speedY))
         }
     }
 
