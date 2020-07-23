@@ -27,4 +27,4 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
           heroku_email: "ilyamerzlakov@gmail.com" 
-          appdir: "Call of Anoro€/server/build/libs"
+          appdir: "Call\ of\ Anoro€/server/build/libs"
