@@ -55,11 +55,11 @@ fun main() {
                     rows = 2
             )
 
+
+            val textGameTimeCenter = solidRect(1, 1, Colors.BLACK).xy(width, 0.0)
             val mapView = TiledMapView(resourcesVfs["map.tmx"].readTiledMap())
             addChild(mapView)
-
-            val textGameTimeCenter = solidRect(0, 0, Colors.BLACK).xy(views.virtualWidth / 2, 10)
-            val gameTimeText = text("").centerOn(textGameTimeCenter)
+            val gameTimeText = text("", 20.0).alignTopToTopOf(textGameTimeCenter)
 
             val fps = text("", 20.0).xy(0, 0)
 
@@ -81,6 +81,7 @@ fun main() {
                 // Update game time
 
                 gameTimeText.text = map.endGameTimer.toString()
+                gameTimeText.alignRightToRightOf(textGameTimeCenter)
 
                 // Delete old entities
 
