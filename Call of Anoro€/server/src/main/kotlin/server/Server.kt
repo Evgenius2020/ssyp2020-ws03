@@ -37,7 +37,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
                 is SetAngle -> s.setAngle(msg.e, msg.point)
                 is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.p)
-                is ChangeSpeed -> s.changeSpeed(msg.m, msg.speedX, msg.speedY)
+                is ChangeSpeed -> s.changeSpeed(msg.m, msg.x, msg.y)
             }
         }
     }
@@ -83,13 +83,15 @@ class ServerActions {
         eng.removePlayer(p)
     }
 
-    fun changeSpeed(m: Moveable, speedX: Double?, speedY: Double?) {
-        if(speedX != null){
-            m.speedX = speedX
+    fun changeSpeed(m: Moveable, x: Int, y: Int) {
+        if(x < -1 || x > 1){
+            throw Exception("Cheater")
         }
-        if(speedY != null){
-            m.speedY = speedY
+        if(y < -1 || y > 1){
+            throw Exception("Cheater")
         }
+        m.speedX = x * Configuration.speedOfPlayer
+        m.speedY = y * Configuration.speedOfPlayer
     }
 }
 
@@ -170,7 +172,7 @@ class Server {
             is shared.Shoot -> {
                 serverActor.send(Shoot(p))
             }
-            is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.speedX, message.speedY))
+            is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.x, message.y))
         }
     }
 

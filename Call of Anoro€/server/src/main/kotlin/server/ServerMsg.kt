@@ -10,4 +10,4 @@ class GetRenderInfo(val p: Player, val res: CompletableDeferred<RenderInfo>): Se
 class SetAngle(val e: Entity, val point: ClientServerPoint): ServerMsg()
 class Shoot(val p: Player): ServerMsg()
 class Disconnect(val p: Player): ServerMsg()
-class ChangeSpeed(val m: Moveable, val speedX: Double?, val speedY: Double?): ServerMsg()
+class ChangeSpeed(val m: Moveable, val x: Int, val y: Int): ServerMsg()
