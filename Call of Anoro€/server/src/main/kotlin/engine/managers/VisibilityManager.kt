@@ -24,15 +24,15 @@ class VisibilityManager : BaseManager<Unit>() {
         visibleEntities.add(player)
         for (ent2 in entitiesData.keys) {
             var cnt = 0
-            if (hypot(player.x - ent2.x, player.y - ent2.y) <
-                    Configuration.width / 1.8) {
-                if (ent2 is Object) visibleEntities.add(ent2)
-                if ((ent2 is Bullet || ent2 is Object) && ent2.id != player.id) {
+            if (ent2 is Object) visibleEntities.add(ent2)
+            //if (hypot(player.x - ent2.x, player.y - ent2.y) <
+                    //Configuration.width / 1.8) {
+                if ((ent2 is Bullet || ent2 is Player) && ent2.id != player.id) {
                     for (ent3 in entitiesData.keys) {
-                        val a = player.y - ent2.y
-                        val b = ent2.x - player.x
-                        val c = player.x * ent2.y - ent2.x * player.y
                         if (ent3 is Object) {
+                            val a = player.y - ent2.y
+                            val b = ent2.x - player.x
+                            val c = player.x * ent2.y - ent2.x * player.y
                             if ((hypot(player.x - ent2.x, player.y - ent2.y) >
                                             hypot(player.x - ent3.x, player.y - ent3.y)) &&
                                     (((a / b > 0) && ((h * a - ent3.x * a - c) / b > ent3.y - h) &&
@@ -45,7 +45,7 @@ class VisibilityManager : BaseManager<Unit>() {
                     }
                     if (cnt == 0) visibleEntities.add(ent2)
                 }
-            }
+            //}
         }
         return visibleEntities.toTypedArray()
     }
