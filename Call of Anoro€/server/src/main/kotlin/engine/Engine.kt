@@ -14,15 +14,17 @@ import kotlin.random.Random
 
 
 class Engine {
-    private val deadPlayers = mutableListOf<Player>()
-    private val positionsManager = PositionsManager()
-    private val timersManager = TimersManager()
-    private val damageManager = DamageManager()
-    private val teamsManager = TeamsManager()
-    private val visibilityManager = VisibilityManager()
-    private val listOfPlayers = mutableMapOf<Int, Player>()
+    val deadPlayers = mutableListOf<Player>()
+    val positionsManager = PositionsManager()
+    val timersManager = TimersManager()
+    val damageManager = DamageManager()
+    val teamsManager = TeamsManager()
+    val visibilityManager = VisibilityManager()
+    val listOfPlayers = mutableMapOf<Int, Player>()
 
-    val map = TMXMapReader().readMap("../shared/src/jvmMain/resources/map.tmx")
+
+    val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
+
 
     init {
         for (i in map.layers.indices) {
@@ -74,10 +76,20 @@ class Engine {
         positionsManager.removeEntity(player)
         timersManager.remove(player)
         visibilityManager.remove(player)
+        teamsManager.removePlayer(player)
     }
 
     fun tick() {
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
+
+        for(team in damageManager.upScore){
+            teamsManager.addScore(team, 10.0)
+        }
+
+        for(team in damageManager.downScore){
+            teamsManager.addScore(team, -100.0)
+        }
+
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
@@ -127,7 +139,7 @@ class Engine {
     fun shot(player: Player) {
         // Creates bullet (based on cooldown)
         if (timersManager.checkCooldownTimer(player)) {
-            val bullet = Bullet(player.team, player.angle)
+            val bullet = Bullet(player.team, player.angle, Configuration.baseDamage, player)
             bullet.x = player.x + (Configuration.radiusOfBullet +
                     Configuration.radiusOfPlayer + 1e-6) * cos(player.angle)
             bullet.y = player.y + (Configuration.radiusOfBullet +

@@ -1,7 +1,6 @@
 package server
 
-import com.soywiz.korgw.delay
-import com.soywiz.korio.async.delay
+import Statistic
 import engine.Configuration
 import engine.Engine
 import io.ktor.network.selector.ActorSelectorManager
@@ -17,11 +16,8 @@ import io.ktor.utils.io.writeStringUtf8
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.time.delay
 import shared.*
 import java.net.InetSocketAddress
-import kotlin.time.milliseconds
-import kotlin.time.seconds
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
@@ -38,6 +34,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
                 is Shoot -> s.shoot(msg.p)
                 is Disconnect -> s.disconnect(msg.p)
                 is ChangeSpeed -> s.changeSpeed(msg.m, msg.x, msg.y)
+                is GetStatistic -> s.getStatistic(msg.statistic)
             }
         }
     }
@@ -94,6 +91,28 @@ class ServerActions {
         }
         m.speedX = x * Configuration.speedOfPlayer
         m.speedY = y * Configuration.speedOfPlayer
+    }
+
+    fun getStatistic(statistic: CompletableDeferred<Statistic>) {
+        val teamMembers = hashMapOf<Int, Array<String>>()
+        val teamScore = hashMapOf<Int, Int>()
+        val nickToKills = hashMapOf<String, Int>()
+        val nickToDeaths = hashMapOf<String, Int>()
+
+        for(team in 0..Configuration.teamCount){
+            teamMembers[team] = eng.teamsManager.getNames(team)
+        }
+        for(team in 0..Configuration.teamCount){
+            teamScore[team] = eng.teamsManager.getScore(team).toInt()
+        }
+        for(p in eng.positionsManager.getEntities()){
+            if(p is Player){
+                nickToDeaths[p.nick] = p.deaths
+                nickToKills[p.nick] = p.kills
+            }
+        }
+        val stat = Statistic(teamMembers, teamScore, nickToKills, nickToDeaths)
+        statistic.complete(stat)
     }
 }
 
@@ -175,6 +194,11 @@ class Server {
                 serverActor.send(Shoot(p))
             }
             is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.x, message.y))
+            is shared.GetStatistic ->{
+                val futureStat = CompletableDeferred<Statistic>()
+                serverActor.send(GetStatistic(futureStat))
+                output.writeStringUtf8(serialize(futureStat.await()) + '\n')
+            }
         }
     }
 

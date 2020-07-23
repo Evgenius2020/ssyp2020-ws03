@@ -1,5 +1,6 @@
 package engine.managers
 
+import engine.Configuration
 import shared.Entity
 import shared.Player
 
@@ -9,8 +10,7 @@ data class TeamInfo(
 )
 
 class TeamsManager : BaseManager<Unit>() {
-    private val teamcount = 2
-    private val teams = List<TeamInfo>(teamcount) { TeamInfo(mutableListOf<String>(), 0.0) }
+    private val teams = List<TeamInfo>(Configuration.teamCount) { TeamInfo(mutableListOf<String>(), 0.0) }
 
     fun register(player: Player) {
         super.register(player, Unit)
@@ -29,6 +29,7 @@ class TeamsManager : BaseManager<Unit>() {
     fun addScore(team: Int, score: Double) {
         teams[team].score += score
     }
+
     fun getNames(team: Int) = teams[team].nicknames.toTypedArray()
     fun getScore(team: Int) = teams[team].score
 }
