@@ -144,4 +144,8 @@ class Engine {
     fun getShootCooldown(player: Player): Double {
         return timersManager.getShootCooldown(player)
     }
+
+    fun getEndGameTime(): Int {
+        return timersManager.getGameTimer()
+    }
 }
