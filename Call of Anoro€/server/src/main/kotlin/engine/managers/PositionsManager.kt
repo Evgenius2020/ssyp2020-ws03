@@ -57,23 +57,23 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
             var dist = 0.0
             if (entity.y > obj.y + ro && entity.x > obj.x + ro) {
                 nocorn = false
-                dist = hypot(obj.x - entity.x + ro,
-                        obj.y - entity.y + ro)
+                dist = hypot(entity.x - obj.x - ro,
+                        entity.y - obj.y - ro)
             }
             if (entity.y > obj.y + ro && entity.x < obj.x - ro) {
                 nocorn = false
                 dist = hypot(obj.x - entity.x - ro,
-                        obj.y - entity.y + ro)
+                        entity.y - obj.y - ro)
             }
             if (entity.y < obj.y - ro && entity.x > obj.x + ro) {
                 nocorn = false
-                dist = hypot(obj.x - entity.x + ro,
+                dist = hypot(entity.x - obj.x - ro,
                         obj.y - entity.y - ro)
             }
             if (entity.y < obj.y - ro && entity.x < obj.x - ro) {
                 nocorn = false
-                dist = hypot(obj.x - entity.x - ro,
-                        obj.y - entity.y - ro)
+                dist = hypot(entity.x - obj.x + ro,
+                        entity.y - obj.y + ro)
             }
             if (dist < re && !nocorn) {
                 nocorn = false
@@ -105,7 +105,6 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
             if(entity is Moveable){
-                println("Entity pos: ${entity.x} ${entity.y}")
                 if (entity is Player){
                     entity.oldX = entity.x
                     entity.oldY = entity.y

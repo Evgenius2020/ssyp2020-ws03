@@ -2,7 +2,7 @@ package engine
 
 object Configuration {
     const val fps = 60
-    const val radiusOfPlayer = 16.0
+    const val radiusOfPlayer = 15.9
     const val radiusOfBullet = 2.0
     const val sizeOfObj = 16.0
     const val speedOfPlayer = 1.0
