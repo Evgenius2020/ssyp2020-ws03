@@ -19,7 +19,7 @@ class Engine {
     val timersManager = TimersManager()
     val damageManager = DamageManager()
     val teamsManager = TeamsManager()
-    val visibilityManager = VisibilityManager()
+//    val visibilityManager = VisibilityManager()
     val listOfPlayers = mutableMapOf<Int, Player>()
 
 
@@ -50,7 +50,7 @@ class Engine {
         timersManager.register(player)
         damageManager.register(player, player.team)
         teamsManager.register(player)
-        visibilityManager.register(player)
+//        visibilityManager.register(player)
         println("player: ${player.x} ${player.y}")
         return player
     }
@@ -60,7 +60,7 @@ class Engine {
         entity.x = x
         entity.y = y
         positionsManager.register(entity)
-        visibilityManager.register(entity)
+//        visibilityManager.register(entity)
     }
 
     fun removePlayer(player: Player) {
@@ -75,7 +75,7 @@ class Engine {
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
-        visibilityManager.remove(player)
+//        visibilityManager.remove(player)
         teamsManager.removePlayer(player)
     }
 
@@ -129,7 +129,8 @@ class Engine {
 
     fun getEntities(player: Player): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return visibilityManager.visible(player)
+        return positionsManager.getEntities()
+//        return visibilityManager.visible(player)
     }
 
     fun setAngle(entity: Entity, angle: Double) {
@@ -147,7 +148,7 @@ class Engine {
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
-            visibilityManager.register(bullet)
+//            visibilityManager.register(bullet)
         }
     }
 
