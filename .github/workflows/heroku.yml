@@ -25,7 +25,7 @@ jobs:
       - run: mkdir dist
       - run: "cp server/build/libs/* dist/"
       - run: "cp client/build/libs/* dist/"
-      - run: "zip --junk-paths dist.zip dist/*"
+      - run: "zip --junk-paths ../dist.zip dist/*"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
