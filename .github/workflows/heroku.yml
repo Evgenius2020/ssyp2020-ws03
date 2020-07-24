@@ -20,11 +20,36 @@ jobs:
           java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
       - run: chmod u+x ./gradlew
-      - run: ./gradlew server:assembleShadowDist 
-      - run: cp Procfile server/build/libs
-      - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
+      - run: ./gradlew server:assembleShadowDist
+      - run: ./gradlew client:packageJvmFatJar
+      - run: mkdir dist
+      - run: "cp server/build/libs/* dist/"
+      - run: "cp client/build/libs/* dist/"
+      - run: "zip --junk-paths dist.zip dist/*"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
-          heroku_email: "ilyamerzlakov@gmail.com" 
-          appdir: "Call\\ of\\ Anoro€/server/build/libs"
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./dist.zip
+          asset_name: dist.zip
+          asset_content_type: application/zip
+#       - run: cp Procfile server/build/libs
+#       - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
+#         with:
+#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#           heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
+#           heroku_email: "ilyamerzlakov@gmail.com" 
+#           appdir: "Call\\ of\\ Anoro€/server/build/libs"
