@@ -99,10 +99,10 @@ class ServerActions {
         val nickToKills = hashMapOf<String, Int>()
         val nickToDeaths = hashMapOf<String, Int>()
 
-        for(team in 0..Configuration.teamCount){
+        for(team in 0 until Configuration.teamCount){
             teamMembers[team] = eng.teamsManager.getNames(team)
         }
-        for(team in 0..Configuration.teamCount){
+        for(team in 0 until Configuration.teamCount){
             teamScore[team] = eng.teamsManager.getScore(team).toInt()
         }
         for(p in eng.positionsManager.getEntities()){

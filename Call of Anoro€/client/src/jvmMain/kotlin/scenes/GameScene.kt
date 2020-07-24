@@ -1,5 +1,6 @@
 package client.scenes
 
+import Statistic
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
@@ -199,7 +200,7 @@ class GameScene(val nick: String) : Scene() {
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
 
             output.writeStringUtf8(serialize(GetStatistic) + '\n')
-
+            val stats = deserialize(input.readUTF8Line()!!) as Statistic
         }
     }
 }
