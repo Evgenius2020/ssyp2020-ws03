@@ -22,9 +22,9 @@ class Engine {
 //    val visibilityManager = VisibilityManager()
     val listOfPlayers = mutableMapOf<Int, Player>()
 
+    var isStopped = false
 
     val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
-
 
     init {
         for (i in map.layers.indices) {
@@ -36,6 +36,31 @@ class Engine {
                             println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
                         }
                     }
+                }
+            }
+        }
+    }
+
+    fun restart(){
+        timersManager.resetGameTimer()
+        isStopped = false
+        for(ent in positionsManager.getEntities()){
+            teamsManager.clear()
+            when(ent){
+                is Bullet ->{
+                    positionsManager.removeEntity(ent)
+                    damageManager.remove(ent)
+                }
+                is Player ->{
+                    ent.kills = 0
+                    ent.deaths = 0
+
+                    ent.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.width - Configuration.radiusOfPlayer)
+                    ent.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.height - Configuration.radiusOfPlayer)
+                    ent.oldX = 0.0
+                    ent.oldY = 0.0
                 }
             }
         }
@@ -77,6 +102,7 @@ class Engine {
         timersManager.remove(player)
 //        visibilityManager.remove(player)
         teamsManager.removePlayer(player)
+        deadPlayers.remove(player)
     }
 
     fun respawnPlayer(player: Player){
@@ -92,6 +118,13 @@ class Engine {
     }
 
     fun tick() {
+        timersManager.tick()
+        if(isStopped){
+            if(timersManager.checkStop()){
+                restart()
+            }
+            return
+        }
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
 
         for(team in damageManager.upScore){
@@ -115,7 +148,6 @@ class Engine {
                 timersManager.remove(ent)
             }
         }
-        timersManager.tick()
         for (player in deadPlayers) {
             if (timersManager.checkRespawn(player)) {
                 respawnPlayer(player)
@@ -129,6 +161,11 @@ class Engine {
                         Configuration.height - Configuration.radiusOfPlayer)
             }
             if (!player.isDead && player in deadPlayers) deadPlayers.remove(player)
+        }
+
+        if(timersManager.getGameTimer() <= 0){
+            isStopped = true
+            timersManager.resetStop()
         }
     }
 
@@ -171,5 +208,9 @@ class Engine {
 
     fun getRespawnTimer(p: Player): Int {
         return timersManager.getRespawnTimer(p)
+    }
+
+    fun getStopTimer(): Int {
+        return timersManager.getStopTimer()
     }
 }

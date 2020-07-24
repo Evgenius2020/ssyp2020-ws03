@@ -236,8 +236,8 @@ class GameScene(val nick: String) : Scene() {
             val y = (-inputWASD[Key.W].toInt()) + (inputWASD[Key.S].toInt())
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
 
-            //output.writeStringUtf8(serialize(GetStatistic) + '\n')
-
+            output.writeStringUtf8(serialize(GetStatistic) + '\n')
+            val stats = deserialize(input.readUTF8Line()!!) as Statistic
         }
     }
 }

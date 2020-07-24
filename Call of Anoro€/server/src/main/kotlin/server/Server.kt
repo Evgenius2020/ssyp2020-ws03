@@ -67,7 +67,8 @@ class ServerActions {
         val cooldown = eng.getShootCooldown(p)
         val respawn = eng.getRespawnTimer(p) / Configuration.fps
         val endGame = eng.getEndGameTime() / Configuration.fps
-        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, respawn, p.isDead, p.id))
+        val stopTimer = eng.getStopTimer() / Configuration.fps
+        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, stopTimer, respawn, p.isDead, p.id))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
@@ -99,10 +100,10 @@ class ServerActions {
         val nickToKills = hashMapOf<String, Int>()
         val nickToDeaths = hashMapOf<String, Int>()
 
-        for(team in 0..Configuration.teamCount){
+        for(team in 0 until Configuration.teamCount){
             teamMembers[team] = eng.teamsManager.getNames(team)
         }
-        for(team in 0..Configuration.teamCount){
+        for(team in 0 until Configuration.teamCount){
             teamScore[team] = eng.teamsManager.getScore(team).toInt()
         }
         for(p in eng.positionsManager.getEntities()){
