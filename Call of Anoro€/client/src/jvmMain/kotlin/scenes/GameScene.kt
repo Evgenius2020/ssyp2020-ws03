@@ -3,13 +3,13 @@ package client.scenes
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
-import com.soywiz.korge.input.mouse
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.tiled.TiledMapView
 import com.soywiz.korge.tiled.readTiledMap
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
+import com.soywiz.korim.color.RGBA
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
 import com.soywiz.korma.geom.Angle
@@ -30,7 +30,7 @@ import java.net.InetSocketAddress
 import kotlin.math.max
 import kotlin.math.min
 
-class GameScene(val nick : String) : Scene() {
+class GameScene(val nick: String) : Scene() {
 
     private lateinit var boomAnimation: SpriteAnimation
     private lateinit var gameTimer: Text
@@ -150,8 +150,8 @@ class GameScene(val nick : String) : Scene() {
                         }
                         is Player -> {
                             val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
-                            val healthbarD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 50)
-                            val healthbarT = solidRect(30, 5, Colors.RED).xy(i.x - 16, i.y - 50)
+                            val healthbarD = solidRect(30, 5, RGBA(45, 52, 54, 255)).xy(i.x - 16, i.y - 50)
+                            val healthbarT = solidRect(30, 5, RGBA(214, 48, 49, 255)).xy(i.x - 16, i.y - 50)
 
                             val nick = text(i.nick, 10.0, color = Colors.BLACK).centerOn(healthbarD)
 
@@ -160,8 +160,8 @@ class GameScene(val nick : String) : Scene() {
                             player.width = 40.0
 
                             if (map.pId == i.id) {
-                                val cooldownD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 45)
-                                val cooldownT = solidRect(30, 5, Colors.LIGHTGRAY).xy(i.x - 16, i.y - 45)
+                                val cooldownD = solidRect(30, 5, RGBA(45, 52, 54, 255)).xy(i.x - 16, i.y - 45)
+                                val cooldownT = solidRect(30, 5, RGBA(178, 190, 195, 252)).xy(i.x - 16, i.y - 45)
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick, cooldownD, cooldownT)
                             } else
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)

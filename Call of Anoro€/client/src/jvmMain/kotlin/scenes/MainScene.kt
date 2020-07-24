@@ -2,7 +2,6 @@ package client.scenes
 
 import client.util.LoadingProxyScene
 import com.soywiz.klock.seconds
-import com.soywiz.korev.Key
 import com.soywiz.korev.keys
 import com.soywiz.korge.input.mouse
 import com.soywiz.korge.input.onKeyTyped
@@ -13,7 +12,6 @@ import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
-import kotlin.reflect.typeOf
 
 class MainScene : Scene() {
     private lateinit var bg: View
@@ -21,7 +19,7 @@ class MainScene : Scene() {
     private lateinit var button: View
     private lateinit var nickBox: View
     private var nick = ""
-    private lateinit var nickText : View
+    private lateinit var nickText: View
     val maxNickSize = 9
     val minNickSize = 1
 
@@ -45,19 +43,20 @@ class MainScene : Scene() {
 
             }
             views.keys {
-                onKeyTyped {
-                    keyEvent ->
+                onKeyTyped { keyEvent ->
                     run {
                         //print(keyEvent.character == '\b')
-                        when
-                        {
-                            keyEvent.character =='\b' -> {
+                        when {
+                            keyEvent.character == '\b' -> {
                                 if (nick.length > 0)
                                     nick = nick.substring(0 until nick.length - 1)
                             }
-                            nick.length == maxNickSize -> { }
-                            keyEvent.character == '\n' -> { }
-                            keyEvent.character == ' ' -> { }
+                            nick.length == maxNickSize -> {
+                            }
+                            keyEvent.character == '\n' -> {
+                            }
+                            keyEvent.character == ' ' -> {
+                            }
 
                             else -> nick += keyEvent.character
                         }
@@ -91,11 +90,14 @@ class MainScene : Scene() {
                     tint = Colors.LIGHTGRAY
                 }
                 onClick {
-                    if (nick.length >= minNickSize && nick.length <= maxNickSize) {
+                    if (nick.length <= maxNickSize) {
                         if (mouseEnabled) {
                             mouseEnabled = false
                             scale -= 0.5
-                            sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), nick,  time = .5.seconds)
+                            if (nick == "")
+                                sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), "Unknown", time = .5.seconds)
+                            else
+                                sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), nick, time = .5.seconds)
                         }
                     }
                 }
