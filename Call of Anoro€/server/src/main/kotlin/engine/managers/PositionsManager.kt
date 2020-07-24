@@ -102,8 +102,8 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         val listOfCol = mutableListOf<Pair<Entity, Entity>>()
         val toRemove = mutableListOf<Entity>()
         for ((entity, posData) in entitiesData) {
-            if(entity is Moveable){
-                if (entity is Player){
+            if (entity is Moveable) {
+                if (entity is Player) {
                     entity.oldX = entity.x
                     entity.oldY = entity.y
                 }
@@ -151,4 +151,14 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     fun getEntities(): Array<Entity> = entitiesData.keys.toTypedArray()
+    fun getVisibleEntities(player: Player): Array<Entity> {
+        val visibleEntities = mutableListOf<Entity>()
+        for (ent2 in entitiesData.keys) {
+            if (hypot(player.x - ent2.x, player.y - ent2.y) <
+                    Configuration.width / 1.8 || ent2 is Object) {
+                visibleEntities.add(ent2)
+            }
+        }
+        return visibleEntities.toTypedArray()
+    }
 }

@@ -80,7 +80,9 @@ class Engine {
     }
 
     fun tick() {
-        val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
+        val collided = positionsManager.moveAll()?.toTypedArray()
+        val deds = damageManager.processCollisions(collided)
+//        visibilityManager.check(collided)
 
         for(team in damageManager.upScore){
             teamsManager.addScore(team, 10.0)
@@ -129,8 +131,7 @@ class Engine {
 
     fun getEntities(player: Player): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return positionsManager.getEntities()
-//        return visibilityManager.visible(player)
+        return positionsManager.getVisibleEntities(player)
     }
 
     fun setAngle(entity: Entity, angle: Double) {

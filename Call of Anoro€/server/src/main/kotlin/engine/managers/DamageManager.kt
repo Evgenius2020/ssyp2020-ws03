@@ -44,22 +44,20 @@ class DamageManager : BaseManager<DamageManagerData>() {
         val arrDead = mutableListOf<Player>()
         if (arr != null) {
             for ((ent1, ent2) in arr) {
-                if ((ent1 !is Object) && (ent2 !is Object)) {
-                    if (friendlyFire == true) {
-                        if ((ent1 is Bullet) && (ent2 is Player)) {
-                            makeDMG(ent2, ent1)
-                        }
-                        if ((ent1 is Player) && (ent2 is Bullet)) {
-                            makeDMG(ent1, ent2)
-                        }
+                if (friendlyFire == true) {
+                    if ((ent1 is Bullet) && (ent2 is Player)) {
+                        makeDMG(ent2, ent1)
                     }
-                    if (friendlyFire == false) {
-                        if ((ent1 is Bullet) && (ent2 is Player) && (ent1.team != ent2.team)) {
-                            makeDMG(ent2, ent1)
-                        }
-                        if ((ent1 is Player) && (ent2 is Bullet) && (ent1.team != ent2.team)) {
-                            makeDMG(ent1, ent2)
-                        }
+                    if ((ent1 is Player) && (ent2 is Bullet)) {
+                        makeDMG(ent1, ent2)
+                    }
+                }
+                if (friendlyFire == false) {
+                    if ((ent1 is Bullet) && (ent2 is Player) && (ent1.team != ent2.team)) {
+                        makeDMG(ent2, ent1)
+                    }
+                    if ((ent1 is Player) && (ent2 is Bullet) && (ent1.team != ent2.team)) {
+                        makeDMG(ent1, ent2)
                     }
                 }
             }
