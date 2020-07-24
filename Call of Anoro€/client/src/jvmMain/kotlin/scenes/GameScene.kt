@@ -248,6 +248,22 @@ class GameScene(val nick: String) : Scene() {
                     removeChild(statistics)
                 }
             }
+
+            if (map.endGameTimer == 0)
+            {
+                statistics.visible = true
+                addChild(statistics)
+                var tmp = map.endGameTimer
+                while (tmp == 0)
+                {
+                    output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
+                    val tmpResponse = input.readUTF8Line()!!
+                    val tmpMap = deserialize(tmpResponse) as RenderInfo
+                    tmp = tmpMap.endGameTimer
+                }
+                statistics.visible = false
+                removeChild(statistics)
+            }
         }
     }
 }
