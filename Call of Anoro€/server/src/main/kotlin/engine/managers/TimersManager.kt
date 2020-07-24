@@ -15,6 +15,7 @@ data class TimersManagerData(
 
 class TimersManager : BaseManager<TimersManagerData>() {
     private var gameTime = Configuration.gameTime
+    private var stopTime = 0
 
     fun register(entity: Entity) {
         super.register(entity, TimersManagerData())
@@ -35,6 +36,7 @@ class TimersManager : BaseManager<TimersManagerData>() {
             if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0)
             entitiesData[entity]!!.respawnTime--
             gameTime--
+            stopTime--
         }
     }
 
@@ -43,7 +45,7 @@ class TimersManager : BaseManager<TimersManagerData>() {
     }
 
     fun checkCooldownTimer(player: Player) = when {
-        entitiesData[player]!!.cooldown < 0 && player.isDead == 0 -> true
+        entitiesData[player]!!.cooldown < 0 && !player.isDead -> true
         else -> false
     }
 
@@ -53,10 +55,7 @@ class TimersManager : BaseManager<TimersManagerData>() {
         entitiesData[player]!!.cooldown = Configuration.shootCD
     }
 
-    fun checkRespawn(player: Player) = when{
-            entitiesData[player]!!.respawnTime < 0 -> true
-            else -> false
-    }
+    fun checkRespawn(player: Player) = (entitiesData[player]!!.respawnTime <= 0)
 
     fun getGameTimer() = when {
         gameTime < 0.0 -> 0
@@ -66,6 +65,26 @@ class TimersManager : BaseManager<TimersManagerData>() {
     fun haveDead(player: Player) {
         entitiesData[player]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size *
                 ++entitiesData[player]!!.deaths
-        entitiesData[player]!!.respawnTime = min(30, entitiesData[player]!!.respawnTime)
+        entitiesData[player]!!.respawnTime = min(30 * Configuration.fps, entitiesData[player]!!.respawnTime)
+    }
+
+    fun getRespawnTimer(p: Player): Int {
+        return entitiesData[p]!!.respawnTime
+    }
+
+    fun checkStop(): Boolean {
+        return (stopTime <= 0)
+    }
+
+    fun resetStop() {
+        stopTime = Configuration.stopTime
+    }
+
+    fun resetGameTimer() {
+        gameTime = Configuration.gameTime
+    }
+
+    fun getStopTimer(): Int {
+        return stopTime
     }
 }

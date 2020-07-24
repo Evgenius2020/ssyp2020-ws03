@@ -1,15 +1,16 @@
 package client.scenes
 
+import Statistic
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
-import com.soywiz.korge.input.mouse
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.tiled.TiledMapView
 import com.soywiz.korge.tiled.readTiledMap
 import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
+import com.soywiz.korim.color.RGBA
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
 import com.soywiz.korma.geom.Angle
@@ -30,7 +31,7 @@ import java.net.InetSocketAddress
 import kotlin.math.max
 import kotlin.math.min
 
-class GameScene : Scene() {
+class GameScene(val nick: String) : Scene() {
 
     private lateinit var boomAnimation: SpriteAnimation
     private lateinit var gameTimer: Text
@@ -40,12 +41,17 @@ class GameScene : Scene() {
     private lateinit var output: ByteWriteChannel
     private lateinit var tiledMap: TiledMapView
     private lateinit var graphicsMap: MutableMap<Int, List<View>>
+    private lateinit var statisticCenter: View
+    private var statistics: Triple<View, MutableList<View>, MutableList<View>>? = null
+    private var respawnTimer: Pair<View, View>? = null
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
         socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         input = socket.openReadChannel()
         output = socket.openWriteChannel(autoFlush = true)
+
+        output.writeStringUtf8(serialize(Register(nick)) + '\n')
 
         boomAnimation = SpriteAnimation(
                 spriteMap = resourcesVfs["BOOM.png"].readBitmap(),
@@ -59,12 +65,15 @@ class GameScene : Scene() {
         addChild(tiledMap)
 
         val gameTimerAligner = solidRect(1, 1, Colors.BLACK).xy(width, 0.0)
-        gameTimer = text("", 20.0).alignTopToTopOf(gameTimerAligner)
-        gameTimer.addUpdater {
-            alignRightToRightOf(gameTimerAligner)
+        gameTimer = text("", 20.0) {
+            filtering = false
+            addUpdater {
+                alignRightToRightOf(gameTimerAligner)
+            }
         }
 
         fpsText = text("", 20.0) {
+            filtering = false
             position(0.0, 0.0)
             addUpdater {
                 text = (1000 / it.milliseconds).toInt().toString()
@@ -77,6 +86,12 @@ class GameScene : Scene() {
 
         views.root.onClick {
             output.writeStringUtf8(serialize(Shoot) + '\n')
+        }
+
+        statisticCenter = solidRect(1, views.virtualHeight, RGBA(0, 0, 0, 0)) {
+            addUpdater {
+                position(views.virtualWidth / 2, views.virtualHeight / 2)
+            }
         }
 
     }
@@ -113,6 +128,44 @@ class GameScene : Scene() {
                 if (i.id in graphicsMap) {
                     when (i) {
                         is Player -> {
+                            if (i.isDead)
+                                graphicsMap[i.id]!![0].tint = Colors.RED
+                            else
+                                graphicsMap[i.id]!![0].tint = Colors.WHITE
+
+                            if (map.isDead) {
+                                if (respawnTimer == null)
+                                {
+                                    val deadSquare = solidRect(views.virtualWidth, views.virtualHeight, RGBA(0, 0, 0, 100)) {
+                                        addUpdater {
+                                            this.width = views.virtualWidth.toDouble()
+                                            this.height = views.virtualHeight.toDouble()
+                                        }
+                                    }
+                                    val deadText = text(map.respawnTimer.toString(), 40.0) {
+                                        filtering = false
+                                        addUpdater {
+                                            position( views.virtualWidth / 2 - this.width / 2, views.virtualHeight / 2 - 20.0)
+                                        }
+                                    }
+
+                                    respawnTimer = Pair(deadSquare, deadText)
+
+                                }
+                                else
+                                    respawnTimer!!.second.setText(map.respawnTimer.toString())
+                            }
+                            else
+                            {
+                                if (respawnTimer != null)
+                                {
+                                    removeChild(respawnTimer!!.first)
+                                    removeChild(respawnTimer!!.second)
+                                    respawnTimer = null
+                                }
+                            }
+                                views.root.tint = Colors.WHITE
+
                             graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
                             graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 50)
                             graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 50)
@@ -145,8 +198,8 @@ class GameScene : Scene() {
                         }
                         is Player -> {
                             val player = image(resourcesVfs["team${map.teamsMap[i.team]}.png"].readBitmap()).anchor(0.3, 0.5).xy(i.x, i.y).rotation(Angle(i.angle))
-                            val healthbarD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 50)
-                            val healthbarT = solidRect(30, 5, Colors.RED).xy(i.x - 16, i.y - 50)
+                            val healthbarD = solidRect(30, 5, RGBA(45, 52, 54, 255)).xy(i.x - 16, i.y - 50)
+                            val healthbarT = solidRect(30, 5, RGBA(214, 48, 49, 255)).xy(i.x - 16, i.y - 50)
 
                             val nick = text(i.nick, 10.0, color = Colors.BLACK).centerOn(healthbarD)
 
@@ -155,8 +208,8 @@ class GameScene : Scene() {
                             player.width = 40.0
 
                             if (map.pId == i.id) {
-                                val cooldownD = solidRect(30, 5, Colors.DARKGRAY).xy(i.x - 16, i.y - 45)
-                                val cooldownT = solidRect(30, 5, Colors.LIGHTGRAY).xy(i.x - 16, i.y - 45)
+                                val cooldownD = solidRect(30, 5, RGBA(45, 52, 54, 255)).xy(i.x - 16, i.y - 45)
+                                val cooldownT = solidRect(30, 5, RGBA(178, 190, 195, 252)).xy(i.x - 16, i.y - 45)
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick, cooldownD, cooldownT)
                             } else
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick)
@@ -184,7 +237,8 @@ class GameScene : Scene() {
             val y = (-inputWASD[Key.W].toInt()) + (inputWASD[Key.S].toInt())
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
 
-            // Shoot
+            output.writeStringUtf8(serialize(GetStatistic) + '\n')
+            val stats = deserialize(input.readUTF8Line()!!) as Statistic
         }
     }
 }

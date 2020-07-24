@@ -22,9 +22,9 @@ class Engine {
 //    val visibilityManager = VisibilityManager()
     val listOfPlayers = mutableMapOf<Int, Player>()
 
+    var isStopped = false
 
     val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
-
 
     init {
         for (i in map.layers.indices) {
@@ -36,6 +36,31 @@ class Engine {
                             println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
                         }
                     }
+                }
+            }
+        }
+    }
+
+    fun restart(){
+        timersManager.resetGameTimer()
+        isStopped = false
+        for(ent in positionsManager.getEntities()){
+            teamsManager.clear()
+            when(ent){
+                is Bullet ->{
+                    positionsManager.removeEntity(ent)
+                    damageManager.remove(ent)
+                }
+                is Player ->{
+                    ent.kills = 0
+                    ent.deaths = 0
+
+                    ent.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.width - Configuration.radiusOfPlayer)
+                    ent.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.height - Configuration.radiusOfPlayer)
+                    ent.oldX = 0.0
+                    ent.oldY = 0.0
                 }
             }
         }
@@ -77,12 +102,32 @@ class Engine {
         timersManager.remove(player)
 //        visibilityManager.remove(player)
         teamsManager.removePlayer(player)
+        deadPlayers.remove(player)
+    }
+
+    fun respawnPlayer(player: Player){
+        player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.width - Configuration.radiusOfPlayer)
+        player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.height - Configuration.radiusOfPlayer)
+        player.oldX = 0.0
+        player.oldY = 0.0
+        player.isDead = false
+        player.health = Configuration.healthOfPlayer
+        println("trying to respawn")
     }
 
     fun tick() {
-        val collided = positionsManager.moveAll()?.toTypedArray()
-        val deds = damageManager.processCollisions(collided)
+//        val collided = positionsManager.moveAll()?.toTypedArray()
 //        visibilityManager.check(collided)
+        timersManager.tick()
+        if(isStopped){
+            if(timersManager.checkStop()){
+                restart()
+            }
+            return
+        }
+        val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
 
         for(team in damageManager.upScore){
             teamsManager.addScore(team, 10.0)
@@ -95,7 +140,7 @@ class Engine {
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
-                player.isDead = 1
+                player.isDead = true
                 timersManager.haveDead(player)
             }
         }
@@ -105,17 +150,9 @@ class Engine {
                 timersManager.remove(ent)
             }
         }
-        timersManager.tick()
         for (player in deadPlayers) {
             if (timersManager.checkRespawn(player)) {
-                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.width - Configuration.radiusOfPlayer)
-                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.height - Configuration.radiusOfPlayer)
-                player.oldX = 0.0
-                player.oldY = 0.0
-                player.isDead = 0
-                player.health = Configuration.healthOfPlayer
+                respawnPlayer(player)
             }
         }
         for (player in listOfPlayers.values) {
@@ -125,7 +162,12 @@ class Engine {
                 player.y = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.height - Configuration.radiusOfPlayer)
             }
-            if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
+            if (!player.isDead && player in deadPlayers) deadPlayers.remove(player)
+        }
+
+        if(timersManager.getGameTimer() <= 0){
+            isStopped = true
+            timersManager.resetStop()
         }
     }
 
@@ -163,5 +205,13 @@ class Engine {
 
     fun getEndGameTime(): Int {
         return timersManager.getGameTimer()
+    }
+
+    fun getRespawnTimer(p: Player): Int {
+        return timersManager.getRespawnTimer(p)
+    }
+
+    fun getStopTimer(): Int {
+        return timersManager.getStopTimer()
     }
 }
