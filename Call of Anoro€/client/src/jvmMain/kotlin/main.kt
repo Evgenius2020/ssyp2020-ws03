@@ -27,7 +27,7 @@ object MainModule : Module() {
 
     override suspend fun AsyncInjector.configure() {
         mapPrototype { MainScene() }
-        mapPrototype { GameScene() }
-        mapPrototype { LoadingProxyScene(get()) }
+        mapPrototype { GameScene(get()) }
+        mapPrototype { LoadingProxyScene(get(), get()) }
     }
 }
