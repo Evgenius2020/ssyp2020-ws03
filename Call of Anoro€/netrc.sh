@@ -10,6 +10,8 @@ EOM
 
 cd server/build/libs
 git init
+git config --global user.email "nope@nope.com"
+git config --global user.name "nope"
 heroku git:remote -a call-of-anoroc
 git add -A
 git commit -a -m "oh shit i am sorry"
