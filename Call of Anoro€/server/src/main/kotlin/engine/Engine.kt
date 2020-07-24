@@ -127,10 +127,12 @@ class Engine {
         for(team in damageManager.upScore){
             teamsManager.addScore(team, 10.0)
         }
+        damageManager.upScore.clear()
 
         for(team in damageManager.downScore){
             teamsManager.addScore(team, -100.0)
         }
+        damageManager.downScore.clear()
 
         if (deds != null) {
             for (player in deds) {
