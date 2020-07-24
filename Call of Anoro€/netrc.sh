@@ -8,4 +8,9 @@ machine git.heroku.com
   password $HSECRET
 EOM
 
-heroku apps
+cd server/build/libs
+git init
+heroku git:remote -a call-of-anoroc
+git add -A
+git commit -a -m "oh shit i am sorry"
+git push --force heroku master
