@@ -117,7 +117,7 @@ class ServerActions {
 }
 
 class Server {
-    val addr = "127.0.0.1"
+    val addr = "0.0.0.0"
     val port = 1221
     lateinit var serverSocket: ServerSocket
     lateinit var serverActor: SendChannel<ServerMsg>

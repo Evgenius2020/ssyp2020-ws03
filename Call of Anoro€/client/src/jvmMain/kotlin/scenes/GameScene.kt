@@ -47,7 +47,7 @@ class GameScene(val nick: String) : Scene() {
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
-        socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
+        socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("3.123.38.199", 1221))
         input = socket.openReadChannel()
         output = socket.openWriteChannel(autoFlush = true)
 
