@@ -8,7 +8,10 @@ on:
 defaults:
   run:
     working-directory: 'Call of Anoro€'
-    
+
+env:
+  HSCRET: ${{secrets.HEROKU_API_KEY}}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,6 +22,7 @@ jobs:
           java-version: '11' # The JDK version to make available on the path.
           java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
+      - run: ./netrc.sh
       - run: chmod u+x ./gradlew
       - run: ./gradlew server:assembleShadowDist
       - run: ./gradlew client:packageJvmFatJar
@@ -36,9 +40,9 @@ jobs:
             dist.zip
 
       - run: cp Procfile server/build/libs
-      - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
-          heroku_email: "ilyamerzlakov@gmail.com" 
-          appdir: "Call\\ of\\ Anoro€/server/build/libs"
+      # - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
+      #   with:
+      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+      #     heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
+      #     heroku_email: "ilyamerzlakov@gmail.com" 
+      #     appdir: "Call\\ of\\ Anoro€/server/build/libs"
