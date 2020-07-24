@@ -12,6 +12,7 @@ import com.soywiz.korge.view.*
 import com.soywiz.korim.color.Colors
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
+import kotlin.random.Random
 
 class MainScene : Scene() {
     private lateinit var bg: View
@@ -95,7 +96,7 @@ class MainScene : Scene() {
                             mouseEnabled = false
                             scale -= 0.5
                             if (nick == "")
-                                sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), "Unknown", time = .5.seconds)
+                                sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), "Unknown${Random.nextInt(1000)}", time = .5.seconds)
                             else
                                 sceneContainer.changeTo<LoadingProxyScene>(LoadingProxyScene.NextScreen(GameScene::class), nick, time = .5.seconds)
                         }
