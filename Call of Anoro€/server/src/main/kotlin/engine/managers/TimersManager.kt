@@ -33,11 +33,12 @@ class TimersManager : BaseManager<TimersManagerData>() {
             if((entity is BOOM) && (!checkBoomTimer(entity))){
                 entitiesData[entity]!!.boomDuration--
             }
-            if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0)
-            entitiesData[entity]!!.respawnTime--
-            gameTime--
-            stopTime--
+            if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0) {
+                entitiesData[entity]!!.respawnTime--
+            }
         }
+        gameTime--
+        stopTime--
     }
 
     fun getShootCooldown(player: Player): Double {
