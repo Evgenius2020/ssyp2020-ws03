@@ -67,7 +67,7 @@ data class Player(
         val nick: String,
         var health: Int
 ) : Moveable() {
-    var isDead = 0
+    var isDead = false
     var team = -1
     var oldX = 0.0
     var oldY = 0.0

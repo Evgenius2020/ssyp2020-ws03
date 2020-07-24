@@ -1,9 +1,6 @@
 package engine
 
-import engine.managers.DamageManager
-import engine.managers.PositionsManager
-import engine.managers.TeamsManager
-import engine.managers.TimersManager
+import engine.managers.*
 import org.mapeditor.core.TileLayer
 import org.mapeditor.io.TMXMapReader
 import shared.BOOM
@@ -22,6 +19,7 @@ class Engine {
     val timersManager = TimersManager()
     val damageManager = DamageManager()
     val teamsManager = TeamsManager()
+//    val visibilityManager = VisibilityManager()
     val listOfPlayers = mutableMapOf<Int, Player>()
 
 
@@ -52,6 +50,7 @@ class Engine {
         timersManager.register(player)
         damageManager.register(player, player.team)
         teamsManager.register(player)
+//        visibilityManager.register(player)
         println("player: ${player.x} ${player.y}")
         return player
     }
@@ -61,6 +60,7 @@ class Engine {
         entity.x = x
         entity.y = y
         positionsManager.register(entity)
+//        visibilityManager.register(entity)
     }
 
     fun removePlayer(player: Player) {
@@ -75,7 +75,20 @@ class Engine {
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
+//        visibilityManager.remove(player)
         teamsManager.removePlayer(player)
+    }
+
+    fun respawnPlayer(player: Player){
+        player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.width - Configuration.radiusOfPlayer)
+        player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.height - Configuration.radiusOfPlayer)
+        player.oldX = 0.0
+        player.oldY = 0.0
+        player.isDead = false
+        player.health = Configuration.healthOfPlayer
+        println("trying to respawn")
     }
 
     fun tick() {
@@ -92,7 +105,7 @@ class Engine {
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
-                player.isDead = 1
+                player.isDead = true
                 timersManager.haveDead(player)
             }
         }
@@ -105,14 +118,7 @@ class Engine {
         timersManager.tick()
         for (player in deadPlayers) {
             if (timersManager.checkRespawn(player)) {
-                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.width - Configuration.radiusOfPlayer)
-                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.height - Configuration.radiusOfPlayer)
-                player.oldX = 0.0
-                player.oldY = 0.0
-                player.isDead = 0
-                player.health = Configuration.healthOfPlayer
+                respawnPlayer(player)
             }
         }
         for (player in listOfPlayers.values) {
@@ -122,13 +128,14 @@ class Engine {
                 player.y = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.height - Configuration.radiusOfPlayer)
             }
-            if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
+            if (!player.isDead && player in deadPlayers) deadPlayers.remove(player)
         }
     }
 
-    fun getEntities(player: Entity): Array<Entity> {
+    fun getEntities(player: Player): Array<Entity> {
         // All visible entities (based on VisibilityManager)
         return positionsManager.getEntities()
+//        return visibilityManager.visible(player)
     }
 
     fun setAngle(entity: Entity, angle: Double) {
@@ -146,6 +153,7 @@ class Engine {
             positionsManager.register(bullet)
             timersManager.haveShooted(player)
             damageManager.register(bullet, bullet.team)
+//            visibilityManager.register(bullet)
         }
     }
 
@@ -159,5 +167,9 @@ class Engine {
 
     fun getEndGameTime(): Int {
         return timersManager.getGameTimer()
+    }
+
+    fun getRespawnTimer(p: Player): Int {
+        return timersManager.getRespawnTimer(p)
     }
 }
