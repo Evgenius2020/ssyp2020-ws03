@@ -30,7 +30,7 @@ import java.net.InetSocketAddress
 import kotlin.math.max
 import kotlin.math.min
 
-class GameScene : Scene() {
+class GameScene(val nick : String) : Scene() {
 
     private lateinit var boomAnimation: SpriteAnimation
     private lateinit var gameTimer: Text
@@ -43,6 +43,7 @@ class GameScene : Scene() {
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
+        println(nick)
         socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         input = socket.openReadChannel()
         output = socket.openWriteChannel(autoFlush = true)
