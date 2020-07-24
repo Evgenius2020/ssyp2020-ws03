@@ -65,4 +65,8 @@ class TimersManager : BaseManager<TimersManagerData>() {
                 ++entitiesData[player]!!.deaths
         entitiesData[player]!!.respawnTime = min(30 * Configuration.fps, entitiesData[player]!!.respawnTime)
     }
+
+    fun getRespawnTimer(p: Player): Int {
+        return entitiesData[p]!!.respawnTime
+    }
 }

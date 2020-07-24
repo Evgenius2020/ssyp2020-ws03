@@ -65,9 +65,9 @@ class ServerActions {
             }
         }
         val cooldown = eng.getShootCooldown(p)
-        val endGame = eng.getEndGameTime()
-        val pId = p.id
-        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, pId))
+        val respawn = eng.getRespawnTimer(p) / Configuration.fps
+        val endGame = eng.getEndGameTime() / Configuration.fps
+        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, respawn, p.isDead, p.id))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {

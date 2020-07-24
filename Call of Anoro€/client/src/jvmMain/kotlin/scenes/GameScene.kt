@@ -40,6 +40,7 @@ class GameScene(val nick: String) : Scene() {
     private lateinit var output: ByteWriteChannel
     private lateinit var tiledMap: TiledMapView
     private lateinit var graphicsMap: MutableMap<Int, List<View>>
+    private lateinit var respawnTimer: Text
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
@@ -68,6 +69,15 @@ class GameScene(val nick: String) : Scene() {
             }
         }
 
+        val respawnTimerAligner = solidRect(1, 1, Colors.BLACK).xy(width / 2, 0.0)
+        respawnTimer = text("Alive", 20.0) {
+            filtering = false
+            addUpdater {
+                alignLeftToLeftOf(respawnTimerAligner)
+            }
+        }
+
+
         fpsText = text("", 20.0) {
             filtering = false
             position(0.0, 0.0)
@@ -83,7 +93,6 @@ class GameScene(val nick: String) : Scene() {
         views.root.onClick {
             output.writeStringUtf8(serialize(Shoot) + '\n')
         }
-
     }
 
     override suspend fun Container.sceneMain() {
@@ -95,6 +104,13 @@ class GameScene(val nick: String) : Scene() {
 
             //Update game timer
             gameTimer.text = map.endGameTimer.toString()
+
+            //Update respawn timer if need
+            if (map.isDead) {
+                respawnTimer.text = "To respawn: ${map.respawnTimer.toString()}"
+            } else {
+                respawnTimer.text = "Alive"
+            }
 
             // All existing entities
             val exist = mutableListOf<Int>()
@@ -160,6 +176,7 @@ class GameScene(val nick: String) : Scene() {
                             player.width = 40.0
 
                             if (map.pId == i.id) {
+                                //Draw cooldown
                                 val cooldownD = solidRect(30, 5, RGBA(45, 52, 54, 255)).xy(i.x - 16, i.y - 45)
                                 val cooldownT = solidRect(30, 5, RGBA(178, 190, 195, 252)).xy(i.x - 16, i.y - 45)
                                 graphicsMap[i.id] = listOf(player, healthbarD, healthbarT, nick, cooldownD, cooldownT)
