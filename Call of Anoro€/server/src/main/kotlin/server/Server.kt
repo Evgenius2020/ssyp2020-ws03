@@ -143,7 +143,6 @@ class Server {
     private fun runActor(context: CoroutineScope) {
         context.launch {
             serverActor = serverActor()
-            println("ActorStarted")
         }
     }
 
@@ -179,7 +178,6 @@ class Server {
                             communicate(input, output, p)
                         } catch (exc: Exception) {
                             serverActor.send(Disconnect(p))
-                            println("Disconnected")
                             break
                         }
                     }

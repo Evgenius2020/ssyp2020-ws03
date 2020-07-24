@@ -33,7 +33,6 @@ class Engine {
                     for (y in 0 until map.height) {
                         if ((map.layers[i] as TileLayer).getTileAt(x, y) != null) {
                             registerEntity((x * 32).toDouble() + 16.0, (y * 32).toDouble() + 16.0)
-                            println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
                         }
                     }
                 }
@@ -76,7 +75,6 @@ class Engine {
         damageManager.register(player, player.team)
         teamsManager.register(player)
 //        visibilityManager.register(player)
-        println("player: ${player.x} ${player.y}")
         return player
     }
 
@@ -95,8 +93,6 @@ class Engine {
         positionsManager.register(boom)
         timersManager.register(boom)
 
-        println("BOOM")
-
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
@@ -114,7 +110,6 @@ class Engine {
         player.oldY = 0.0
         player.isDead = false
         player.health = Configuration.healthOfPlayer
-        println("trying to respawn")
     }
 
     fun tick() {
@@ -176,8 +171,8 @@ class Engine {
         return positionsManager.getVisibleEntities(player)
     }
 
-    fun setAngle(entity: Entity, angle: Double) {
-        listOfPlayers[entity.id]!!.angle = angle
+    fun setAngle(player: Entity, angle: Double) {
+        if (player is Player && !player.isDead) listOfPlayers[player.id]!!.angle = angle
     }
 
     fun shot(player: Player) {
