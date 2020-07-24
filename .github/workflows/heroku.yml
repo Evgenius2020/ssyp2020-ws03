@@ -34,32 +34,11 @@ jobs:
           title: "Development Build"
           files: |
             dist.zip
-#       - name: Create Release
-#         id: create_release
-#         uses: actions/create-release@v1
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           tag_name: ${{ github.ref }}
-#           release_name: Release ${{ github.sha }}
-#           draft: false
-#           prerelease: false
-#       - name: Upload Release Asset
-#         id: upload-release-asset 
-#         uses: actions/upload-release-asset@v1
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         with:
-#           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-#           asset_path: ./dist.zip
-#           asset_name: dist.zip
-#           asset_content_type: application/zip
 
-
-#       - run: cp Procfile server/build/libs
-#       - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
-#         with:
-#           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-#           heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
-#           heroku_email: "ilyamerzlakov@gmail.com" 
-#           appdir: "Call\\ of\\ Anoro€/server/build/libs"
+      - run: cp Procfile server/build/libs
+      - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
+          heroku_email: "ilyamerzlakov@gmail.com" 
+          appdir: "Call\\ of\\ Anoro€/server/build/libs"
