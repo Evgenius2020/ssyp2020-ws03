@@ -38,7 +38,15 @@ jobs:
           files: |
             dist.zip
 
-      - run: cp Procfile server/build/libs
+      # - run: cp Procfile server/build/libs
+
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
       - run: ./netrc.sh
       # - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
       #   with:
