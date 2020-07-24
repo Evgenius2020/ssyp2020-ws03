@@ -104,6 +104,9 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
         for ((entity, posData) in entitiesData) {
             if(entity is Moveable){
                 if (entity is Player){
+                    if(entity.isDead){
+                        continue
+                    }
                     entity.oldX = entity.x
                     entity.oldY = entity.y
                 }
@@ -121,13 +124,13 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
                                     dist < posData.hitboxes[listOfTypes[entity1.id]!!])) && (entity !is Bullet ||
                                     entity1 !is Bullet)) {
                         when {
-                            entity1 is Player && entity is Player && entity.isDead + entity1.isDead == 0 ->
+                            entity1 is Player && entity is Player && !entity.isDead && !entity1.isDead ->
                                 listOfCol.add(Pair(entity, entity1))
-                            entity1 is Player && entity1.isDead == 0 && entity is Bullet -> {
+                            entity1 is Player && !entity1.isDead && entity is Bullet -> {
                                 toRemove.add(entity)
                                 listOfCol.add(Pair(entity, entity1))
                             }
-                            entity is Player && entity.isDead == 0 && entity1 is Bullet -> {
+                            entity is Player && !entity.isDead && entity1 is Bullet -> {
                                 toRemove.add(entity1)
                                 listOfCol.add(Pair(entity, entity1))
                             }

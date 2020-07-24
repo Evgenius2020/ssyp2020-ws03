@@ -8,7 +8,7 @@ object Configuration {
     const val speedOfPlayer = 1.0
     const val speedOfBullet = 7.0
     const val shootCD = (1.5 * fps).toInt() //seconds * fps => frames
-    const val baseRespawnTime = (0.2 * fps).toInt() //seconds * fps => frames
+    const val baseRespawnTime = (10 * fps).toInt() //seconds * fps => frames
     const val gameTime = 300 * fps //seconds * fps => frames
     const val healthOfPlayer = 100
     const val baseDamage = 34

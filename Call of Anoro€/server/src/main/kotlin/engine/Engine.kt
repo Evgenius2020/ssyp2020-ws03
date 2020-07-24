@@ -79,6 +79,18 @@ class Engine {
         teamsManager.removePlayer(player)
     }
 
+    fun respawnPlayer(player: Player){
+        player.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.width - Configuration.radiusOfPlayer)
+        player.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                Configuration.height - Configuration.radiusOfPlayer)
+        player.oldX = 0.0
+        player.oldY = 0.0
+        player.isDead = false
+        player.health = Configuration.healthOfPlayer
+        println("trying to respawn")
+    }
+
     fun tick() {
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
 
@@ -93,7 +105,7 @@ class Engine {
         if (deds != null) {
             for (player in deds) {
                 deadPlayers.add(player)
-                player.isDead = 1
+                player.isDead = true
                 timersManager.haveDead(player)
             }
         }
@@ -106,14 +118,7 @@ class Engine {
         timersManager.tick()
         for (player in deadPlayers) {
             if (timersManager.checkRespawn(player)) {
-                player.x = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.width - Configuration.radiusOfPlayer)
-                player.y = Random.nextDouble(Configuration.radiusOfPlayer,
-                        Configuration.height - Configuration.radiusOfPlayer)
-                player.oldX = 0.0
-                player.oldY = 0.0
-                player.isDead = 0
-                player.health = Configuration.healthOfPlayer
+                respawnPlayer(player)
             }
         }
         for (player in listOfPlayers.values) {
@@ -123,7 +128,7 @@ class Engine {
                 player.y = Random.nextDouble(Configuration.radiusOfPlayer,
                         Configuration.height - Configuration.radiusOfPlayer)
             }
-            if (player.isDead == 0 && player in deadPlayers) deadPlayers.remove(player)
+            if (!player.isDead && player in deadPlayers) deadPlayers.remove(player)
         }
     }
 

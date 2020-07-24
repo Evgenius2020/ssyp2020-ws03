@@ -43,7 +43,7 @@ class TimersManager : BaseManager<TimersManagerData>() {
     }
 
     fun checkCooldownTimer(player: Player) = when {
-        entitiesData[player]!!.cooldown < 0 && player.isDead == 0 -> true
+        entitiesData[player]!!.cooldown < 0 && !player.isDead -> true
         else -> false
     }
 
@@ -53,10 +53,7 @@ class TimersManager : BaseManager<TimersManagerData>() {
         entitiesData[player]!!.cooldown = Configuration.shootCD
     }
 
-    fun checkRespawn(player: Player) = when{
-            entitiesData[player]!!.respawnTime < 0 -> true
-            else -> false
-    }
+    fun checkRespawn(player: Player) = (entitiesData[player]!!.respawnTime <= 0)
 
     fun getGameTimer() = when {
         gameTime < 0.0 -> 0
@@ -66,6 +63,6 @@ class TimersManager : BaseManager<TimersManagerData>() {
     fun haveDead(player: Player) {
         entitiesData[player]!!.respawnTime = Configuration.baseRespawnTime + entitiesData.size *
                 ++entitiesData[player]!!.deaths
-        entitiesData[player]!!.respawnTime = min(30, entitiesData[player]!!.respawnTime)
+        entitiesData[player]!!.respawnTime = min(30 * Configuration.fps, entitiesData[player]!!.respawnTime)
     }
 }
