@@ -10,7 +10,7 @@ defaults:
     working-directory: 'Call of Anoro€'
 
 env:
-  HSCRET: ${{secrets.HEROKU_API_KEY}}
+  HSECRET: ${{secrets.HEROKU_API_KEY}}
 
 jobs:
   build:
