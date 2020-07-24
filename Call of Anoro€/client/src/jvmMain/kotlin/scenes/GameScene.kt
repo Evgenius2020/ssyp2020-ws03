@@ -1,6 +1,5 @@
 package client.scenes
 
-import Statistic
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
@@ -43,6 +42,7 @@ class GameScene(val nick: String) : Scene() {
     private lateinit var graphicsMap: MutableMap<Int, List<View>>
     private lateinit var statisticCenter: View
     private var statistics: Triple<View, MutableList<View>, MutableList<View>>? = null
+    private lateinit var respawnTimer: Text
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
@@ -191,96 +191,14 @@ class GameScene(val nick: String) : Scene() {
 
             output.writeStringUtf8(serialize(SetAngle(ClientServerPoint(mX, mY))) + '\n')
 
-            // Move + Statistics
+            // Move
 
-            val inputWASDTab = views.input.keys
-            val x = (inputWASDTab[Key.D].toInt()) - (inputWASDTab[Key.A].toInt())
-            val y = (-inputWASDTab[Key.W].toInt()) + (inputWASDTab[Key.S].toInt())
+            val inputWASD = views.input.keys
+            val x = (inputWASD[Key.D].toInt()) - (inputWASD[Key.A].toInt())
+            val y = (-inputWASD[Key.W].toInt()) + (inputWASD[Key.S].toInt())
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
 
-            if (inputWASDTab[Key.C]) {
-                println("TAAAAAAAAAb")
-                if (statistics == null) {
-                    //output.writeStringUtf8(serialize(GetStatistic) + '\n')
-                    //val response = input.readUTF8Line()!! as Statistic
-
-                    val blackScreen = solidRect(views.virtualWidth, views.virtualHeight, RGBA(0, 0, 0, 100)) {
-                        addUpdater {
-                            width = views.virtualWidth.toDouble()
-                            height = views.virtualHeight.toDouble()
-                        }
-                    }
-
-                    /*val team1Views = mutableListOf<View>()
-                    val team2Views = mutableListOf<View>()
-
-                    val team1ScoreView = text(team1Score.toString(), 20.0, RGBA(9, 132, 227, 255)) {
-                        addUpdater {
-                            alignRightToLeftOf(statisticCenter)
-                            this.x -= 20
-                            this.y = (views.virtualHeight / 8).toDouble()
-                        }
-                    }
-
-                    val team2ScoreView = text(team2Score.toString(), 20.0, RGBA(214, 48, 49, 255)) {
-                        addUpdater {
-                            alignLeftToRightOf(statisticCenter)
-                            this.x += 20
-                            this.y = (views.virtualHeight / 8).toDouble()
-                        }
-                    }
-
-                    team1Views.add(team1ScoreView)
-                    team2Views.add(team2ScoreView)
-
-                    val team1Members = response.teamMembers[0]
-                    val team2Members = response.teamMembers[1]
-
-                    if (team1Members != null) {
-
-                        for (i in 0..team1Members.size) {
-                            val member = text("${team1Members[i]}: ${response.nickToKills[team1Members[i]]}/${response.nickToDeaths[team1Members[i]]}", 20.0) {
-                                filtering = false
-                                addUpdater {
-                                    addUpdater {
-                                        alignRightToLeftOf(statisticCenter)
-                                        this.x -= 20
-                                        this.y = (views.virtualHeight / 8 + 30 * i).toDouble()
-                                    }
-                                }
-                            }
-                            team1Views.add(member)
-                        }
-                    }
-
-                    if (team2Members != null) {
-
-                        for (i in 0..team2Members.size) {
-                            val member = text("${team2Members[i]}: ${response.nickToKills[team2Members[i]]}/${response.nickToDeaths[team2Members[i]]}", 20.0) {
-                                filtering = false
-                                addUpdater {
-                                    addUpdater {
-                                        alignLeftToRightOf(statisticCenter)
-                                        this.x += 20
-                                        this.y = (views.virtualHeight / 8 + 30 * i).toDouble()
-                                    }
-                                }
-                            }
-                            team2Views.add(member)
-                        }
-                    }
-
-                    statistics = Triple(blackScreen, team1Views, team2Views)*/
-
-                }
-                else {
-                    /*output.writeStringUtf8(serialize(GetStatistic) + '\n')
-                    val response = input.readUTF8Line()!! as Statistic
-
-                    statistics!!.second[0].setText(response.teamScore[0].toString())
-                    statistics!!.third[0].setText(response.teamScore[1].toString())*/
-                }
-            }
+            // Shoot
         }
     }
 }

@@ -168,4 +168,8 @@ class Engine {
     fun getEndGameTime(): Int {
         return timersManager.getGameTimer()
     }
+
+    fun getRespawnTimer(p: Player): Int {
+        return timersManager.getRespawnTimer(p)
+    }
 }
