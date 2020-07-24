@@ -20,7 +20,7 @@ class DamageManager : BaseManager<DamageManagerData>() {
         entitiesData[entity]!!.team = team
     }
 
-    private fun remove(entity: Entity) {
+    fun remove(entity: Entity) {
         super.delete(entity)
     }
 

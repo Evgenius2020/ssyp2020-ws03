@@ -17,6 +17,7 @@ class TeamsManager : BaseManager<Unit>() {
         player.team = nextTeam()
         addPlayer(player.team, player.nick)
     }
+
     fun removePlayer(player: Player) {
         removePlayer(player.team, player.nick)
         super.delete(player)
@@ -32,4 +33,10 @@ class TeamsManager : BaseManager<Unit>() {
 
     fun getNames(team: Int) = teams[team].nicknames.toTypedArray()
     fun getScore(team: Int) = teams[team].score
+
+    fun clear() {
+        for(team in teams){
+            team.score = 0.0
+        }
+    }
 }
