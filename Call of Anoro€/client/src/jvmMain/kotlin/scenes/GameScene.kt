@@ -1,5 +1,6 @@
 package client.scenes
 
+import Statistic
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
