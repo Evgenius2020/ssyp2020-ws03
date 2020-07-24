@@ -154,4 +154,14 @@ class PositionsManager : BaseManager<PositionsManagerData>() {
     }
 
     fun getEntities(): Array<Entity> = entitiesData.keys.toTypedArray()
+    fun getVisibleEntities(player: Player): Array<Entity> {
+        val visibleEntities = mutableListOf<Entity>()
+        for (ent2 in entitiesData.keys) {
+            if (hypot(player.x - ent2.x, player.y - ent2.y) <
+                    Configuration.width / 1.8 || ent2 is Object) {
+                visibleEntities.add(ent2)
+            }
+        }
+        return visibleEntities.toTypedArray()
+    }
 }

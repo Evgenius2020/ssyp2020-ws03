@@ -1,10 +1,12 @@
 package client.scenes
 
 import Statistic
+import client.Statistics
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.onClick
+import com.soywiz.korge.internal.KorgeUntested
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.tiled.TiledMapView
 import com.soywiz.korge.tiled.readTiledMap
@@ -41,10 +43,10 @@ class GameScene(val nick: String) : Scene() {
     private lateinit var output: ByteWriteChannel
     private lateinit var tiledMap: TiledMapView
     private lateinit var graphicsMap: MutableMap<Int, List<View>>
-    private lateinit var statisticCenter: View
-    private var statistics: Triple<View, MutableList<View>, MutableList<View>>? = null
-    private lateinit var respawnTimer: Text
+    private lateinit var statistics: Statistics
+    private var respawnTimer: Pair<View, View>? = null
 
+    @KorgeUntested
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
         socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("3.123.38.199", 1221))
@@ -88,12 +90,9 @@ class GameScene(val nick: String) : Scene() {
             output.writeStringUtf8(serialize(Shoot) + '\n')
         }
 
-        statisticCenter = solidRect(1, views.virtualHeight, RGBA(0, 0, 0, 0)) {
-            addUpdater {
-                position(views.virtualWidth / 2, views.virtualHeight / 2)
-            }
-        }
-
+        statistics = Statistics((views.virtualWidth * 2 / 3).toDouble(), (views.virtualHeight * 2 / 3).toDouble())
+        statistics.position(views.virtualWidth / 6, views.virtualHeight / 6)
+        statistics.visible = false
     }
 
     override suspend fun Container.sceneMain() {
@@ -128,6 +127,39 @@ class GameScene(val nick: String) : Scene() {
                 if (i.id in graphicsMap) {
                     when (i) {
                         is Player -> {
+                            if (i.isDead)
+                                graphicsMap[i.id]!![0].tint = Colors.RED
+                            else
+                                graphicsMap[i.id]!![0].tint = Colors.WHITE
+
+                            if (map.isDead) {
+                                if (respawnTimer == null) {
+                                    val deadSquare = solidRect(views.virtualWidth, views.virtualHeight, RGBA(0, 0, 0, 100)) {
+                                        addUpdater {
+                                            this.width = views.virtualWidth.toDouble()
+                                            this.height = views.virtualHeight.toDouble()
+                                        }
+                                    }
+                                    val deadText = text(map.respawnTimer.toString(), 40.0) {
+                                        filtering = false
+                                        addUpdater {
+                                            position(views.virtualWidth / 2 - this.width / 2, views.virtualHeight / 2 - 20.0)
+                                        }
+                                    }
+
+                                    respawnTimer = Pair(deadSquare, deadText)
+
+                                } else
+                                    respawnTimer!!.second.setText(map.respawnTimer.toString())
+                            } else {
+                                if (respawnTimer != null) {
+                                    removeChild(respawnTimer!!.first)
+                                    removeChild(respawnTimer!!.second)
+                                    respawnTimer = null
+                                }
+                            }
+                            views.root.tint = Colors.WHITE
+
                             graphicsMap[i.id]!![0].xy(i.x, i.y).rotation(Angle(i.angle))
                             graphicsMap[i.id]!![1].xy(i.x - 16, i.y - 50)
                             graphicsMap[i.id]!![2].xy(i.x - 16, i.y - 50)
@@ -201,6 +233,37 @@ class GameScene(val nick: String) : Scene() {
 
             output.writeStringUtf8(serialize(GetStatistic) + '\n')
             val stats = deserialize(input.readUTF8Line()!!) as Statistic
+
+            statistics.setTeamScores(stats.teamScore[0]!!, stats.teamScore[1]!!)
+            statistics.updateTeamStats(stats.teamMembers, stats.nickToKills, stats.nickToDeaths)
+
+            if (views.input.keys[Key.C]) {
+                if (statistics.visible == false) {
+                    statistics.visible = true
+                    addChild(statistics)
+                }
+            } else {
+                if (statistics.visible == true) {
+                    statistics.visible = false
+                    removeChild(statistics)
+                }
+            }
+
+            if (map.endGameTimer == 0)
+            {
+                statistics.visible = true
+                addChild(statistics)
+                var tmp = map.endGameTimer
+                while (tmp == 0)
+                {
+                    output.writeStringUtf8(serialize(GetRenderInfo) + '\n')
+                    val tmpResponse = input.readUTF8Line()!!
+                    val tmpMap = deserialize(tmpResponse) as RenderInfo
+                    tmp = tmpMap.endGameTimer
+                }
+                statistics.visible = false
+                removeChild(statistics)
+            }
         }
     }
 }

@@ -67,7 +67,8 @@ class ServerActions {
         val cooldown = eng.getShootCooldown(p)
         val respawn = eng.getRespawnTimer(p) / Configuration.fps
         val endGame = eng.getEndGameTime() / Configuration.fps
-        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, respawn, p.isDead, p.id))
+        val stopTimer = eng.getStopTimer() / Configuration.fps
+        res.complete(RenderInfo(entities, imageManager.base, cooldown, endGame, stopTimer, respawn, p.isDead, p.id))
     }
 
     fun setAngle(e: Entity, point: ClientServerPoint) {
@@ -142,7 +143,6 @@ class Server {
     private fun runActor(context: CoroutineScope) {
         context.launch {
             serverActor = serverActor()
-            println("ActorStarted")
         }
     }
 
@@ -178,7 +178,6 @@ class Server {
                             communicate(input, output, p)
                         } catch (exc: Exception) {
                             serverActor.send(Disconnect(p))
-                            println("Disconnected")
                             break
                         }
                     }

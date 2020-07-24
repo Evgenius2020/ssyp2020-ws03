@@ -22,9 +22,9 @@ class Engine {
 //    val visibilityManager = VisibilityManager()
     val listOfPlayers = mutableMapOf<Int, Player>()
 
+    var isStopped = false
 
     val map = TMXMapReader().readMap(javaClass.classLoader.getResource("map.tmx"))
-
 
     init {
         for (i in map.layers.indices) {
@@ -33,9 +33,33 @@ class Engine {
                     for (y in 0 until map.height) {
                         if ((map.layers[i] as TileLayer).getTileAt(x, y) != null) {
                             registerEntity((x * 32).toDouble() + 16.0, (y * 32).toDouble() + 16.0)
-                            println("Position of entity: {${(x * 32).toDouble() + 16.0}, ${(y * 32).toDouble() + 16.0}}")
                         }
                     }
+                }
+            }
+        }
+    }
+
+    fun restart(){
+        timersManager.resetGameTimer()
+        isStopped = false
+        for(ent in positionsManager.getEntities()){
+            teamsManager.clear()
+            when(ent){
+                is Bullet ->{
+                    positionsManager.removeEntity(ent)
+                    damageManager.remove(ent)
+                }
+                is Player ->{
+                    ent.kills = 0
+                    ent.deaths = 0
+
+                    ent.x = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.width - Configuration.radiusOfPlayer)
+                    ent.y = Random.nextDouble(Configuration.radiusOfPlayer,
+                            Configuration.height - Configuration.radiusOfPlayer)
+                    ent.oldX = 0.0
+                    ent.oldY = 0.0
                 }
             }
         }
@@ -51,7 +75,6 @@ class Engine {
         damageManager.register(player, player.team)
         teamsManager.register(player)
 //        visibilityManager.register(player)
-        println("player: ${player.x} ${player.y}")
         return player
     }
 
@@ -70,13 +93,12 @@ class Engine {
         positionsManager.register(boom)
         timersManager.register(boom)
 
-        println("BOOM")
-
         listOfPlayers.remove(player.id)
         positionsManager.removeEntity(player)
         timersManager.remove(player)
 //        visibilityManager.remove(player)
         teamsManager.removePlayer(player)
+        deadPlayers.remove(player)
     }
 
     fun respawnPlayer(player: Player){
@@ -88,19 +110,29 @@ class Engine {
         player.oldY = 0.0
         player.isDead = false
         player.health = Configuration.healthOfPlayer
-        println("trying to respawn")
     }
 
     fun tick() {
+//        val collided = positionsManager.moveAll()?.toTypedArray()
+//        visibilityManager.check(collided)
+        timersManager.tick()
+        if(isStopped){
+            if(timersManager.checkStop()){
+                restart()
+            }
+            return
+        }
         val deds = damageManager.processCollisions(positionsManager.moveAll()?.toTypedArray())
 
         for(team in damageManager.upScore){
             teamsManager.addScore(team, 10.0)
         }
+        damageManager.upScore.clear()
 
         for(team in damageManager.downScore){
             teamsManager.addScore(team, -100.0)
         }
+        damageManager.downScore.clear()
 
         if (deds != null) {
             for (player in deds) {
@@ -115,7 +147,6 @@ class Engine {
                 timersManager.remove(ent)
             }
         }
-        timersManager.tick()
         for (player in deadPlayers) {
             if (timersManager.checkRespawn(player)) {
                 respawnPlayer(player)
@@ -130,16 +161,20 @@ class Engine {
             }
             if (!player.isDead && player in deadPlayers) deadPlayers.remove(player)
         }
+
+        if(timersManager.getGameTimer() <= 0){
+            isStopped = true
+            timersManager.resetStop()
+        }
     }
 
     fun getEntities(player: Player): Array<Entity> {
         // All visible entities (based on VisibilityManager)
-        return positionsManager.getEntities()
-//        return visibilityManager.visible(player)
+        return positionsManager.getVisibleEntities(player)
     }
 
-    fun setAngle(entity: Entity, angle: Double) {
-        listOfPlayers[entity.id]!!.angle = angle
+    fun setAngle(player: Entity, angle: Double) {
+        if (player is Player && !player.isDead) listOfPlayers[player.id]!!.angle = angle
     }
 
     fun shot(player: Player) {
@@ -171,5 +206,9 @@ class Engine {
 
     fun getRespawnTimer(p: Player): Int {
         return timersManager.getRespawnTimer(p)
+    }
+
+    fun getStopTimer(): Int {
+        return timersManager.getStopTimer()
     }
 }

@@ -15,6 +15,7 @@ data class TimersManagerData(
 
 class TimersManager : BaseManager<TimersManagerData>() {
     private var gameTime = Configuration.gameTime
+    private var stopTime = 0
 
     fun register(entity: Entity) {
         super.register(entity, TimersManagerData())
@@ -32,10 +33,12 @@ class TimersManager : BaseManager<TimersManagerData>() {
             if((entity is BOOM) && (!checkBoomTimer(entity))){
                 entitiesData[entity]!!.boomDuration--
             }
-            if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0)
-            entitiesData[entity]!!.respawnTime--
-            gameTime--
+            if (entity is Player && entitiesData[entity]!!.respawnTime > 0.0) {
+                entitiesData[entity]!!.respawnTime--
+            }
         }
+        gameTime--
+        stopTime--
     }
 
     fun getShootCooldown(player: Player): Double {
@@ -68,5 +71,21 @@ class TimersManager : BaseManager<TimersManagerData>() {
 
     fun getRespawnTimer(p: Player): Int {
         return entitiesData[p]!!.respawnTime
+    }
+
+    fun checkStop(): Boolean {
+        return (stopTime <= 0)
+    }
+
+    fun resetStop() {
+        stopTime = Configuration.stopTime
+    }
+
+    fun resetGameTimer() {
+        gameTime = Configuration.gameTime
+    }
+
+    fun getStopTimer(): Int {
+        return stopTime
     }
 }
