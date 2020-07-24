@@ -43,10 +43,11 @@ class GameScene(val nick : String) : Scene() {
 
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
-        println(nick)
         socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("127.0.0.1", 1221))
         input = socket.openReadChannel()
         output = socket.openWriteChannel(autoFlush = true)
+
+        output.writeStringUtf8(serialize(Register(nick)) + '\n')
 
         boomAnimation = SpriteAnimation(
                 spriteMap = resourcesVfs["BOOM.png"].readBitmap(),
@@ -60,12 +61,15 @@ class GameScene(val nick : String) : Scene() {
         addChild(tiledMap)
 
         val gameTimerAligner = solidRect(1, 1, Colors.BLACK).xy(width, 0.0)
-        gameTimer = text("", 20.0).alignTopToTopOf(gameTimerAligner)
-        gameTimer.addUpdater {
-            alignRightToRightOf(gameTimerAligner)
+        gameTimer = text("", 20.0) {
+            filtering = false
+            addUpdater {
+                alignRightToRightOf(gameTimerAligner)
+            }
         }
 
         fpsText = text("", 20.0) {
+            filtering = false
             position(0.0, 0.0)
             addUpdater {
                 text = (1000 / it.milliseconds).toInt().toString()

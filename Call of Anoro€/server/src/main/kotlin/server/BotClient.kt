@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.SendChannel
 import shared.ClientServerPoint
 import shared.Player
 import kotlin.random.Random
-
+/*
 class BotClient(val server: SendChannel<ServerMsg>) {
     suspend fun start() {
         val responsePlayer = CompletableDeferred<Player>()
@@ -30,4 +30,4 @@ class BotClient(val server: SendChannel<ServerMsg>) {
             }
         }
     }
-}
+}*/
