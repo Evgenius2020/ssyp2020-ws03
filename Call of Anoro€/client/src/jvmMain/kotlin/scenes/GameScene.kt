@@ -198,7 +198,8 @@ class GameScene(val nick: String) : Scene() {
             val y = (-inputWASD[Key.W].toInt()) + (inputWASD[Key.S].toInt())
             output.writeStringUtf8(serialize(ChangeSpeed(x, y)) + '\n')
 
-            // Shoot
+            output.writeStringUtf8(serialize(GetStatistic) + '\n')
+
         }
     }
 }
