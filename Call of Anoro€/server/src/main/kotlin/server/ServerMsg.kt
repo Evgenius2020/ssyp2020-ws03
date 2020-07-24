@@ -5,7 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import shared.*
 
 sealed class ServerMsg
-class Register(val u: CompletableDeferred<Player>): ServerMsg()
+class Register(val u: CompletableDeferred<Player>, val nick: String): ServerMsg()
 object Tick : ServerMsg()
 class GetRenderInfo(val p: Player, val res: CompletableDeferred<RenderInfo>): ServerMsg()
 class SetAngle(val e: Entity, val point: ClientServerPoint): ServerMsg()

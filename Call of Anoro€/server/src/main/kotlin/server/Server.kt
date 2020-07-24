@@ -27,7 +27,7 @@ fun CoroutineScope.serverActor() = actor<ServerMsg> {
     for (msg in channel) {
         if (!isClosedForReceive) {
             when (msg) {
-                is Register -> s.register(msg.u)
+                is Register -> s.register(msg.u, msg.nick)
                 is Tick -> s.tick()
                 is GetRenderInfo -> s.getRenderInfo(msg.p, msg.res)
                 is SetAngle -> s.setAngle(msg.e, msg.point)
@@ -49,8 +49,8 @@ class ServerActions {
         eng.setFriendlyFire(false)
     }
 
-    fun register(res: CompletableDeferred<Player>){
-        res.complete(eng.registerPlayer("pepe"))
+    fun register(res: CompletableDeferred<Player>, nick: String){
+        res.complete(eng.registerPlayer(nick))
     }
 
     fun tick(){
@@ -161,12 +161,17 @@ class Server {
                 val socket = serverSocket.accept()
 
                 launch {
-                    val futurePlayer = CompletableDeferred<Player>()
-                    serverActor.send(Register(futurePlayer))
-                    val p = futurePlayer.await()
-
                     val input = socket.openReadChannel()
                     val output = socket.openWriteChannel(autoFlush = true)
+
+                    val registerMSG = deserialize(input.readUTF8Line()!!)
+                    if(registerMSG !is shared.Register){
+                        throw Exception("First request must be shared.Register")
+                    }
+
+                    val futurePlayer = CompletableDeferred<Player>()
+                    serverActor.send(Register(futurePlayer, registerMSG.nick))
+                    val p = futurePlayer.await()
 
                     while (true) {
                         try {
@@ -194,7 +199,7 @@ class Server {
                 serverActor.send(Shoot(p))
             }
             is shared.ChangeSpeed -> serverActor.send(ChangeSpeed(p, message.x, message.y))
-            is shared.GetStatistic ->{
+            is shared.GetStatistic -> {
                 val futureStat = CompletableDeferred<Statistic>()
                 serverActor.send(GetStatistic(futureStat))
                 output.writeStringUtf8(serialize(futureStat.await()) + '\n')
