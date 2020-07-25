@@ -36,8 +36,7 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            *.jar
-        working-directoty: 'dist'
+            dist/*.jar
       - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v1
         with:
