@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+defaults:
+  run:
+    working-directory: 'Call of Anoro€'
+
+env:
+  HSECRET: ${{secrets.HEROKU_API_KEY}}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11' # The JDK version to make available on the path.
+          java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
+          architecture: x64 # (x64 or x86) - defaults to x64
+      - run: chmod u+x ./gradlew
+      - run: ./gradlew server:assembleShadowDist
+      - run: ./gradlew client:packageJvmFatJar
+      - run: mkdir ../dist
+      - run: "cp server/build/libs/* ../dist/"
+      - run: "cp client/build/libs/* ../dist/"
+      # - run: "zip --junk-paths ../dist.zip dist/*"
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            dist/*.jar
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - run: ./netrc.sh
