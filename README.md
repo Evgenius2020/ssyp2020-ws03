@@ -20,5 +20,5 @@
 * Play on global server: `java -jar client-all-4.10.1.jar`
 * Play over LAN
   1. Launch server: `java -jar server-all.jar`
-  2. Launch client: `java -jar client-all-4.10.1.jar \<server ip without port\>`
+  2. Launch client: `java -jar client-all-4.10.1.jar <server ip without port>`
  
