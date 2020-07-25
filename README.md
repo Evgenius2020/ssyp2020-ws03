@@ -13,12 +13,12 @@
 * Build from source
   1. Clone this repo
   1. Go to “Call of Anoro€” directory
-  1. Execute following commands: "./gradlew client:packageJvmFatJar" and "./gradlew server:assembleShadowDist"
-  1. Built files now in client/build/libs and server/build/libs
+  1. Execute following commands: `./gradlew client:packageJvmFatJar` and `./gradlew server:assembleShadowDist`
+  1. Built files now in `client/build/libs` and `server/build/libs`
 * Download latest version [here](https://github.com/Evgenius2020/ssyp2020-ws03/releases)
 ### Launch
-* Play on global server: java -jar client-all-4.10.1.jar
+* Play on global server: `java -jar client-all-4.10.1.jar`
 * Play over LAN
-  1. Launch server: java -jar server-all.jar
-  2. Launch client: java -jar client-all-4.10.1.jar \<server ip without port\>
+  1. Launch server: `java -jar server-all.jar`
+  2. Launch client: `java -jar client-all-4.10.1.jar \<server ip without port\>`
  
