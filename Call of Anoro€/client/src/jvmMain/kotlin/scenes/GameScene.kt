@@ -1,6 +1,7 @@
 package client.scenes
 
 import Statistic
+import client.ClientConfiguration
 import client.Statistics
 import com.soywiz.klock.seconds
 import com.soywiz.kmem.toInt
@@ -49,7 +50,7 @@ class GameScene(val nick: String) : Scene() {
     @KorgeUntested
     @KtorExperimentalAPI
     override suspend fun Container.sceneInit() {
-        socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("3.123.38.199", 1221))
+        socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress(ClientConfiguration.server, 1221))
         input = socket.openReadChannel()
         output = socket.openWriteChannel(autoFlush = true)
 

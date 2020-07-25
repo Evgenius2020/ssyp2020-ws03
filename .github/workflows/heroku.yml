@@ -25,10 +25,10 @@ jobs:
       - run: chmod u+x ./gradlew
       - run: ./gradlew server:assembleShadowDist
       - run: ./gradlew client:packageJvmFatJar
-      - run: mkdir dist
-      - run: "cp server/build/libs/* dist/"
-      - run: "cp client/build/libs/* dist/"
-      - run: "zip --junk-paths ../dist.zip dist/*"
+      - run: mkdir ../dist
+      - run: "cp server/build/libs/* ../dist/"
+      - run: "cp client/build/libs/* ../dist/"
+      # - run: "zip --junk-paths ../dist.zip dist/*"
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -36,10 +36,8 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            dist.zip
-
-      # - run: cp Procfile server/build/libs
-
+            *.jar
+        working-directoty: 'dist'
       - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -48,9 +46,3 @@ jobs:
           aws-region: eu-central-1
 
       - run: ./netrc.sh
-      # - uses: akhileshns/heroku-deploy@v3.3.6 # This is the action
-      #   with:
-      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-      #     heroku_app_name: "call-of-anoroc" #Must be unique in Heroku
-      #     heroku_email: "ilyamerzlakov@gmail.com" 
-      #     appdir: "Call\\ of\\ Anoro€/server/build/libs"

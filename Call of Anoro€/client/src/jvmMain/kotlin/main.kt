@@ -12,7 +12,12 @@ import com.soywiz.korma.geom.SizeInt
 import client.util.LoadingProxyScene
 import kotlin.reflect.KClass
 
-suspend fun main() = Korge(Korge.Config(module = MainModule))
+suspend fun main(args: Array<String>){
+    if(args.size > 0){
+        ClientConfiguration.server = args[0]
+    }
+    Korge(Korge.Config(module = MainModule))
+}
 
 object MainModule : Module() {
 
